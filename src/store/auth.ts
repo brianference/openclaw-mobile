@@ -7,6 +7,7 @@ import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as Crypto from 'expo-crypto';
+import logger from '../utils/logger';
 
 // ============================================
 // Constants
@@ -19,6 +20,10 @@ const ENCRYPTION_KEY_KEY = 'openclaw_encryption_key';
 
 // Auto-lock after 5 minutes of inactivity
 const AUTO_LOCK_MS = 5 * 60 * 1000;
+
+// Brute force protection
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 5 * 60 * 1000; // 5 minutes
 
 // ============================================
 // Crypto Utilities
@@ -69,16 +74,22 @@ interface AuthState {
   lastActivity: number;
   encryptionKey: string | null;
   
+  // Brute force protection
+  failedAttempts: number;
+  lockoutUntil: number | null;
+  
   // Actions
   initialize: () => Promise<void>;
   setupPassphrase: (passphrase: string) => Promise<boolean>;
-  verifyPassphrase: (passphrase: string) => Promise<boolean>;
+  verifyPassphrase: (passphrase: string) => Promise<{ success: boolean; error?: string }>;
   unlockWithBiometric: () => Promise<boolean>;
   enableBiometric: (enable: boolean) => Promise<void>;
   lock: () => void;
   updateActivity: () => void;
   checkAutoLock: () => void;
   getEncryptionKey: () => string | null;
+  isLockedOut: () => boolean;
+  getRemainingLockoutTime: () => number;
 }
 
 export const useAuthStore = create<AuthState>()((set, get) => ({
@@ -88,6 +99,8 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   biometricEnabled: false,
   lastActivity: Date.now(),
   encryptionKey: null,
+  failedAttempts: 0,
+  lockoutUntil: null,
   
   /**
    * Initialize auth state - check if passphrase is set up
@@ -113,7 +126,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         biometricEnabled,
       });
     } catch (error) {
-      console.error('Auth initialization error:', error);
+      logger.error('Auth initialization error:', error);
     }
   },
   
@@ -139,21 +152,56 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       
       return true;
     } catch (error) {
-      console.error('Passphrase setup error:', error);
+      logger.error('Passphrase setup error:', error);
       return false;
     }
   },
   
   /**
+   * Check if currently locked out
+   */
+  isLockedOut: () => {
+    const { lockoutUntil } = get();
+    if (!lockoutUntil) return false;
+    if (Date.now() >= lockoutUntil) {
+      // Lockout expired, reset
+      set({ lockoutUntil: null, failedAttempts: 0 });
+      return false;
+    }
+    return true;
+  },
+  
+  /**
+   * Get remaining lockout time in seconds
+   */
+  getRemainingLockoutTime: () => {
+    const { lockoutUntil } = get();
+    if (!lockoutUntil) return 0;
+    const remaining = Math.max(0, lockoutUntil - Date.now());
+    return Math.ceil(remaining / 1000);
+  },
+  
+  /**
    * Verify passphrase and unlock
+   * Includes brute force protection with lockout
    */
   verifyPassphrase: async (passphrase) => {
+    // Check lockout
+    if (get().isLockedOut()) {
+      const remaining = get().getRemainingLockoutTime();
+      const minutes = Math.ceil(remaining / 60);
+      return { 
+        success: false, 
+        error: `Too many failed attempts. Try again in ${minutes} minute${minutes > 1 ? 's' : ''}.` 
+      };
+    }
+    
     try {
       const salt = await SecureStore.getItemAsync(PASSPHRASE_SALT_KEY);
       const storedHash = await SecureStore.getItemAsync(PASSPHRASE_HASH_KEY);
       
       if (!salt || !storedHash) {
-        return false;
+        return { success: false, error: 'Passphrase not set up' };
       }
       
       const hash = await hashPassphrase(passphrase, salt);
@@ -164,14 +212,36 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
           isUnlocked: true, 
           encryptionKey,
           lastActivity: Date.now(),
+          failedAttempts: 0,
+          lockoutUntil: null,
         });
-        return true;
+        return { success: true };
       }
       
-      return false;
+      // Failed attempt - increment counter
+      const { failedAttempts } = get();
+      const newAttempts = failedAttempts + 1;
+      
+      if (newAttempts >= MAX_FAILED_ATTEMPTS) {
+        // Trigger lockout
+        set({ 
+          failedAttempts: newAttempts, 
+          lockoutUntil: Date.now() + LOCKOUT_DURATION_MS 
+        });
+        return { 
+          success: false, 
+          error: `Too many failed attempts. Locked out for 5 minutes.` 
+        };
+      }
+      
+      set({ failedAttempts: newAttempts });
+      const remaining = MAX_FAILED_ATTEMPTS - newAttempts;
+      return { 
+        success: false, 
+        error: `Incorrect passphrase. ${remaining} attempt${remaining > 1 ? 's' : ''} remaining.` 
+      };
     } catch (error) {
-      console.error('Passphrase verification error:', error);
-      return false;
+      return { success: false, error: 'Verification failed' };
     }
   },
   
@@ -205,7 +275,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       
       return false;
     } catch (error) {
-      console.error('Biometric auth error:', error);
+      logger.error('Biometric auth error:', error);
       return false;
     }
   },

@@ -89,17 +89,15 @@ export default function AuthScreen({ isSetup }: AuthScreenProps) {
     setIsLoading(true);
     
     try {
-      let success: boolean;
-      
       if (isSetup) {
-        // Verify existing passphrase
-        success = await verifyPassphrase(passphrase);
-        if (!success) {
-          setError('Incorrect passphrase');
+        // Verify existing passphrase (with lockout protection)
+        const result = await verifyPassphrase(passphrase);
+        if (!result.success) {
+          setError(result.error || 'Incorrect passphrase');
         }
       } else {
         // Setup new passphrase
-        success = await setupPassphrase(passphrase);
+        const success = await setupPassphrase(passphrase);
         if (!success) {
           setError('Failed to set up passphrase');
         }

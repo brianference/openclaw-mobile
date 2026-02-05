@@ -21,6 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useTheme } from '../../src/store/theme';
 import { SecurityCheck, SecurityCheckStatus } from '../../src/types';
+import logger from '../../src/utils/logger';
 
 // ============================================
 // Security Check Functions
@@ -322,7 +323,7 @@ export default function ScannerScreen() {
       setChecks(results);
       setLastScan(Date.now());
     } catch (error) {
-      console.error('Scan failed:', error);
+      logger.error('Scan failed:', error);
     } finally {
       setIsScanning(false);
     }

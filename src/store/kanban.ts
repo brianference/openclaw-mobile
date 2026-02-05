@@ -8,6 +8,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Crypto from 'expo-crypto';
 import { KanbanCard, KanbanColumn, KanbanState, ColumnId, Priority } from '../types';
+import logger from '../utils/logger';
 
 // ============================================
 // Constants
@@ -220,7 +221,7 @@ export const useKanbanStore = create<KanbanStore>()(
           set({ lastSync: Date.now(), isSyncing: false });
           return true;
         } catch (error) {
-          console.error('Sync from web failed:', error);
+          logger.error('Sync from web failed:', error);
           set({ isSyncing: false });
           return false;
         }
@@ -248,7 +249,7 @@ export const useKanbanStore = create<KanbanStore>()(
           set({ lastSync: Date.now(), isSyncing: false });
           return true;
         } catch (error) {
-          console.error('Sync to web failed:', error);
+          logger.error('Sync to web failed:', error);
           set({ isSyncing: false });
           return false;
         }

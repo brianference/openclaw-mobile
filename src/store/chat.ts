@@ -11,6 +11,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { Message, ChatState } from '../types';
+import logger from '../utils/logger';
 
 // ============================================
 // Secure Token Storage
@@ -129,7 +130,7 @@ export const useChatStore = create<ChatStore>()(
           const ws = new WebSocket(wsUrl);
           
           ws.onopen = () => {
-            console.log('WebSocket connected');
+            logger.log('WebSocket connected');
             set({ 
               isConnected: true, 
               error: null, 
@@ -162,7 +163,7 @@ export const useChatStore = create<ChatStore>()(
                   
                 case 'status':
                   // Connection status update
-                  console.log('Status update:', data);
+                  logger.debug('Status update:', data);
                   break;
                   
                 case 'error':
@@ -170,17 +171,17 @@ export const useChatStore = create<ChatStore>()(
                   break;
               }
             } catch (err) {
-              console.error('Failed to parse WebSocket message:', err);
+              logger.error('Failed to parse WebSocket message:', err);
             }
           };
           
           ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
+            logger.error('WebSocket error:', error);
             set({ error: 'Connection error' });
           };
           
           ws.onclose = (event) => {
-            console.log('WebSocket closed:', event.code, event.reason);
+            logger.log('WebSocket closed:', event.code, event.reason);
             set({ isConnected: false, ws: null });
             
             // Auto-reconnect with exponential backoff
@@ -198,7 +199,7 @@ export const useChatStore = create<ChatStore>()(
           
           set({ ws });
         } catch (err) {
-          console.error('Failed to create WebSocket:', err);
+          logger.error('Failed to create WebSocket:', err);
           set({ error: 'Failed to connect' });
         }
       },
@@ -249,7 +250,7 @@ export const useChatStore = create<ChatStore>()(
           get().updateMessageStatus(message.id, 'sent');
           get().setTyping(true); // Assistant will be typing
         } catch (err) {
-          console.error('Failed to send message:', err);
+          logger.error('Failed to send message:', err);
           get().updateMessageStatus(message.id, 'error');
           get().setError('Failed to send message');
         }
