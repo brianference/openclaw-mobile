@@ -96,15 +96,15 @@ export default function TabsLayout() {
         }}
       />
       
-      {/* Security Scanner Tab */}
+      {/* Device Checks Tab */}
       <Tabs.Screen
         name="scanner"
         options={{
-          title: 'Security',
+          title: 'Checks',
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="shield-checkmark" color={color} focused={focused} />
+            <TabIcon name="checkbox" color={color} focused={focused} />
           ),
-          headerTitle: 'Security Scanner',
+          headerTitle: 'Device Checks',
         }}
       />
       

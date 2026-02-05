@@ -1,6 +1,10 @@
 /**
- * OpenClaw Mobile - Security Scanner Screen
- * Device security checks, network analysis, and risk assessment
+ * OpenClaw Mobile - Device Checks Screen
+ * Basic device security checks using available Expo APIs
+ * 
+ * NOTE: This is NOT a comprehensive security scanner.
+ * It only checks what Expo APIs expose (biometrics, device security level).
+ * For full security assessment, use dedicated security tools.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -264,7 +268,10 @@ function ScoreRing({ score, colors }: ScoreRingProps) {
         <Text style={[styles.scoreMax, { color: colors.textDim }]}>/100</Text>
       </View>
       <Text style={[styles.scoreLabel, { color: getScoreColor() }]}>{getScoreLabel()}</Text>
-      <Text style={[styles.scoreSubtext, { color: colors.textDim }]}>Security Score</Text>
+      <Text style={[styles.scoreSubtext, { color: colors.textDim }]}>Basic Check Score</Text>
+      <Text style={[styles.scoreDisclaimer, { color: colors.textMuted }]}>
+        Based on {6} device checks • Not a security audit
+      </Text>
     </View>
   );
 }
@@ -367,7 +374,12 @@ export default function ScannerScreen() {
         
         {lastScan && (
           <Text style={[styles.lastScan, { color: colors.textMuted }]}>
-            Last scan: {new Date(lastScan).toLocaleTimeString()}
+            Last scan: {new Date(lastScan).toLocaleDateString([], { 
+              month: 'short', 
+              day: 'numeric', 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            })}
           </Text>
         )}
       </View>
@@ -467,6 +479,11 @@ const styles = StyleSheet.create({
   scoreSubtext: {
     fontSize: 13,
     marginTop: 4,
+  },
+  scoreDisclaimer: {
+    fontSize: 11,
+    marginTop: 8,
+    textAlign: 'center',
   },
   statsRow: {
     flexDirection: 'row',

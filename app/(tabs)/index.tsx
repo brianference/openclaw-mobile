@@ -29,6 +29,20 @@ interface MessageBubbleProps {
   colors: any;
 }
 
+/**
+ * Format timestamp for display
+ */
+function formatMessageTime(timestamp: number): string {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const isToday = date.toDateString() === now.toDateString();
+  
+  if (isToday) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  return date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
 function MessageBubble({ message, colors }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   
@@ -48,20 +62,30 @@ function MessageBubble({ message, colors }: MessageBubbleProps) {
         {message.content}
       </Text>
       
-      {/* Status indicator for user messages */}
-      {isUser && message.status && (
-        <View style={styles.statusContainer}>
-          {message.status === 'sending' && (
-            <Ionicons name="time-outline" size={12} color="#ffffff80" />
-          )}
-          {message.status === 'sent' && (
-            <Ionicons name="checkmark" size={12} color="#ffffff80" />
-          )}
-          {message.status === 'error' && (
-            <Ionicons name="alert-circle" size={12} color="#ff6b6b" />
-          )}
-        </View>
-      )}
+      {/* Timestamp and status */}
+      <View style={styles.messageFooter}>
+        <Text style={[
+          styles.messageTime,
+          { color: isUser ? '#ffffff80' : colors.textMuted }
+        ]}>
+          {formatMessageTime(message.timestamp)}
+        </Text>
+        
+        {/* Status indicator for user messages */}
+        {isUser && message.status && (
+          <View style={styles.statusContainer}>
+            {message.status === 'sending' && (
+              <Ionicons name="time-outline" size={12} color="#ffffff80" />
+            )}
+            {message.status === 'sent' && (
+              <Ionicons name="checkmark" size={12} color="#ffffff80" />
+            )}
+            {message.status === 'error' && (
+              <Ionicons name="alert-circle" size={12} color="#ff6b6b" />
+            )}
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -301,10 +325,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 22,
   },
+  messageFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginTop: 4,
+    gap: 4,
+  },
+  messageTime: {
+    fontSize: 11,
+  },
   statusContainer: {
-    position: 'absolute',
-    bottom: 4,
-    right: 8,
+    marginLeft: 2,
   },
   typingContainer: {
     flexDirection: 'row',

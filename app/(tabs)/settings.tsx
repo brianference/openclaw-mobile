@@ -85,6 +85,7 @@ export default function SettingsScreen() {
   const { gatewayUrl, gatewayToken, setGatewayConfig, isConnected, disconnect } = useChatStore();
   
   const [showGatewaySetup, setShowGatewaySetup] = useState(false);
+  const [showToken, setShowToken] = useState(false);
   const [tempUrl, setTempUrl] = useState(gatewayUrl);
   const [tempToken, setTempToken] = useState(gatewayToken);
   
@@ -213,16 +214,27 @@ export default function SettingsScreen() {
             />
             
             <Text style={[styles.inputLabel, { color: colors.textDim }]}>Gateway Token</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
-              value={tempToken}
-              onChangeText={setTempToken}
-              placeholder="Enter token"
-              placeholderTextColor={colors.textMuted}
-              autoCapitalize="none"
-              autoCorrect={false}
-              secureTextEntry
-            />
+            <View style={styles.tokenInputContainer}>
+              <TextInput
+                style={[styles.input, styles.tokenInput, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
+                value={tempToken}
+                onChangeText={setTempToken}
+                placeholder="Enter token"
+                placeholderTextColor={colors.textMuted}
+                autoCapitalize="none"
+                autoCorrect={false}
+                secureTextEntry={!showToken}
+              />
+              <TouchableOpacity 
+                style={styles.tokenToggle}
+                onPress={() => setShowToken(!showToken)}
+              >
+                <Ionicons name={showToken ? 'eye-off' : 'eye'} size={20} color={colors.textDim} />
+              </TouchableOpacity>
+            </View>
+            <Text style={[styles.tokenHint, { color: colors.textMuted }]}>
+              ⚠️ Token stored securely on device
+            </Text>
             
             <View style={styles.gatewayActions}>
               <TouchableOpacity 
@@ -436,6 +448,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
+  },
+  tokenInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  tokenInput: {
+    flex: 1,
+  },
+  tokenToggle: {
+    position: 'absolute',
+    right: 12,
+    padding: 4,
+  },
+  tokenHint: {
+    fontSize: 11,
+    marginTop: 4,
   },
   gatewayActions: {
     flexDirection: 'row',

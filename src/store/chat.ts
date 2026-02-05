@@ -1,12 +1,40 @@
 /**
  * OpenClaw Mobile - Chat Store
  * Manages chat messages and WebSocket connection to OpenClaw gateway
+ * 
+ * SECURITY: Gateway token stored in SecureStore (hardware-backed)
+ * Messages stored in AsyncStorage (not encrypted - non-sensitive)
  */
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { Message, ChatState } from '../types';
+
+// ============================================
+// Secure Token Storage
+// ============================================
+
+const GATEWAY_TOKEN_KEY = 'openclaw_gateway_token';
+const GATEWAY_URL_KEY = 'openclaw_gateway_url';
+
+/**
+ * Save gateway credentials to SecureStore
+ */
+async function saveGatewayCredentials(url: string, token: string): Promise<void> {
+  await SecureStore.setItemAsync(GATEWAY_URL_KEY, url);
+  await SecureStore.setItemAsync(GATEWAY_TOKEN_KEY, token);
+}
+
+/**
+ * Load gateway credentials from SecureStore
+ */
+async function loadGatewayCredentials(): Promise<{ url: string; token: string }> {
+  const url = await SecureStore.getItemAsync(GATEWAY_URL_KEY) || '';
+  const token = await SecureStore.getItemAsync(GATEWAY_TOKEN_KEY) || '';
+  return { url, token };
+}
 
 // ============================================
 // Message ID Generator
@@ -29,7 +57,8 @@ interface ChatStore extends ChatState {
   maxReconnectAttempts: number;
   
   // Actions
-  setGatewayConfig: (url: string, token: string) => void;
+  setGatewayConfig: (url: string, token: string) => Promise<void>;
+  loadCredentials: () => Promise<void>;
   connect: () => void;
   disconnect: () => void;
   sendMessage: (content: string) => void;
@@ -56,8 +85,18 @@ export const useChatStore = create<ChatStore>()(
       
       /**
        * Configure gateway connection
+       * Stores credentials securely in SecureStore
        */
-      setGatewayConfig: (url, token) => {
+      setGatewayConfig: async (url, token) => {
+        await saveGatewayCredentials(url, token);
+        set({ gatewayUrl: url, gatewayToken: token });
+      },
+      
+      /**
+       * Load gateway credentials from secure storage
+       */
+      loadCredentials: async () => {
+        const { url, token } = await loadGatewayCredentials();
         set({ gatewayUrl: url, gatewayToken: token });
       },
       
@@ -261,10 +300,18 @@ export const useChatStore = create<ChatStore>()(
       name: 'openclaw-chat',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
+        // Only persist messages - credentials are in SecureStore
         messages: state.messages.slice(-100), // Keep last 100 messages
-        gatewayUrl: state.gatewayUrl,
-        gatewayToken: state.gatewayToken,
       }),
+      // Load credentials from SecureStore on rehydrate
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          loadGatewayCredentials().then(({ url, token }) => {
+            state.gatewayUrl = url;
+            state.gatewayToken = token;
+          });
+        }
+      },
     }
   )
 );

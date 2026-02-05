@@ -23,26 +23,13 @@ import { VaultItem, SecretCategory } from '../../src/types';
 // Mock Vault Store (TODO: Implement full store)
 // ============================================
 
+// ⚠️ WARNING: Encryption NOT yet implemented
+// Secrets are stored locally but NOT encrypted
+// TODO: Implement AES-256-GCM encryption before production release
+const ENCRYPTION_WARNING = true;
+
 // Temporary mock data - will be replaced with real encrypted store
-const MOCK_ITEMS: VaultItem[] = [
-  {
-    id: '1',
-    name: 'GitHub Token',
-    category: 'api_key',
-    value: 'ghp_xxxx...xxxx',
-    notes: 'Personal access token with repo scope',
-    createdAt: Date.now() - 86400000,
-    updatedAt: Date.now() - 86400000,
-  },
-  {
-    id: '2',
-    name: 'Netlify Deploy',
-    category: 'api_key',
-    value: 'netlify_xxxx...xxxx',
-    createdAt: Date.now() - 172800000,
-    updatedAt: Date.now() - 172800000,
-  },
-];
+const MOCK_ITEMS: VaultItem[] = [];
 
 // ============================================
 // Category Icon Component
@@ -323,6 +310,16 @@ export default function VaultScreen() {
   
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      {/* Security Warning Banner */}
+      {ENCRYPTION_WARNING && (
+        <View style={[styles.warningBanner, { backgroundColor: colors.warning }]}>
+          <Ionicons name="warning" size={18} color="#000" />
+          <Text style={styles.warningText}>
+            ⚠️ Preview Mode — Encryption not yet implemented. Do not store real secrets.
+          </Text>
+        </View>
+      )}
+      
       {/* Search Bar */}
       <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <Ionicons name="search" size={20} color={colors.textDim} />
@@ -395,6 +392,19 @@ export default function VaultScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  warningBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    gap: 8,
+  },
+  warningText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#000',
   },
   searchContainer: {
     flexDirection: 'row',
