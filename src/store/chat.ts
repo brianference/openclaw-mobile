@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { Message, Conversation } from '../types';
 
+const FUNCTIONS_URL = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1`;
+
 interface ChatState {
   conversations: Conversation[];
   activeConversation: Conversation | null;
@@ -77,11 +79,14 @@ export const useChatStore = create<ChatState>()((set, get) => ({
   },
 
   sendMessage: async (content) => {
-    const { activeConversation } = get();
+    const { activeConversation, messages } = get();
     if (!activeConversation) return;
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
 
     const userMessage: Message = {
       id: `temp_${Date.now()}`,
@@ -114,41 +119,83 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       return;
     }
 
+    const savedUserMsg = data as Message;
     set((state) => ({
       messages: state.messages.map((m) =>
-        m.id === userMessage.id ? { ...(data as Message), status: 'sent' as const } : m
+        m.id === userMessage.id ? { ...savedUserMsg, status: 'sent' as const } : m
       ),
     }));
 
     set({ isTyping: true });
 
-    const assistantContent = generateLocalResponse(content);
+    try {
+      const chatMessages = [
+        ...messages.map((m) => ({ role: m.role, content: m.content })),
+        { role: 'user' as const, content },
+      ];
 
-    const { data: aiMsg } = await supabase
-      .from('messages')
-      .insert({
-        conversation_id: activeConversation.id,
-        user_id: user.id,
-        role: 'assistant',
-        content: assistantContent,
-      })
-      .select()
-      .maybeSingle();
+      const response = await fetch(`${FUNCTIONS_URL}/chat-completion`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+          'Apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
+        },
+        body: JSON.stringify({
+          messages: chatMessages,
+          conversationId: activeConversation.id,
+        }),
+      });
 
-    set((state) => ({
-      isTyping: false,
-      messages: aiMsg
-        ? [...state.messages, aiMsg as Message]
-        : state.messages,
-    }));
+      const result = await response.json();
 
-    await supabase
-      .from('conversations')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', activeConversation.id);
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to get response');
+      }
+
+      if (result.message) {
+        set((state) => ({
+          isTyping: false,
+          messages: [...state.messages, result.message as Message],
+        }));
+
+        await supabase
+          .from('conversations')
+          .update({ updated_at: new Date().toISOString() })
+          .eq('id', activeConversation.id);
+      } else {
+        set({ isTyping: false });
+      }
+    } catch {
+      set({ isTyping: false });
+
+      const fallbackContent = generateFallbackResponse(content);
+      const { data: fallbackMsg } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: activeConversation.id,
+          user_id: user.id,
+          role: 'assistant',
+          content: fallbackContent,
+        })
+        .select()
+        .maybeSingle();
+
+      if (fallbackMsg) {
+        set((state) => ({
+          messages: [...state.messages, fallbackMsg as Message],
+        }));
+      }
+
+      await supabase
+        .from('conversations')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', activeConversation.id);
+    }
   },
 
   deleteConversation: async (id) => {
+    await supabase.from('messages').delete().eq('conversation_id', id);
     await supabase.from('conversations').delete().eq('id', id);
     set((state) => ({
       conversations: state.conversations.filter((c) => c.id !== id),
@@ -168,16 +215,13 @@ export const useChatStore = create<ChatState>()((set, get) => ({
   },
 }));
 
-function generateLocalResponse(userMessage: string): string {
+function generateFallbackResponse(userMessage: string): string {
   const lower = userMessage.toLowerCase();
   if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
-    return "Hello! I'm your OpenClaw AI assistant. How can I help you today? I can assist with brainstorming, coding, writing, analysis, and much more.";
+    return "Hello! I'm **OpenClaw AI**. How can I help you today?\n\n*Note: Running in offline mode. Connect to the gateway for full AI capabilities.*";
   }
   if (lower.includes('help')) {
-    return "I'm here to help! You can ask me anything -- from coding questions to creative brainstorming. Try the Board tab for task management, or Brain tab for capturing ideas.";
+    return "Here's what you can do:\n\n- **Chat** tab for AI conversations\n- **Board** for kanban task management\n- **Brain** for notes and brainstorming\n- **Vault** for secure storage\n\n*Running in offline mode.*";
   }
-  if (lower.includes('code') || lower.includes('programming')) {
-    return "I'd be happy to help with coding! Share your code or describe what you're trying to build, and I'll provide guidance, examples, or debug assistance.";
-  }
-  return `Thanks for your message! I've processed your request: "${userMessage.slice(0, 50)}${userMessage.length > 50 ? '...' : ''}"\n\nThis is a local demo response. Connect to an OpenClaw gateway in Settings for full AI capabilities including GPT-4, Claude, and other models.`;
+  return `I received: *"${userMessage.slice(0, 60)}${userMessage.length > 60 ? '...' : ''}"*\n\n*Running in offline mode. The Edge Function may be unavailable. Check your connection and try again.*`;
 }

@@ -9,9 +9,15 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Alert,
+  RefreshControl,
 } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming, withDelay, withSequence } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
+import Markdown from 'react-native-markdown-display';
 import { useChatStore } from '../../src/store/chat';
+import { useAuthStore } from '../../src/store/auth';
 import { useTheme, Theme } from '../../src/store/theme';
 import { Message } from '../../src/types';
 
@@ -26,6 +32,37 @@ function formatTime(dateStr: string): string {
 
 function MessageBubble({ message, colors }: { message: Message; colors: Theme }) {
   const isUser = message.role === 'user';
+  const mdStyles = {
+    body: { color: isUser ? '#fff' : colors.text, fontSize: 15, lineHeight: 22 },
+    strong: { fontWeight: '700' as const },
+    em: { fontStyle: 'italic' as const },
+    code_inline: {
+      backgroundColor: isUser ? 'rgba(255,255,255,0.15)' : colors.surface2,
+      color: isUser ? '#fff' : colors.primaryLight,
+      paddingHorizontal: 5,
+      paddingVertical: 1,
+      borderRadius: 4,
+      fontSize: 13,
+      fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    },
+    fence: {
+      backgroundColor: isUser ? 'rgba(0,0,0,0.2)' : colors.bg,
+      borderRadius: 8,
+      padding: 12,
+      marginVertical: 6,
+    },
+    code_block: {
+      color: isUser ? '#e2e8f0' : colors.text,
+      fontSize: 13,
+      fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    },
+    bullet_list: { marginVertical: 4 },
+    ordered_list: { marginVertical: 4 },
+    list_item: { marginVertical: 2 },
+    paragraph: { marginVertical: 2 },
+    link: { color: isUser ? '#93c5fd' : colors.accent },
+  };
+
   return (
     <View style={[
       styles.bubble,
@@ -38,9 +75,11 @@ function MessageBubble({ message, colors }: { message: Message; colors: Theme })
         </View>
       )}
       <View style={styles.bubbleContent}>
-        <Text style={[styles.messageText, { color: isUser ? '#fff' : colors.text }]}>
-          {message.content}
-        </Text>
+        {isUser ? (
+          <Text style={[styles.messageText, { color: '#fff' }]}>{message.content}</Text>
+        ) : (
+          <Markdown style={mdStyles}>{message.content}</Markdown>
+        )}
         <View style={styles.messageFooter}>
           <Text style={[styles.timeText, { color: isUser ? 'rgba(255,255,255,0.6)' : colors.textMuted }]}>
             {formatTime(message.created_at)}
@@ -54,6 +93,25 @@ function MessageBubble({ message, colors }: { message: Message; colors: Theme })
   );
 }
 
+function AnimatedDot({ delay, color }: { delay: number; color: string }) {
+  const opacity = useSharedValue(0.3);
+  useEffect(() => {
+    opacity.value = withDelay(
+      delay,
+      withRepeat(
+        withSequence(
+          withTiming(1, { duration: 400 }),
+          withTiming(0.3, { duration: 400 })
+        ),
+        -1,
+        false
+      )
+    );
+  }, []);
+  const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  return <Animated.View style={[styles.dot, { backgroundColor: color }, style]} />;
+}
+
 function TypingDots({ colors }: { colors: Theme }) {
   return (
     <View style={[styles.bubble, styles.bubbleAssistant, { backgroundColor: colors.surface }]}>
@@ -61,9 +119,9 @@ function TypingDots({ colors }: { colors: Theme }) {
         <Ionicons name="flash" size={12} color={colors.primary} />
       </View>
       <View style={styles.dotsWrap}>
-        {[0.6, 0.4, 0.2].map((opacity, i) => (
-          <View key={i} style={[styles.dot, { backgroundColor: colors.textMuted, opacity }]} />
-        ))}
+        <AnimatedDot delay={0} color={colors.textMuted} />
+        <AnimatedDot delay={150} color={colors.textMuted} />
+        <AnimatedDot delay={300} color={colors.textMuted} />
       </View>
     </View>
   );
@@ -73,6 +131,7 @@ export default function ChatScreen() {
   const [inputText, setInputText] = useState('');
   const listRef = useRef<FlatList>(null);
   const { colors } = useTheme();
+  const { profile, fetchProfile } = useAuthStore();
   const {
     messages,
     isTyping,
@@ -82,6 +141,7 @@ export default function ChatScreen() {
     createConversation,
     setActiveConversation,
     sendMessage,
+    deleteConversation,
     isLoading,
   } = useChatStore();
 
@@ -97,14 +157,23 @@ export default function ChatScreen() {
 
   const handleSend = async () => {
     const text = inputText.trim();
-    if (!text) return;
+    if (!text || isTyping) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setInputText('');
 
     if (!activeConversation) {
       const conv = await createConversation(text.slice(0, 40));
       if (!conv) return;
     }
-    sendMessage(text);
+    await sendMessage(text);
+    fetchProfile();
+  };
+
+  const handleDeleteConversation = (id: string, title: string) => {
+    Alert.alert('Delete Chat', `Delete "${title}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: () => deleteConversation(id) },
+    ]);
   };
 
   if (!activeConversation) {
@@ -119,6 +188,15 @@ export default function ChatScreen() {
             Your intelligent assistant for coding, writing, analysis, and brainstorming
           </Text>
 
+          {profile && (
+            <View style={[styles.creditsBanner, { backgroundColor: colors.primaryBg }]}>
+              <Ionicons name="flash" size={16} color={colors.primary} />
+              <Text style={[styles.creditsLabel, { color: colors.primary }]}>
+                {profile.credits} credits remaining
+              </Text>
+            </View>
+          )}
+
           <TouchableOpacity
             style={[styles.newChatBtn, { backgroundColor: colors.primary }]}
             onPress={() => createConversation()}
@@ -129,22 +207,33 @@ export default function ChatScreen() {
           </TouchableOpacity>
 
           {conversations.length > 0 && (
-            <View style={styles.recentSection}>
-              <Text style={[styles.recentLabel, { color: colors.textMuted }]}>RECENT</Text>
-              {conversations.slice(0, 5).map((conv) => (
+            <FlatList
+              style={styles.recentSection}
+              data={conversations.slice(0, 10)}
+              keyExtractor={(item) => item.id}
+              refreshControl={<RefreshControl refreshing={isLoading} onRefresh={fetchConversations} tintColor={colors.primary} />}
+              ListHeaderComponent={
+                <Text style={[styles.recentLabel, { color: colors.textMuted }]}>RECENT</Text>
+              }
+              renderItem={({ item: conv }) => (
                 <TouchableOpacity
-                  key={conv.id}
                   style={[styles.recentItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
                   onPress={() => setActiveConversation(conv)}
+                  onLongPress={() => handleDeleteConversation(conv.id, conv.title)}
                 >
                   <Ionicons name="chatbubble-outline" size={18} color={colors.textDim} />
-                  <Text style={[styles.recentText, { color: colors.text }]} numberOfLines={1}>
-                    {conv.title}
-                  </Text>
+                  <View style={styles.recentInfo}>
+                    <Text style={[styles.recentText, { color: colors.text }]} numberOfLines={1}>
+                      {conv.title}
+                    </Text>
+                    <Text style={[styles.recentDate, { color: colors.textMuted }]}>
+                      {new Date(conv.updated_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                    </Text>
+                  </View>
                   <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
                 </TouchableOpacity>
-              ))}
-            </View>
+              )}
+            />
           )}
         </View>
       </View>
@@ -166,7 +255,12 @@ export default function ChatScreen() {
             {activeConversation.title}
           </Text>
         </View>
-        <View style={[styles.statusDot, { backgroundColor: colors.success }]} />
+        {profile && (
+          <View style={[styles.creditsChip, { backgroundColor: colors.primaryBg }]}>
+            <Ionicons name="flash" size={12} color={colors.primary} />
+            <Text style={[styles.creditsChipText, { color: colors.primary }]}>{profile.credits}</Text>
+          </View>
+        )}
       </View>
 
       <FlatList
@@ -204,11 +298,11 @@ export default function ChatScreen() {
           maxLength={4000}
         />
         <TouchableOpacity
-          style={[styles.sendBtn, { backgroundColor: inputText.trim() ? colors.primary : colors.border }]}
+          style={[styles.sendBtn, { backgroundColor: inputText.trim() && !isTyping ? colors.primary : colors.border }]}
           onPress={handleSend}
-          disabled={!inputText.trim()}
+          disabled={!inputText.trim() || isTyping}
         >
-          <Ionicons name="arrow-up" size={20} color={inputText.trim() ? '#fff' : colors.textMuted} />
+          <Ionicons name="arrow-up" size={20} color={inputText.trim() && !isTyping ? '#fff' : colors.textMuted} />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -227,7 +321,10 @@ const styles = StyleSheet.create({
   },
   chatHeaderInfo: { flex: 1 },
   chatHeaderTitle: { fontSize: 16, fontWeight: '600' },
-  statusDot: { width: 8, height: 8, borderRadius: 4 },
+  creditsChip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, gap: 4 },
+  creditsChipText: { fontSize: 12, fontWeight: '700' },
+  creditsBanner: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, marginTop: 16 },
+  creditsLabel: { fontSize: 14, fontWeight: '600' },
   emptyCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 },
   emptyIcon: { width: 88, height: 88, borderRadius: 28, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
   emptyTitle: { fontSize: 26, fontWeight: '700', letterSpacing: -0.3 },
@@ -238,12 +335,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 14,
     borderRadius: 14,
-    marginTop: 28,
+    marginTop: 20,
     gap: 8,
   },
   newChatBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  recentSection: { width: '100%', marginTop: 36, gap: 8 },
-  recentLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 4, marginLeft: 4 },
+  recentSection: { width: '100%', marginTop: 24 },
+  recentLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 8, marginLeft: 4 },
   recentItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -251,8 +348,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     gap: 12,
+    marginBottom: 8,
   },
-  recentText: { flex: 1, fontSize: 15 },
+  recentInfo: { flex: 1 },
+  recentText: { fontSize: 15 },
+  recentDate: { fontSize: 11, marginTop: 2 },
   messagesList: { paddingHorizontal: 16, paddingVertical: 12 },
   messagesListEmpty: { flex: 1, justifyContent: 'center' },
   chatEmptyText: { fontSize: 15, marginTop: 12 },

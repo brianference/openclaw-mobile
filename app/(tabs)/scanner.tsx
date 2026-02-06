@@ -3,8 +3,10 @@ import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, TextInput, Alert, RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useBrainStore } from '../../src/store/brain';
 import { useTheme } from '../../src/store/theme';
+import { useToast } from '../../src/components/Toast';
 import { BrainNote, NoteCategory } from '../../src/types';
 
 const CATEGORIES: { id: NoteCategory | 'all'; label: string; icon: string }[] = [
@@ -153,6 +155,7 @@ function NoteModal({ visible, note, onClose, onSave, onDelete, colors }: {
 
 export default function BrainScreen() {
   const { colors } = useTheme();
+  const toast = useToast();
   const { fetchNotes, addNote, updateNote, deleteNote, togglePin, setFilterCategory, filterCategory, getFilteredNotes, isLoading, searchQuery, setSearchQuery } = useBrainStore();
   const [selected, setSelected] = useState<BrainNote | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -192,7 +195,7 @@ export default function BrainScreen() {
         {filtered.map((note) => (
           <NoteCard key={note.id} note={note} colors={colors}
             onPress={() => { setSelected(note); setShowModal(true); }}
-            onTogglePin={() => togglePin(note.id)} />
+            onTogglePin={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); togglePin(note.id); }} />
         ))}
         {filtered.length === 0 && (
           <View style={styles.emptyState}>
@@ -212,10 +215,10 @@ export default function BrainScreen() {
       <NoteModal visible={showModal} note={selected} colors={colors}
         onClose={() => setShowModal(false)}
         onSave={(data) => {
-          if (selected) updateNote(selected.id, data);
-          else addNote(data);
+          if (selected) { updateNote(selected.id, data); toast.show('Note updated', 'success'); }
+          else { addNote(data); toast.show('Note created', 'success'); }
         }}
-        onDelete={selected ? () => { deleteNote(selected.id); setShowModal(false); } : undefined} />
+        onDelete={selected ? () => { deleteNote(selected.id); setShowModal(false); toast.show('Note deleted', 'info'); } : undefined} />
     </View>
   );
 }

@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import * as SecureStore from 'expo-secure-store';
 import { useTheme } from '../../src/store/theme';
+import { useToast } from '../../src/components/Toast';
 import { VaultItem } from '../../src/types';
 
 const CATEGORIES = ['api_key', 'password', 'note', 'other'] as const;
@@ -26,17 +27,17 @@ async function saveVault(items: VaultItem[]) {
 
 export default function VaultScreen() {
   const { colors } = useTheme();
+  const toast = useToast();
   const [items, setItems] = useState<VaultItem[]>([]);
-  const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<VaultItem | null>(null);
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  if (!loaded) {
-    loadVault().then((data) => { setItems(data); setLoaded(true); });
-  }
+  useEffect(() => {
+    loadVault().then(setItems);
+  }, []);
 
   const filtered = items.filter((i) => !search || i.name.toLowerCase().includes(search.toLowerCase()));
 
@@ -52,6 +53,7 @@ export default function VaultScreen() {
     await saveVault(updated);
     setShowModal(false);
     setEditItem(null);
+    toast.show(editItem ? 'Item updated' : 'Item saved to vault', 'success');
   };
 
   const handleDelete = async (id: string) => {
@@ -60,11 +62,13 @@ export default function VaultScreen() {
     await saveVault(updated);
     setShowModal(false);
     setEditItem(null);
+    toast.show('Item removed from vault', 'info');
   };
 
   const handleCopy = async (item: VaultItem) => {
     await Clipboard.setStringAsync(item.value);
     setCopiedId(item.id);
+    toast.show('Copied to clipboard', 'success');
     setTimeout(() => setCopiedId(null), 2000);
   };
 

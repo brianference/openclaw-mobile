@@ -6,6 +6,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuthStore } from '../src/store/auth';
 import { useThemeStore, useTheme } from '../src/store/theme';
 import AuthScreen from '../src/components/AuthScreen';
+import ErrorBoundary from '../src/components/ErrorBoundary';
+import { ToastProvider } from '../src/components/Toast';
 
 export default function RootLayout() {
   const { session, isLoading, isInitialized, initialize } = useAuthStore();
@@ -33,19 +35,25 @@ export default function RootLayout() {
 
   if (!session) {
     return (
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <StatusBar style={isDark ? 'light' : 'dark'} />
-        <AuthScreen />
-      </GestureHandlerRootView>
+      <ErrorBoundary>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <StatusBar style={isDark ? 'light' : 'dark'} />
+          <AuthScreen />
+          <ToastProvider />
+        </GestureHandlerRootView>
+      </ErrorBoundary>
     );
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <StatusBar style={isDark ? 'light' : 'dark'} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+        </Stack>
+        <ToastProvider />
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }

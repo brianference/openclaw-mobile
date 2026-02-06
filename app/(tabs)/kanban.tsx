@@ -3,8 +3,10 @@ import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, TextInput, Alert, RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useKanbanStore } from '../../src/store/kanban';
 import { useTheme } from '../../src/store/theme';
+import { useToast } from '../../src/components/Toast';
 import { KanbanCard, ColumnId, Priority } from '../../src/types';
 
 const COLUMNS: { id: ColumnId; title: string; icon: string }[] = [
@@ -34,7 +36,7 @@ function CardItem({ card, columnId, colors, onPress, onMove }: {
     <TouchableOpacity
       style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
       onPress={onPress}
-      onLongPress={() => setShowMove(true)}
+      onLongPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setShowMove(true); }}
       activeOpacity={0.7}
     >
       <View style={styles.cardTop}>
@@ -145,6 +147,7 @@ function CardModal({ visible, card, onClose, onSave, onDelete, colors }: {
 
 export default function KanbanScreen() {
   const { colors } = useTheme();
+  const toast = useToast();
   const { cards, fetchCards, addCard, updateCard, moveCard, deleteCard, isLoading } = useKanbanStore();
   const [selected, setSelected] = useState<KanbanCard | null>(null);
   const [addColumn, setAddColumn] = useState<ColumnId | null>(null);
@@ -176,7 +179,7 @@ export default function KanbanScreen() {
                 {colCards.map((card) => (
                   <CardItem key={card.id} card={card} columnId={id} colors={colors}
                     onPress={() => { setSelected(card); setAddColumn(null); setShowModal(true); }}
-                    onMove={(to) => moveCard(card.id, to)} />
+                    onMove={(to) => { moveCard(card.id, to); toast.show(`Moved to ${COLUMNS.find(c => c.id === to)?.title}`, 'success'); }} />
                 ))}
                 {colCards.length === 0 && (
                   <Text style={[styles.emptyCol, { color: colors.textMuted }]}>No cards</Text>
@@ -189,10 +192,10 @@ export default function KanbanScreen() {
       <CardModal visible={showModal} card={selected} colors={colors}
         onClose={() => setShowModal(false)}
         onSave={(data) => {
-          if (selected) updateCard(selected.id, data);
-          else if (addColumn) addCard(addColumn, data);
+          if (selected) { updateCard(selected.id, data); toast.show('Card updated', 'success'); }
+          else if (addColumn) { addCard(addColumn, data); toast.show('Card created', 'success'); }
         }}
-        onDelete={selected ? () => { deleteCard(selected.id); setShowModal(false); } : undefined} />
+        onDelete={selected ? () => { deleteCard(selected.id); setShowModal(false); toast.show('Card deleted', 'info'); } : undefined} />
     </View>
   );
 }
