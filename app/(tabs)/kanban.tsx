@@ -1,128 +1,67 @@
-/**
- * OpenClaw Mobile - Kanban Board Screen
- * Drag-and-drop task management synced with web kanban
- */
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  Modal,
-  TextInput,
-  Alert,
+  View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, TextInput, Alert, RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useKanbanStore } from '../../src/store/kanban';
 import { useTheme } from '../../src/store/theme';
 import { KanbanCard, ColumnId, Priority } from '../../src/types';
 
-// ============================================
-// Priority Badge Component
-// ============================================
+const COLUMNS: { id: ColumnId; title: string; icon: string }[] = [
+  { id: 'backlog', title: 'Backlog', icon: 'albums-outline' },
+  { id: 'progress', title: 'In Progress', icon: 'play-circle-outline' },
+  { id: 'done', title: 'Done', icon: 'checkmark-circle-outline' },
+];
 
-interface PriorityBadgeProps {
-  priority: Priority;
-  colors: any;
-}
-
-function PriorityBadge({ priority, colors }: PriorityBadgeProps) {
-  const priorityColors = {
-    high: colors.priorityHigh,
-    medium: colors.priorityMedium,
-    low: colors.priorityLow,
-  };
-  
+function PriorityBadge({ priority, colors }: { priority: Priority; colors: any }) {
+  const map = { high: colors.priorityHigh, medium: colors.priorityMedium, low: colors.priorityLow };
   return (
-    <View style={[styles.priorityBadge, { backgroundColor: `${priorityColors[priority]}20` }]}>
-      <View style={[styles.priorityDot, { backgroundColor: priorityColors[priority] }]} />
-      <Text style={[styles.priorityText, { color: priorityColors[priority] }]}>
+    <View style={[styles.priorityBadge, { backgroundColor: `${map[priority]}18` }]}>
+      <View style={[styles.priorityDot, { backgroundColor: map[priority] }]} />
+      <Text style={[styles.priorityText, { color: map[priority] }]}>
         {priority.charAt(0).toUpperCase() + priority.slice(1)}
       </Text>
     </View>
   );
 }
 
-// ============================================
-// Card Component
-// ============================================
-
-interface CardProps {
-  card: KanbanCard;
-  columnId: ColumnId;
-  colors: any;
-  onPress: () => void;
-  onMove: (toColumn: ColumnId) => void;
-}
-
-function Card({ card, columnId, colors, onPress, onMove }: CardProps) {
-  const [showMoveMenu, setShowMoveMenu] = useState(false);
-  
-  const columns: ColumnId[] = ['backlog', 'progress', 'done'];
-  const otherColumns = columns.filter(c => c !== columnId);
-  
+function CardItem({ card, columnId, colors, onPress, onMove }: {
+  card: KanbanCard; columnId: ColumnId; colors: any; onPress: () => void; onMove: (to: ColumnId) => void;
+}) {
+  const [showMove, setShowMove] = useState(false);
+  const others = COLUMNS.filter((c) => c.id !== columnId);
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
       onPress={onPress}
-      onLongPress={() => setShowMoveMenu(true)}
+      onLongPress={() => setShowMove(true)}
+      activeOpacity={0.7}
     >
-      <PriorityBadge priority={card.priority} colors={colors} />
-      
-      <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>
-        {card.title}
-      </Text>
-      
-      {card.description && (
-        <Text style={[styles.cardDescription, { color: colors.textDim }]} numberOfLines={2}>
-          {card.description}
-        </Text>
-      )}
-      
-      {/* Tags */}
+      <View style={styles.cardTop}>
+        <PriorityBadge priority={card.priority} colors={colors} />
+      </View>
+      <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>{card.title}</Text>
+      {card.description ? (
+        <Text style={[styles.cardDesc, { color: colors.textDim }]} numberOfLines={2}>{card.description}</Text>
+      ) : null}
       {card.tags.length > 0 && (
-        <View style={styles.tagsContainer}>
-          {card.tags.slice(0, 3).map((tag, index) => (
-            <View 
-              key={index} 
-              style={[styles.tag, { backgroundColor: colors.tagDefault.bg }]}
-            >
-              <Text style={[styles.tagText, { color: colors.tagDefault.text }]}>
-                {tag}
-              </Text>
+        <View style={styles.tagsRow}>
+          {card.tags.slice(0, 3).map((tag, i) => (
+            <View key={i} style={[styles.tag, { backgroundColor: colors.tagDefault.bg }]}>
+              <Text style={[styles.tagText, { color: colors.tagDefault.text }]}>{tag}</Text>
             </View>
           ))}
         </View>
       )}
-      
-      {/* Move Menu Modal */}
-      <Modal
-        visible={showMoveMenu}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowMoveMenu(false)}
-      >
-        <TouchableOpacity 
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowMoveMenu(false)}
-        >
+      <Modal visible={showMove} transparent animationType="fade" onRequestClose={() => setShowMove(false)}>
+        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setShowMove(false)}>
           <View style={[styles.moveMenu, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.moveMenuTitle, { color: colors.text }]}>Move to</Text>
-            {otherColumns.map((col) => (
-              <TouchableOpacity
-                key={col}
-                style={[styles.moveMenuItem, { borderBottomColor: colors.border }]}
-                onPress={() => {
-                  onMove(col);
-                  setShowMoveMenu(false);
-                }}
-              >
-                <Text style={[styles.moveMenuItemText, { color: colors.text }]}>
-                  {col === 'backlog' ? 'Backlog' : col === 'progress' ? 'In Progress' : 'Done'}
-                </Text>
+            <Text style={[styles.moveTitle, { color: colors.text }]}>Move to</Text>
+            {others.map((col) => (
+              <TouchableOpacity key={col.id} style={[styles.moveItem, { borderBottomColor: colors.border }]}
+                onPress={() => { onMove(col.id); setShowMove(false); }}>
+                <Ionicons name={col.icon as any} size={20} color={colors.primary} />
+                <Text style={[styles.moveItemText, { color: colors.text }]}>{col.title}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -132,184 +71,70 @@ function Card({ card, columnId, colors, onPress, onMove }: CardProps) {
   );
 }
 
-// ============================================
-// Column Component
-// ============================================
-
-interface ColumnProps {
-  title: string;
-  columnId: ColumnId;
-  cards: KanbanCard[];
-  colors: any;
-  onAddCard: () => void;
-  onCardPress: (card: KanbanCard) => void;
-  onMoveCard: (cardId: string, toColumn: ColumnId) => void;
-}
-
-function Column({ title, columnId, cards, colors, onAddCard, onCardPress, onMoveCard }: ColumnProps) {
-  const columnColors = {
-    backlog: colors.accent,
-    progress: colors.warning,
-    done: colors.success,
-  };
-  
-  return (
-    <View style={[styles.column, { backgroundColor: colors.surface2 }]}>
-      {/* Column Header */}
-      <View style={styles.columnHeader}>
-        <View style={[styles.columnIndicator, { backgroundColor: columnColors[columnId] }]} />
-        <Text style={[styles.columnTitle, { color: colors.text }]}>{title}</Text>
-        <View style={[styles.cardCount, { backgroundColor: colors.border }]}>
-          <Text style={[styles.cardCountText, { color: colors.textDim }]}>{cards.length}</Text>
-        </View>
-        <TouchableOpacity onPress={onAddCard} style={styles.addButton}>
-          <Ionicons name="add" size={24} color={colors.accent} />
-        </TouchableOpacity>
-      </View>
-      
-      {/* Cards */}
-      <ScrollView style={styles.cardsList} showsVerticalScrollIndicator={false}>
-        {cards.map((card) => (
-          <Card
-            key={card.id}
-            card={card}
-            columnId={columnId}
-            colors={colors}
-            onPress={() => onCardPress(card)}
-            onMove={(toColumn) => onMoveCard(card.id, toColumn)}
-          />
-        ))}
-        {cards.length === 0 && (
-          <Text style={[styles.emptyColumn, { color: colors.textMuted }]}>
-            No cards
-          </Text>
-        )}
-      </ScrollView>
-    </View>
-  );
-}
-
-// ============================================
-// Add/Edit Card Modal
-// ============================================
-
-interface CardModalProps {
-  visible: boolean;
-  card?: KanbanCard | null;
-  onClose: () => void;
-  onSave: (data: { title: string; description: string; priority: Priority; tags: string[] }) => void;
-  onDelete?: () => void;
-  colors: any;
-}
-
-function CardModal({ visible, card, onClose, onSave, onDelete, colors }: CardModalProps) {
+function CardModal({ visible, card, onClose, onSave, onDelete, colors }: {
+  visible: boolean; card?: KanbanCard | null; onClose: () => void;
+  onSave: (d: { title: string; description: string; priority: Priority; tags: string[] }) => void;
+  onDelete?: () => void; colors: any;
+}) {
   const [title, setTitle] = useState(card?.title || '');
-  const [description, setDescription] = useState(card?.description || '');
+  const [desc, setDesc] = useState(card?.description || '');
   const [priority, setPriority] = useState<Priority>(card?.priority || 'medium');
   const [tagsText, setTagsText] = useState(card?.tags.join(', ') || '');
-  
   const isEdit = !!card;
-  
-  const handleSave = () => {
-    if (!title.trim()) {
-      Alert.alert('Error', 'Title is required');
-      return;
+
+  useEffect(() => {
+    if (visible) {
+      setTitle(card?.title || '');
+      setDesc(card?.description || '');
+      setPriority(card?.priority || 'medium');
+      setTagsText(card?.tags.join(', ') || '');
     }
-    
-    const tags = tagsText
-      .split(',')
-      .map(t => t.trim())
-      .filter(t => t.length > 0);
-    
-    onSave({ title: title.trim(), description: description.trim(), priority, tags });
+  }, [visible, card]);
+
+  const handleSave = () => {
+    if (!title.trim()) { Alert.alert('Error', 'Title is required'); return; }
+    onSave({ title: title.trim(), description: desc.trim(), priority, tags: tagsText.split(',').map((t) => t.trim()).filter(Boolean) });
     onClose();
   };
-  
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={styles.modalOverlay}>
-        <View style={[styles.cardModal, { backgroundColor: colors.surface }]}>
-          <View style={styles.modalHeader}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>
-              {isEdit ? 'Edit Card' : 'New Card'}
-            </Text>
-            <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color={colors.textDim} />
-            </TouchableOpacity>
+      <View style={styles.overlay}>
+        <View style={[styles.modal, { backgroundColor: colors.surface }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{isEdit ? 'Edit Card' : 'New Card'}</Text>
+            <TouchableOpacity onPress={onClose}><Ionicons name="close" size={24} color={colors.textDim} /></TouchableOpacity>
           </View>
-          
-          <ScrollView style={styles.modalContent}>
-            {/* Title */}
-            <Text style={[styles.inputLabel, { color: colors.textDim }]}>Title *</Text>
-            <TextInput
-              style={[styles.modalInput, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
-              value={title}
-              onChangeText={setTitle}
-              placeholder="Enter title"
-              placeholderTextColor={colors.textMuted}
-            />
-            
-            {/* Description */}
-            <Text style={[styles.inputLabel, { color: colors.textDim }]}>Description</Text>
-            <TextInput
-              style={[styles.modalInput, styles.modalTextarea, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Enter description"
-              placeholderTextColor={colors.textMuted}
-              multiline
-              numberOfLines={3}
-            />
-            
-            {/* Priority */}
-            <Text style={[styles.inputLabel, { color: colors.textDim }]}>Priority</Text>
-            <View style={styles.prioritySelector}>
+          <ScrollView style={styles.modalBody}>
+            <Text style={[styles.label, { color: colors.textDim }]}>Title *</Text>
+            <TextInput style={[styles.modalInput, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
+              value={title} onChangeText={setTitle} placeholder="Card title" placeholderTextColor={colors.textMuted} />
+            <Text style={[styles.label, { color: colors.textDim }]}>Description</Text>
+            <TextInput style={[styles.modalInput, styles.textarea, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
+              value={desc} onChangeText={setDesc} placeholder="Description" placeholderTextColor={colors.textMuted} multiline numberOfLines={3} />
+            <Text style={[styles.label, { color: colors.textDim }]}>Priority</Text>
+            <View style={styles.priorityRow}>
               {(['high', 'medium', 'low'] as Priority[]).map((p) => (
-                <TouchableOpacity
-                  key={p}
-                  style={[
-                    styles.priorityOption,
-                    priority === p && styles.priorityOptionSelected,
-                    { borderColor: priority === p ? colors.accent : colors.border }
-                  ]}
-                  onPress={() => setPriority(p)}
-                >
+                <TouchableOpacity key={p}
+                  style={[styles.priorityOption, { borderColor: priority === p ? colors.primary : colors.border }, priority === p && { backgroundColor: colors.primaryBg }]}
+                  onPress={() => setPriority(p)}>
                   <PriorityBadge priority={p} colors={colors} />
                 </TouchableOpacity>
               ))}
             </View>
-            
-            {/* Tags */}
-            <Text style={[styles.inputLabel, { color: colors.textDim }]}>Tags (comma-separated)</Text>
-            <TextInput
-              style={[styles.modalInput, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
-              value={tagsText}
-              onChangeText={setTagsText}
-              placeholder="coding, research, urgent"
-              placeholderTextColor={colors.textMuted}
-            />
+            <Text style={[styles.label, { color: colors.textDim }]}>Tags (comma-separated)</Text>
+            <TextInput style={[styles.modalInput, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
+              value={tagsText} onChangeText={setTagsText} placeholder="design, frontend" placeholderTextColor={colors.textMuted} />
           </ScrollView>
-          
-          {/* Actions */}
-          <View style={styles.modalActions}>
+          <View style={[styles.modalFooter, { borderTopColor: colors.border }]}>
             {isEdit && onDelete && (
-              <TouchableOpacity 
-                style={[styles.deleteButton, { borderColor: colors.error }]}
-                onPress={() => {
-                  Alert.alert('Delete Card', 'Are you sure?', [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Delete', style: 'destructive', onPress: onDelete },
-                  ]);
-                }}
-              >
-                <Text style={[styles.deleteButtonText, { color: colors.error }]}>Delete</Text>
+              <TouchableOpacity style={[styles.deleteBtn, { borderColor: colors.error }]}
+                onPress={() => Alert.alert('Delete Card', 'Are you sure?', [{ text: 'Cancel' }, { text: 'Delete', style: 'destructive', onPress: onDelete }])}>
+                <Text style={{ color: colors.error, fontWeight: '600' }}>Delete</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity 
-              style={[styles.saveButton, { backgroundColor: colors.accent }]}
-              onPress={handleSave}
-            >
-              <Text style={styles.saveButtonText}>Save</Text>
+            <TouchableOpacity style={[styles.saveBtn, { backgroundColor: colors.primary }]} onPress={handleSave}>
+              <Text style={styles.saveBtnText}>Save</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -318,308 +143,98 @@ function CardModal({ visible, card, onClose, onSave, onDelete, colors }: CardMod
   );
 }
 
-// ============================================
-// Kanban Screen
-// ============================================
-
 export default function KanbanScreen() {
   const { colors } = useTheme();
-  const { columns, addCard, updateCard, moveCard, deleteCard, isSyncing, syncFromWeb } = useKanbanStore();
-  
-  const [selectedCard, setSelectedCard] = useState<KanbanCard | null>(null);
-  const [addToColumn, setAddToColumn] = useState<ColumnId | null>(null);
+  const { cards, fetchCards, addCard, updateCard, moveCard, deleteCard, isLoading } = useKanbanStore();
+  const [selected, setSelected] = useState<KanbanCard | null>(null);
+  const [addColumn, setAddColumn] = useState<ColumnId | null>(null);
   const [showModal, setShowModal] = useState(false);
-  
-  const handleAddCard = (columnId: ColumnId) => {
-    setSelectedCard(null);
-    setAddToColumn(columnId);
-    setShowModal(true);
-  };
-  
-  const handleEditCard = (card: KanbanCard) => {
-    setSelectedCard(card);
-    setAddToColumn(null);
-    setShowModal(true);
-  };
-  
-  const handleSaveCard = (data: { title: string; description: string; priority: Priority; tags: string[] }) => {
-    if (selectedCard) {
-      // Edit existing
-      updateCard(selectedCard.id, data);
-    } else if (addToColumn) {
-      // Add new
-      addCard(addToColumn, data);
-    }
-  };
-  
-  const handleDeleteCard = () => {
-    if (selectedCard) {
-      const column = columns.find(c => c.cards.some(card => card.id === selectedCard.id));
-      if (column) {
-        deleteCard(selectedCard.id, column.id);
-      }
-    }
-    setShowModal(false);
-  };
-  
-  const handleMoveCard = (cardId: string, toColumn: ColumnId) => {
-    const fromColumn = columns.find(c => c.cards.some(card => card.id === cardId));
-    if (fromColumn) {
-      moveCard(cardId, fromColumn.id, toColumn);
-    }
-  };
-  
+
+  useEffect(() => { fetchCards(); }, []);
+
+  const colColors: Record<ColumnId, string> = { backlog: colors.accent, progress: colors.warning, done: colors.success };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      {/* Sync Status */}
-      {isSyncing && (
-        <View style={[styles.syncBar, { backgroundColor: colors.accent }]}>
-          <Text style={styles.syncBarText}>Syncing...</Text>
-        </View>
-      )}
-      
-      {/* Columns */}
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.columnsContainer}
-      >
-        {columns.map((column) => (
-          <Column
-            key={column.id}
-            title={column.title}
-            columnId={column.id}
-            cards={column.cards}
-            colors={colors}
-            onAddCard={() => handleAddCard(column.id)}
-            onCardPress={handleEditCard}
-            onMoveCard={handleMoveCard}
-          />
-        ))}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.columnsWrap}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={fetchCards} tintColor={colors.primary} />}>
+        {COLUMNS.map(({ id, title }) => {
+          const colCards = cards.filter((c) => c.column_id === id);
+          return (
+            <View key={id} style={[styles.column, { backgroundColor: colors.surface2 }]}>
+              <View style={styles.colHeader}>
+                <View style={[styles.colDot, { backgroundColor: colColors[id] }]} />
+                <Text style={[styles.colTitle, { color: colors.text }]}>{title}</Text>
+                <View style={[styles.countBadge, { backgroundColor: colors.border }]}>
+                  <Text style={[styles.countText, { color: colors.textDim }]}>{colCards.length}</Text>
+                </View>
+                <TouchableOpacity onPress={() => { setSelected(null); setAddColumn(id); setShowModal(true); }} style={styles.addBtn}>
+                  <Ionicons name="add-circle-outline" size={22} color={colors.primary} />
+                </TouchableOpacity>
+              </View>
+              <ScrollView showsVerticalScrollIndicator={false} style={styles.cardsList}>
+                {colCards.map((card) => (
+                  <CardItem key={card.id} card={card} columnId={id} colors={colors}
+                    onPress={() => { setSelected(card); setAddColumn(null); setShowModal(true); }}
+                    onMove={(to) => moveCard(card.id, to)} />
+                ))}
+                {colCards.length === 0 && (
+                  <Text style={[styles.emptyCol, { color: colors.textMuted }]}>No cards</Text>
+                )}
+              </ScrollView>
+            </View>
+          );
+        })}
       </ScrollView>
-      
-      {/* Card Modal */}
-      <CardModal
-        visible={showModal}
-        card={selectedCard}
+      <CardModal visible={showModal} card={selected} colors={colors}
         onClose={() => setShowModal(false)}
-        onSave={handleSaveCard}
-        onDelete={selectedCard ? handleDeleteCard : undefined}
-        colors={colors}
-      />
+        onSave={(data) => {
+          if (selected) updateCard(selected.id, data);
+          else if (addColumn) addCard(addColumn, data);
+        }}
+        onDelete={selected ? () => { deleteCard(selected.id); setShowModal(false); } : undefined} />
     </View>
   );
 }
 
-// ============================================
-// Styles
-// ============================================
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  syncBar: {
-    paddingVertical: 8,
-    alignItems: 'center',
-  },
-  syncBarText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  columnsContainer: {
-    paddingHorizontal: 8,
-    paddingVertical: 16,
-  },
-  column: {
-    width: 300,
-    marginHorizontal: 8,
-    borderRadius: 12,
-    padding: 12,
-    maxHeight: '100%',
-  },
-  columnHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  columnIndicator: {
-    width: 4,
-    height: 20,
-    borderRadius: 2,
-    marginRight: 8,
-  },
-  columnTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    flex: 1,
-  },
-  cardCount: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    marginRight: 8,
-  },
-  cardCountText: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  addButton: {
-    padding: 4,
-  },
-  cardsList: {
-    flex: 1,
-  },
-  emptyColumn: {
-    textAlign: 'center',
-    paddingVertical: 20,
-    fontSize: 14,
-  },
-  card: {
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-  },
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: '500',
-    marginTop: 8,
-  },
-  cardDescription: {
-    fontSize: 13,
-    marginTop: 4,
-  },
-  priorityBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  priorityDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginRight: 4,
-  },
-  priorityText: {
-    fontSize: 11,
-    fontWeight: '500',
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 8,
-    gap: 4,
-  },
-  tag: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  tagText: {
-    fontSize: 11,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  moveMenu: {
-    borderRadius: 12,
-    padding: 8,
-    minWidth: 200,
-  },
-  moveMenuTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    padding: 12,
-  },
-  moveMenuItem: {
-    padding: 12,
-    borderBottomWidth: 1,
-  },
-  moveMenuItemText: {
-    fontSize: 16,
-  },
-  cardModal: {
-    width: '90%',
-    maxHeight: '80%',
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#30363d',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  modalContent: {
-    padding: 16,
-  },
-  inputLabel: {
-    fontSize: 13,
-    fontWeight: '500',
-    marginBottom: 6,
-    marginTop: 12,
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  modalTextarea: {
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  prioritySelector: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  priorityOption: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 8,
-  },
-  priorityOptionSelected: {
-    borderWidth: 2,
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    padding: 16,
-    gap: 12,
-  },
-  deleteButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  deleteButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  saveButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  saveButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '500',
-  },
+  container: { flex: 1 },
+  columnsWrap: { padding: 12 },
+  column: { width: 290, marginHorizontal: 6, borderRadius: 14, padding: 12, maxHeight: '100%' },
+  colHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  colDot: { width: 4, height: 18, borderRadius: 2, marginRight: 8 },
+  colTitle: { fontSize: 15, fontWeight: '600', flex: 1 },
+  countBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, marginRight: 6 },
+  countText: { fontSize: 12, fontWeight: '500' },
+  addBtn: { padding: 2 },
+  cardsList: { flex: 1 },
+  emptyCol: { textAlign: 'center', paddingVertical: 24, fontSize: 14 },
+  card: { borderRadius: 10, padding: 12, marginBottom: 8, borderWidth: 1 },
+  cardTop: { flexDirection: 'row', marginBottom: 6 },
+  cardTitle: { fontSize: 14, fontWeight: '600' },
+  cardDesc: { fontSize: 13, marginTop: 4, lineHeight: 18 },
+  priorityBadge: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  priorityDot: { width: 6, height: 6, borderRadius: 3, marginRight: 5 },
+  priorityText: { fontSize: 11, fontWeight: '600' },
+  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 8, gap: 4 },
+  tag: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  tagText: { fontSize: 11 },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
+  moveMenu: { borderRadius: 14, padding: 8, minWidth: 220 },
+  moveTitle: { fontSize: 14, fontWeight: '600', padding: 12 },
+  moveItem: { flexDirection: 'row', alignItems: 'center', padding: 14, borderBottomWidth: 1, gap: 12 },
+  moveItemText: { fontSize: 15 },
+  modal: { width: '92%', maxHeight: '80%', borderRadius: 18, overflow: 'hidden' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1 },
+  modalTitle: { fontSize: 18, fontWeight: '600' },
+  modalBody: { padding: 16 },
+  label: { fontSize: 13, fontWeight: '600', marginBottom: 6, marginTop: 14 },
+  modalInput: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15 },
+  textarea: { minHeight: 80, textAlignVertical: 'top' },
+  priorityRow: { flexDirection: 'row', gap: 8 },
+  priorityOption: { borderWidth: 1.5, borderRadius: 10, padding: 8 },
+  modalFooter: { flexDirection: 'row', justifyContent: 'flex-end', padding: 16, gap: 12, borderTopWidth: 1 },
+  deleteBtn: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 10, borderWidth: 1.5 },
+  saveBtn: { paddingVertical: 12, paddingHorizontal: 24, borderRadius: 10 },
+  saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
 });

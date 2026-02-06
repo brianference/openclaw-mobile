@@ -1,250 +1,212 @@
-/**
- * OpenClaw Mobile - Secrets Vault Screen
- * Encrypted local storage for API keys, passwords, and secure notes
- */
-
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  Modal,
-  TextInput,
-  Alert,
-  Clipboard,
+  View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, TextInput, Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Clipboard from 'expo-clipboard';
+import * as SecureStore from 'expo-secure-store';
 import { useTheme } from '../../src/store/theme';
-import { VaultItem, SecretCategory } from '../../src/types';
+import { VaultItem } from '../../src/types';
 
-// ============================================
-// Mock Vault Store (TODO: Implement full store)
-// ============================================
+const CATEGORIES = ['api_key', 'password', 'note', 'other'] as const;
+const CAT_ICONS: Record<string, string> = { api_key: 'key-outline', password: 'lock-closed-outline', note: 'document-text-outline', other: 'ellipsis-horizontal-circle-outline' };
+const CAT_LABELS: Record<string, string> = { api_key: 'API Key', password: 'Password', note: 'Secure Note', other: 'Other' };
 
-// ⚠️ WARNING: Encryption NOT yet implemented
-// Secrets are stored locally but NOT encrypted
-// TODO: Implement AES-256-GCM encryption before production release
-const ENCRYPTION_WARNING = true;
+const VAULT_KEY = 'openclaw_vault_items';
 
-// Temporary mock data - will be replaced with real encrypted store
-const MOCK_ITEMS: VaultItem[] = [];
-
-// ============================================
-// Category Icon Component
-// ============================================
-
-interface CategoryIconProps {
-  category: SecretCategory;
-  size?: number;
-  color: string;
+async function loadVault(): Promise<VaultItem[]> {
+  const raw = await SecureStore.getItemAsync(VAULT_KEY);
+  if (!raw) return [];
+  try { return JSON.parse(raw); } catch { return []; }
 }
 
-function CategoryIcon({ category, size = 24, color }: CategoryIconProps) {
-  const icons: Record<SecretCategory, string> = {
-    api_key: 'key',
-    password: 'lock-closed',
-    note: 'document-text',
-    other: 'ellipsis-horizontal-circle',
+async function saveVault(items: VaultItem[]) {
+  await SecureStore.setItemAsync(VAULT_KEY, JSON.stringify(items));
+}
+
+export default function VaultScreen() {
+  const { colors } = useTheme();
+  const [items, setItems] = useState<VaultItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [search, setSearch] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [editItem, setEditItem] = useState<VaultItem | null>(null);
+  const [revealed, setRevealed] = useState<Set<string>>(new Set());
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  if (!loaded) {
+    loadVault().then((data) => { setItems(data); setLoaded(true); });
+  }
+
+  const filtered = items.filter((i) => !search || i.name.toLowerCase().includes(search.toLowerCase()));
+
+  const handleSave = async (data: { name: string; value: string; category: VaultItem['category']; notes: string }) => {
+    let updated: VaultItem[];
+    if (editItem) {
+      updated = items.map((i) => i.id === editItem.id ? { ...i, ...data, updatedAt: Date.now() } : i);
+    } else {
+      const newItem: VaultItem = { id: `vault_${Date.now()}`, ...data, createdAt: Date.now(), updatedAt: Date.now() };
+      updated = [newItem, ...items];
+    }
+    setItems(updated);
+    await saveVault(updated);
+    setShowModal(false);
+    setEditItem(null);
   };
-  
-  return <Ionicons name={icons[category] as any} size={size} color={color} />;
-}
 
-// ============================================
-// Vault Item Component
-// ============================================
-
-interface VaultItemRowProps {
-  item: VaultItem;
-  colors: any;
-  onPress: () => void;
-  onCopy: () => void;
-}
-
-function VaultItemRow({ item, colors, onPress, onCopy }: VaultItemRowProps) {
-  const categoryLabels: Record<SecretCategory, string> = {
-    api_key: 'API Key',
-    password: 'Password',
-    note: 'Secure Note',
-    other: 'Other',
+  const handleDelete = async (id: string) => {
+    const updated = items.filter((i) => i.id !== id);
+    setItems(updated);
+    await saveVault(updated);
+    setShowModal(false);
+    setEditItem(null);
   };
-  
+
+  const handleCopy = async (item: VaultItem) => {
+    await Clipboard.setStringAsync(item.value);
+    setCopiedId(item.id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const toggleReveal = (id: string) => {
+    setRevealed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
   return (
-    <TouchableOpacity 
-      style={[styles.itemRow, { backgroundColor: colors.surface, borderColor: colors.border }]}
-      onPress={onPress}
-    >
-      <View style={[styles.itemIcon, { backgroundColor: `${colors.accent}15` }]}>
-        <CategoryIcon category={item.category} color={colors.accent} />
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      <View style={[styles.searchWrap, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <View style={[styles.searchBox, { backgroundColor: colors.bg, borderColor: colors.border }]}>
+          <Ionicons name="search" size={18} color={colors.textMuted} />
+          <TextInput style={[styles.searchInput, { color: colors.text }]}
+            placeholder="Search vault..." placeholderTextColor={colors.textMuted}
+            value={search} onChangeText={setSearch} />
+        </View>
       </View>
-      
-      <View style={styles.itemContent}>
-        <Text style={[styles.itemName, { color: colors.text }]}>{item.name}</Text>
-        <Text style={[styles.itemCategory, { color: colors.textDim }]}>
-          {categoryLabels[item.category]}
-        </Text>
-      </View>
-      
-      <TouchableOpacity style={styles.copyButton} onPress={onCopy}>
-        <Ionicons name="copy-outline" size={20} color={colors.textDim} />
+
+      <ScrollView contentContainerStyle={styles.list}>
+        {filtered.map((item) => {
+          const isRevealed = revealed.has(item.id);
+          const isCopied = copiedId === item.id;
+          return (
+            <View key={item.id} style={[styles.vaultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <View style={styles.vaultHeader}>
+                <View style={[styles.iconCircle, { backgroundColor: colors.primaryBg }]}>
+                  <Ionicons name={CAT_ICONS[item.category] as any} size={18} color={colors.primary} />
+                </View>
+                <View style={styles.vaultInfo}>
+                  <Text style={[styles.vaultName, { color: colors.text }]}>{item.name}</Text>
+                  <Text style={[styles.vaultCat, { color: colors.textMuted }]}>{CAT_LABELS[item.category]}</Text>
+                </View>
+                <TouchableOpacity onPress={() => { setEditItem(item); setShowModal(true); }}>
+                  <Ionicons name="create-outline" size={20} color={colors.textDim} />
+                </TouchableOpacity>
+              </View>
+              <View style={[styles.valueRow, { backgroundColor: colors.bg, borderColor: colors.border }]}>
+                <Text style={[styles.valueText, { color: colors.text }]} numberOfLines={1}>
+                  {isRevealed ? item.value : '\u2022'.repeat(Math.min(item.value.length, 20))}
+                </Text>
+                <TouchableOpacity onPress={() => toggleReveal(item.id)} style={styles.actionBtn}>
+                  <Ionicons name={isRevealed ? 'eye-off-outline' : 'eye-outline'} size={18} color={colors.textDim} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleCopy(item)} style={styles.actionBtn}>
+                  <Ionicons name={isCopied ? 'checkmark' : 'copy-outline'} size={18} color={isCopied ? colors.success : colors.textDim} />
+                </TouchableOpacity>
+              </View>
+              {item.notes ? (
+                <Text style={[styles.notesText, { color: colors.textDim }]} numberOfLines={2}>{item.notes}</Text>
+              ) : null}
+            </View>
+          );
+        })}
+        {filtered.length === 0 && (
+          <View style={styles.emptyState}>
+            <Ionicons name="shield-checkmark-outline" size={48} color={colors.textMuted} />
+            <Text style={[styles.emptyText, { color: colors.textDim }]}>Vault is empty</Text>
+            <Text style={[styles.emptySubtext, { color: colors.textMuted }]}>Securely store API keys, passwords, and notes</Text>
+          </View>
+        )}
+      </ScrollView>
+
+      <TouchableOpacity style={[styles.fab, { backgroundColor: colors.primary }]}
+        onPress={() => { setEditItem(null); setShowModal(true); }}>
+        <Ionicons name="add" size={28} color="#fff" />
       </TouchableOpacity>
-    </TouchableOpacity>
+
+      <VaultModal visible={showModal} item={editItem} colors={colors}
+        onClose={() => { setShowModal(false); setEditItem(null); }}
+        onSave={handleSave}
+        onDelete={editItem ? () => handleDelete(editItem.id) : undefined} />
+    </View>
   );
 }
 
-// ============================================
-// Add/Edit Item Modal
-// ============================================
-
-interface ItemModalProps {
-  visible: boolean;
-  item?: VaultItem | null;
-  onClose: () => void;
-  onSave: (data: Omit<VaultItem, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  onDelete?: () => void;
-  colors: any;
-}
-
-function ItemModal({ visible, item, onClose, onSave, onDelete, colors }: ItemModalProps) {
+function VaultModal({ visible, item, onClose, onSave, onDelete, colors }: {
+  visible: boolean; item?: VaultItem | null; onClose: () => void;
+  onSave: (d: { name: string; value: string; category: VaultItem['category']; notes: string }) => void;
+  onDelete?: () => void; colors: any;
+}) {
   const [name, setName] = useState(item?.name || '');
   const [value, setValue] = useState(item?.value || '');
-  const [category, setCategory] = useState<SecretCategory>(item?.category || 'api_key');
+  const [category, setCategory] = useState<VaultItem['category']>(item?.category || 'api_key');
   const [notes, setNotes] = useState(item?.notes || '');
-  const [showValue, setShowValue] = useState(false);
-  
   const isEdit = !!item;
-  
-  const categories: { id: SecretCategory; label: string }[] = [
-    { id: 'api_key', label: 'API Key' },
-    { id: 'password', label: 'Password' },
-    { id: 'note', label: 'Secure Note' },
-    { id: 'other', label: 'Other' },
-  ];
-  
-  const handleSave = () => {
-    if (!name.trim()) {
-      Alert.alert('Error', 'Name is required');
-      return;
+
+  useEffect(() => {
+    if (visible) {
+      setName(item?.name || '');
+      setValue(item?.value || '');
+      setCategory(item?.category || 'api_key');
+      setNotes(item?.notes || '');
     }
-    if (!value.trim()) {
-      Alert.alert('Error', 'Value is required');
-      return;
-    }
-    
-    onSave({ name: name.trim(), value: value.trim(), category, notes: notes.trim() });
-    onClose();
-  };
-  
+  }, [visible, item]);
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={styles.modalOverlay}>
+      <View style={styles.overlay}>
         <View style={[styles.modal, { backgroundColor: colors.surface }]}>
           <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>
-              {isEdit ? 'Edit Secret' : 'New Secret'}
-            </Text>
-            <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color={colors.textDim} />
-            </TouchableOpacity>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{isEdit ? 'Edit Item' : 'Add to Vault'}</Text>
+            <TouchableOpacity onPress={onClose}><Ionicons name="close" size={24} color={colors.textDim} /></TouchableOpacity>
           </View>
-          
-          <View style={styles.modalContent}>
-            {/* Name */}
-            <Text style={[styles.inputLabel, { color: colors.textDim }]}>Name *</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
-              value={name}
-              onChangeText={setName}
-              placeholder="e.g., GitHub Token"
-              placeholderTextColor={colors.textMuted}
-            />
-            
-            {/* Category */}
-            <Text style={[styles.inputLabel, { color: colors.textDim }]}>Category</Text>
-            <View style={styles.categorySelector}>
-              {categories.map((cat) => (
-                <TouchableOpacity
-                  key={cat.id}
-                  style={[
-                    styles.categoryOption,
-                    { borderColor: category === cat.id ? colors.accent : colors.border },
-                    category === cat.id && { backgroundColor: `${colors.accent}15` },
-                  ]}
-                  onPress={() => setCategory(cat.id)}
-                >
-                  <CategoryIcon category={cat.id} size={18} color={category === cat.id ? colors.accent : colors.textDim} />
-                  <Text style={[
-                    styles.categoryLabel,
-                    { color: category === cat.id ? colors.accent : colors.textDim }
-                  ]}>
-                    {cat.label}
-                  </Text>
+          <ScrollView style={styles.modalBody}>
+            <Text style={[styles.label, { color: colors.textDim }]}>Name *</Text>
+            <TextInput style={[styles.modalInput, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
+              value={name} onChangeText={setName} placeholder="e.g. OpenAI API Key" placeholderTextColor={colors.textMuted} />
+            <Text style={[styles.label, { color: colors.textDim }]}>Value *</Text>
+            <TextInput style={[styles.modalInput, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
+              value={value} onChangeText={setValue} placeholder="Secret value" placeholderTextColor={colors.textMuted} secureTextEntry />
+            <Text style={[styles.label, { color: colors.textDim }]}>Category</Text>
+            <View style={styles.catRow}>
+              {CATEGORIES.map((c) => (
+                <TouchableOpacity key={c}
+                  style={[styles.catPill, { borderColor: category === c ? colors.primary : colors.border }, category === c && { backgroundColor: colors.primaryBg }]}
+                  onPress={() => setCategory(c)}>
+                  <Ionicons name={CAT_ICONS[c] as any} size={16} color={category === c ? colors.primary : colors.textDim} />
+                  <Text style={{ color: category === c ? colors.primary : colors.textDim, fontSize: 13 }}>{CAT_LABELS[c]}</Text>
                 </TouchableOpacity>
               ))}
             </View>
-            
-            {/* Value */}
-            <Text style={[styles.inputLabel, { color: colors.textDim }]}>Value *</Text>
-            <View style={styles.valueInputContainer}>
-              <TextInput
-                style={[styles.input, styles.valueInput, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
-                value={value}
-                onChangeText={setValue}
-                placeholder="Enter secret value"
-                placeholderTextColor={colors.textMuted}
-                secureTextEntry={!showValue}
-                multiline={category === 'note'}
-                numberOfLines={category === 'note' ? 4 : 1}
-              />
-              {category !== 'note' && (
-                <TouchableOpacity 
-                  style={styles.showValueButton}
-                  onPress={() => setShowValue(!showValue)}
-                >
-                  <Ionicons 
-                    name={showValue ? 'eye-off' : 'eye'} 
-                    size={20} 
-                    color={colors.textDim} 
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-            
-            {/* Notes */}
-            <Text style={[styles.inputLabel, { color: colors.textDim }]}>Notes</Text>
-            <TextInput
-              style={[styles.input, styles.notesInput, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
-              value={notes}
-              onChangeText={setNotes}
-              placeholder="Optional notes"
-              placeholderTextColor={colors.textMuted}
-              multiline
-              numberOfLines={2}
-            />
-          </View>
-          
-          {/* Actions */}
-          <View style={[styles.modalActions, { borderTopColor: colors.border }]}>
+            <Text style={[styles.label, { color: colors.textDim }]}>Notes</Text>
+            <TextInput style={[styles.modalInput, styles.textarea, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
+              value={notes} onChangeText={setNotes} placeholder="Optional notes" placeholderTextColor={colors.textMuted} multiline />
+          </ScrollView>
+          <View style={[styles.modalFooter, { borderTopColor: colors.border }]}>
             {isEdit && onDelete && (
-              <TouchableOpacity 
-                style={[styles.deleteButton, { borderColor: colors.error }]}
-                onPress={() => {
-                  Alert.alert('Delete Secret', 'This cannot be undone.', [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Delete', style: 'destructive', onPress: onDelete },
-                  ]);
-                }}
-              >
-                <Text style={[styles.deleteButtonText, { color: colors.error }]}>Delete</Text>
+              <TouchableOpacity style={[styles.deleteBtn, { borderColor: colors.error }]}
+                onPress={() => Alert.alert('Delete', 'Remove from vault?', [{ text: 'Cancel' }, { text: 'Delete', style: 'destructive', onPress: onDelete }])}>
+                <Text style={{ color: colors.error, fontWeight: '600' }}>Delete</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity 
-              style={[styles.saveButton, { backgroundColor: colors.accent }]}
-              onPress={handleSave}
-            >
-              <Text style={styles.saveButtonText}>Save</Text>
+            <TouchableOpacity style={[styles.saveBtn, { backgroundColor: colors.primary }]}
+              onPress={() => {
+                if (!name.trim() || !value.trim()) { Alert.alert('Error', 'Name and value are required'); return; }
+                onSave({ name: name.trim(), value: value.trim(), category, notes: notes.trim() });
+              }}>
+              <Text style={styles.saveBtnText}>Save</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -253,331 +215,38 @@ function ItemModal({ visible, item, onClose, onSave, onDelete, colors }: ItemMod
   );
 }
 
-// ============================================
-// Vault Screen
-// ============================================
-
-export default function VaultScreen() {
-  const { colors } = useTheme();
-  const [items, setItems] = useState<VaultItem[]>(MOCK_ITEMS);
-  const [selectedItem, setSelectedItem] = useState<VaultItem | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  
-  // Filter items by search
-  const filteredItems = items.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.notes?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  const handleCopyValue = useCallback((item: VaultItem) => {
-    // In real implementation, decrypt value first
-    Clipboard.setString(item.value);
-    Alert.alert('Copied', `${item.name} copied to clipboard.\nWill clear in 30 seconds.`);
-    
-    // Auto-clear clipboard after 30 seconds
-    setTimeout(() => {
-      Clipboard.setString('');
-    }, 30000);
-  }, []);
-  
-  const handleSaveItem = (data: Omit<VaultItem, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (selectedItem) {
-      // Update existing
-      setItems(items.map(item =>
-        item.id === selectedItem.id
-          ? { ...item, ...data, updatedAt: Date.now() }
-          : item
-      ));
-    } else {
-      // Add new
-      const newItem: VaultItem = {
-        ...data,
-        id: `vault_${Date.now()}`,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      };
-      setItems([newItem, ...items]);
-    }
-  };
-  
-  const handleDeleteItem = () => {
-    if (selectedItem) {
-      setItems(items.filter(item => item.id !== selectedItem.id));
-    }
-    setShowModal(false);
-  };
-  
-  return (
-    <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      {/* Security Warning Banner */}
-      {ENCRYPTION_WARNING && (
-        <View style={[styles.warningBanner, { backgroundColor: colors.warning }]}>
-          <Ionicons name="warning" size={18} color="#000" />
-          <Text style={styles.warningText}>
-            ⚠️ Preview Mode — Encryption not yet implemented. Do not store real secrets.
-          </Text>
-        </View>
-      )}
-      
-      {/* Search Bar */}
-      <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <Ionicons name="search" size={20} color={colors.textDim} />
-        <TextInput
-          style={[styles.searchInput, { color: colors.text }]}
-          placeholder="Search secrets..."
-          placeholderTextColor={colors.textMuted}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
-      
-      {/* Items List */}
-      <FlatList
-        data={filteredItems}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <VaultItemRow
-            item={item}
-            colors={colors}
-            onPress={() => {
-              setSelectedItem(item);
-              setShowModal(true);
-            }}
-            onCopy={() => handleCopyValue(item)}
-          />
-        )}
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons name="lock-closed-outline" size={64} color={colors.textMuted} />
-            <Text style={[styles.emptyText, { color: colors.textDim }]}>
-              {searchQuery ? 'No secrets found' : 'No secrets yet'}
-            </Text>
-            <Text style={[styles.emptySubtext, { color: colors.textMuted }]}>
-              Tap + to add your first secret
-            </Text>
-          </View>
-        }
-      />
-      
-      {/* Add Button */}
-      <TouchableOpacity 
-        style={[styles.fab, { backgroundColor: colors.accent }]}
-        onPress={() => {
-          setSelectedItem(null);
-          setShowModal(true);
-        }}
-      >
-        <Ionicons name="add" size={28} color="#ffffff" />
-      </TouchableOpacity>
-      
-      {/* Item Modal */}
-      <ItemModal
-        visible={showModal}
-        item={selectedItem}
-        onClose={() => setShowModal(false)}
-        onSave={handleSaveItem}
-        onDelete={selectedItem ? handleDeleteItem : undefined}
-        colors={colors}
-      />
-    </View>
-  );
-}
-
-// ============================================
-// Styles
-// ============================================
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  warningBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    gap: 8,
-  },
-  warningText: {
-    flex: 1,
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#000',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 12,
-    fontSize: 16,
-  },
-  list: {
-    paddingHorizontal: 16,
-    paddingBottom: 80,
-  },
-  itemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    marginBottom: 8,
-  },
-  itemIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  itemContent: {
-    flex: 1,
-    marginLeft: 16,
-  },
-  itemName: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  itemCategory: {
-    fontSize: 13,
-    marginTop: 2,
-  },
-  copyButton: {
-    padding: 8,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: 64,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: '500',
-    marginTop: 16,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    marginTop: 8,
-  },
-  fab: {
-    position: 'absolute',
-    right: 24,
-    bottom: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modal: {
-    width: '90%',
-    maxHeight: '85%',
-    borderRadius: 16,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  modalContent: {
-    padding: 16,
-  },
-  inputLabel: {
-    fontSize: 13,
-    fontWeight: '500',
-    marginBottom: 6,
-    marginTop: 12,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  valueInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  valueInput: {
-    flex: 1,
-  },
-  showValueButton: {
-    position: 'absolute',
-    right: 12,
-    padding: 4,
-  },
-  notesInput: {
-    minHeight: 60,
-    textAlignVertical: 'top',
-  },
-  categorySelector: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  categoryOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  categoryLabel: {
-    fontSize: 13,
-    marginLeft: 6,
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    padding: 16,
-    borderTopWidth: 1,
-    gap: 12,
-  },
-  deleteButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  deleteButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  saveButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  saveButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '500',
-  },
+  container: { flex: 1 },
+  searchWrap: { paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1 },
+  searchBox: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, height: 42, gap: 8 },
+  searchInput: { flex: 1, fontSize: 15 },
+  list: { padding: 16, gap: 12 },
+  vaultCard: { borderRadius: 14, padding: 16, borderWidth: 1 },
+  vaultHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
+  iconCircle: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  vaultInfo: { flex: 1 },
+  vaultName: { fontSize: 16, fontWeight: '600' },
+  vaultCat: { fontSize: 12, marginTop: 2 },
+  valueRow: { flexDirection: 'row', alignItems: 'center', borderRadius: 10, borderWidth: 1, paddingLeft: 14, height: 42 },
+  valueText: { flex: 1, fontSize: 14, fontFamily: 'monospace' },
+  actionBtn: { padding: 10 },
+  notesText: { fontSize: 13, marginTop: 10, lineHeight: 18 },
+  emptyState: { alignItems: 'center', paddingVertical: 60 },
+  emptyText: { fontSize: 18, fontWeight: '600', marginTop: 16 },
+  emptySubtext: { fontSize: 14, marginTop: 6, textAlign: 'center', paddingHorizontal: 40 },
+  fab: { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4 },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
+  modal: { width: '92%', maxHeight: '80%', borderRadius: 18, overflow: 'hidden' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1 },
+  modalTitle: { fontSize: 18, fontWeight: '600' },
+  modalBody: { padding: 16 },
+  label: { fontSize: 13, fontWeight: '600', marginBottom: 6, marginTop: 14 },
+  modalInput: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15 },
+  textarea: { minHeight: 80, textAlignVertical: 'top' },
+  catRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  catPill: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, borderWidth: 1, gap: 6 },
+  modalFooter: { flexDirection: 'row', justifyContent: 'flex-end', padding: 16, gap: 12, borderTopWidth: 1 },
+  deleteBtn: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 10, borderWidth: 1.5 },
+  saveBtn: { paddingVertical: 12, paddingHorizontal: 24, borderRadius: 10 },
+  saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
 });

@@ -1,9 +1,4 @@
-/**
- * OpenClaw Mobile - Authentication Screen
- * Handles passphrase setup, login, and biometric unlock
- */
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -12,303 +7,223 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Alert,
+  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../store/auth';
-import { useTheme } from '../store/theme';
+import { useTheme, Theme } from '../store/theme';
 
-interface AuthScreenProps {
-  isSetup: boolean;
-}
-
-export default function AuthScreen({ isSetup }: AuthScreenProps) {
-  const [passphrase, setPassphrase] = useState('');
-  const [confirmPassphrase, setConfirmPassphrase] = useState('');
-  const [showPassphrase, setShowPassphrase] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+export default function AuthScreen() {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const { 
-    setupPassphrase, 
-    verifyPassphrase, 
-    unlockWithBiometric,
-    biometricAvailable,
-    biometricEnabled,
-  } = useAuthStore();
-  
+  const { signIn, signUp, isLoading } = useAuthStore();
   const { colors } = useTheme();
-  
-  // Try biometric on mount if available and enabled
-  useEffect(() => {
-    if (isSetup && biometricEnabled) {
-      handleBiometricUnlock();
-    }
-  }, [isSetup, biometricEnabled]);
-  
-  /**
-   * Handle biometric unlock
-   */
-  const handleBiometricUnlock = async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    const success = await unlockWithBiometric();
-    
-    if (!success) {
-      // Don't show error - user may have cancelled
-      setIsLoading(false);
-    }
-  };
-  
-  /**
-   * Handle passphrase submit
-   */
+  const s = makeStyles(colors);
+
   const handleSubmit = async () => {
     setError(null);
-    
-    // Validation
-    if (!passphrase.trim()) {
-      setError('Please enter a passphrase');
+    if (!email.trim() || !password.trim()) {
+      setError('Please fill in all fields');
       return;
     }
-    
-    if (!isSetup) {
-      // Setup mode - check confirmation
-      if (passphrase.length < 8) {
-        setError('Passphrase must be at least 8 characters');
-        return;
-      }
-      
-      if (passphrase !== confirmPassphrase) {
-        setError('Passphrases do not match');
-        return;
-      }
+    if (!isLogin && !displayName.trim()) {
+      setError('Please enter your name');
+      return;
     }
-    
-    setIsLoading(true);
-    
-    try {
-      if (isSetup) {
-        // Verify existing passphrase (with lockout protection)
-        const result = await verifyPassphrase(passphrase);
-        if (!result.success) {
-          setError(result.error || 'Incorrect passphrase');
-        }
-      } else {
-        // Setup new passphrase
-        const success = await setupPassphrase(passphrase);
-        if (!success) {
-          setError('Failed to set up passphrase');
-        }
-      }
-    } catch (err) {
-      setError('An error occurred');
-    } finally {
-      setIsLoading(false);
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    const result = isLogin
+      ? await signIn(email.trim(), password)
+      : await signUp(email.trim(), password, displayName.trim());
+
+    if (result.error) {
+      setError(result.error);
     }
   };
-  
-  const styles = createStyles(colors);
-  
+
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={[s.container, { backgroundColor: colors.bg }]}
     >
-      <View style={styles.content}>
-        {/* Logo/Title */}
-        <View style={styles.header}>
-          <Ionicons name="flash" size={64} color={colors.accent} />
-          <Text style={styles.title}>OpenClaw</Text>
-          <Text style={styles.subtitle}>
-            {isSetup ? 'Enter your passphrase' : 'Create a passphrase'}
+      <ScrollView
+        contentContainerStyle={s.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={s.header}>
+          <View style={[s.logoContainer, { backgroundColor: colors.primaryBg }]}>
+            <Ionicons name="flash" size={40} color={colors.primary} />
+          </View>
+          <Text style={[s.title, { color: colors.text }]}>OpenClaw</Text>
+          <Text style={[s.subtitle, { color: colors.textDim }]}>
+            {isLogin ? 'Welcome back' : 'Create your account'}
           </Text>
         </View>
-        
-        {/* Error Message */}
+
         {error && (
-          <View style={styles.errorContainer}>
-            <Ionicons name="alert-circle" size={20} color={colors.error} />
-            <Text style={styles.errorText}>{error}</Text>
+          <View style={[s.errorBox, { backgroundColor: colors.errorLight }]}>
+            <Ionicons name="alert-circle" size={18} color={colors.error} />
+            <Text style={[s.errorText, { color: colors.error }]}>{error}</Text>
           </View>
         )}
-        
-        {/* Passphrase Input */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Passphrase"
-            placeholderTextColor={colors.textMuted}
-            value={passphrase}
-            onChangeText={setPassphrase}
-            secureTextEntry={!showPassphrase}
-            autoCapitalize="none"
-            autoCorrect={false}
-            editable={!isLoading}
-          />
-          <TouchableOpacity 
-            style={styles.eyeButton}
-            onPress={() => setShowPassphrase(!showPassphrase)}
+
+        <View style={s.form}>
+          {!isLogin && (
+            <View style={s.inputGroup}>
+              <Text style={[s.label, { color: colors.textDim }]}>Name</Text>
+              <View style={[s.inputWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Ionicons name="person-outline" size={18} color={colors.textMuted} style={s.inputIcon} />
+                <TextInput
+                  style={[s.input, { color: colors.text }]}
+                  placeholder="Your name"
+                  placeholderTextColor={colors.textMuted}
+                  value={displayName}
+                  onChangeText={setDisplayName}
+                  autoCapitalize="words"
+                  editable={!isLoading}
+                />
+              </View>
+            </View>
+          )}
+
+          <View style={s.inputGroup}>
+            <Text style={[s.label, { color: colors.textDim }]}>Email</Text>
+            <View style={[s.inputWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Ionicons name="mail-outline" size={18} color={colors.textMuted} style={s.inputIcon} />
+              <TextInput
+                style={[s.input, { color: colors.text }]}
+                placeholder="you@example.com"
+                placeholderTextColor={colors.textMuted}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={!isLoading}
+              />
+            </View>
+          </View>
+
+          <View style={s.inputGroup}>
+            <Text style={[s.label, { color: colors.textDim }]}>Password</Text>
+            <View style={[s.inputWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Ionicons name="lock-closed-outline" size={18} color={colors.textMuted} style={s.inputIcon} />
+              <TextInput
+                style={[s.input, { color: colors.text }]}
+                placeholder="Min 6 characters"
+                placeholderTextColor={colors.textMuted}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                editable={!isLoading}
+              />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={s.eyeBtn}>
+                <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.textMuted} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[s.submitBtn, { backgroundColor: colors.primary }, isLoading && { opacity: 0.6 }]}
+            onPress={handleSubmit}
+            disabled={isLoading}
+            activeOpacity={0.8}
           >
-            <Ionicons 
-              name={showPassphrase ? 'eye-off' : 'eye'} 
-              size={24} 
-              color={colors.textDim} 
-            />
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={s.submitText}>{isLogin ? 'Sign In' : 'Create Account'}</Text>
+            )}
           </TouchableOpacity>
         </View>
-        
-        {/* Confirm Passphrase (setup only) */}
-        {!isSetup && (
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Confirm passphrase"
-              placeholderTextColor={colors.textMuted}
-              value={confirmPassphrase}
-              onChangeText={setConfirmPassphrase}
-              secureTextEntry={!showPassphrase}
-              autoCapitalize="none"
-              autoCorrect={false}
-              editable={!isLoading}
-            />
-          </View>
-        )}
-        
-        {/* Submit Button */}
-        <TouchableOpacity 
-          style={[styles.button, isLoading && styles.buttonDisabled]}
-          onPress={handleSubmit}
-          disabled={isLoading}
-        >
-          <Text style={styles.buttonText}>
-            {isLoading ? 'Please wait...' : (isSetup ? 'Unlock' : 'Set Up')}
+
+        <View style={s.switchRow}>
+          <Text style={[s.switchText, { color: colors.textDim }]}>
+            {isLogin ? "Don't have an account?" : 'Already have an account?'}
           </Text>
-        </TouchableOpacity>
-        
-        {/* Biometric Button (if available and setup) */}
-        {isSetup && biometricEnabled && (
-          <TouchableOpacity 
-            style={styles.biometricButton}
-            onPress={handleBiometricUnlock}
-            disabled={isLoading}
+          <TouchableOpacity
+            onPress={() => {
+              setIsLogin(!isLogin);
+              setError(null);
+            }}
           >
-            <Ionicons name="finger-print" size={32} color={colors.accent} />
-            <Text style={styles.biometricText}>Use Biometric</Text>
+            <Text style={[s.switchLink, { color: colors.primary }]}>
+              {isLogin ? 'Sign Up' : 'Sign In'}
+            </Text>
           </TouchableOpacity>
-        )}
-        
-        {/* Setup hints */}
-        {!isSetup && (
-          <View style={styles.hints}>
-            <Text style={styles.hintText}>
-              • At least 8 characters
-            </Text>
-            <Text style={styles.hintText}>
-              • This passphrase encrypts your vault
-            </Text>
-            <Text style={styles.hintText}>
-              • Cannot be recovered if forgotten
-            </Text>
-          </View>
-        )}
-      </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-const createStyles = (colors: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.bg,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: colors.text,
-    marginTop: 16,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.textDim,
-    marginTop: 8,
-  },
-  errorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: `${colors.error}15`,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  errorText: {
-    color: colors.error,
-    marginLeft: 8,
-    flex: 1,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 16,
-  },
-  input: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    fontSize: 16,
-    color: colors.text,
-  },
-  eyeButton: {
-    padding: 16,
-  },
-  button: {
-    backgroundColor: colors.accent,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  biometricButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    marginTop: 24,
-  },
-  biometricText: {
-    color: colors.accent,
-    fontSize: 16,
-    marginLeft: 8,
-  },
-  hints: {
-    marginTop: 32,
-  },
-  hintText: {
-    color: colors.textDim,
-    fontSize: 14,
-    marginBottom: 8,
-  },
-});
+const makeStyles = (colors: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1 },
+    scrollContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      paddingHorizontal: 28,
+      paddingVertical: 40,
+    },
+    header: { alignItems: 'center', marginBottom: 36 },
+    logoContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 20,
+    },
+    title: { fontSize: 30, fontWeight: '700', letterSpacing: -0.5 },
+    subtitle: { fontSize: 16, marginTop: 6, lineHeight: 24 },
+    errorBox: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 14,
+      borderRadius: 12,
+      marginBottom: 20,
+      gap: 10,
+    },
+    errorText: { fontSize: 14, flex: 1, lineHeight: 20 },
+    form: { gap: 18 },
+    inputGroup: { gap: 6 },
+    label: { fontSize: 13, fontWeight: '600', marginLeft: 4 },
+    inputWrap: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderRadius: 14,
+      paddingHorizontal: 14,
+      height: 52,
+    },
+    inputIcon: { marginRight: 10 },
+    input: { flex: 1, fontSize: 16, height: '100%' },
+    eyeBtn: { padding: 6 },
+    submitBtn: {
+      height: 52,
+      borderRadius: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 6,
+    },
+    submitText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+    switchRow: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 28,
+      gap: 6,
+    },
+    switchText: { fontSize: 14 },
+    switchLink: { fontSize: 14, fontWeight: '600' },
+  });

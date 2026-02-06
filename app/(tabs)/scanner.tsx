@@ -1,595 +1,259 @@
-/**
- * OpenClaw Mobile - Device Checks Screen
- * Basic device security checks using available Expo APIs
- * 
- * NOTE: This is NOT a comprehensive security scanner.
- * It only checks what Expo APIs expose (biometrics, device security level).
- * For full security assessment, use dedicated security tools.
- */
-
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  RefreshControl,
-  Platform,
+  View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, TextInput, Alert, RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as LocalAuthentication from 'expo-local-authentication';
+import { useBrainStore } from '../../src/store/brain';
 import { useTheme } from '../../src/store/theme';
-import { SecurityCheck, SecurityCheckStatus } from '../../src/types';
-import logger from '../../src/utils/logger';
+import { BrainNote, NoteCategory } from '../../src/types';
 
-// ============================================
-// Security Check Functions
-// ============================================
+const CATEGORIES: { id: NoteCategory | 'all'; label: string; icon: string }[] = [
+  { id: 'all', label: 'All', icon: 'grid-outline' },
+  { id: 'idea', label: 'Ideas', icon: 'bulb-outline' },
+  { id: 'note', label: 'Notes', icon: 'document-text-outline' },
+  { id: 'todo', label: 'Tasks', icon: 'checkbox-outline' },
+  { id: 'research', label: 'Research', icon: 'search-outline' },
+];
 
-/**
- * Check if device has biometric hardware and enrollment
- */
-async function checkBiometrics(): Promise<SecurityCheck> {
-  const hasHardware = await LocalAuthentication.hasHardwareAsync();
-  const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-  const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
-  
-  let status: SecurityCheckStatus = 'fail';
-  let details = '';
-  
-  if (!hasHardware) {
-    details = 'No biometric hardware available';
-  } else if (!isEnrolled) {
-    status = 'warning';
-    details = 'Biometric hardware available but not enrolled';
-  } else {
-    status = 'pass';
-    const types = supportedTypes.map(t => {
-      switch (t) {
-        case LocalAuthentication.AuthenticationType.FINGERPRINT: return 'Fingerprint';
-        case LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION: return 'Face ID';
-        case LocalAuthentication.AuthenticationType.IRIS: return 'Iris';
-        default: return 'Unknown';
-      }
-    });
-    details = `Enrolled: ${types.join(', ')}`;
+const NOTE_COLORS: { id: string; color: string }[] = [
+  { id: 'default', color: '#64748b' },
+  { id: 'teal', color: '#14b8a6' },
+  { id: 'blue', color: '#3b82f6' },
+  { id: 'amber', color: '#f59e0b' },
+  { id: 'rose', color: '#f43f5e' },
+  { id: 'green', color: '#22c55e' },
+];
+
+function getCategoryIcon(cat: NoteCategory): string {
+  switch (cat) {
+    case 'idea': return 'bulb';
+    case 'todo': return 'checkbox';
+    case 'research': return 'search';
+    default: return 'document-text';
   }
-  
-  return {
-    id: 'biometrics',
-    name: 'Biometric Authentication',
-    description: 'Check for biometric hardware and enrollment',
-    status,
-    details,
-    lastChecked: Date.now(),
-  };
 }
 
-/**
- * Check device security level (placeholder - needs native module for full check)
- */
-async function checkDeviceSecurity(): Promise<SecurityCheck> {
-  // In a real implementation, this would check:
-  // - Root/jailbreak detection
-  // - Screen lock enabled
-  // - Device encryption
-  // - Developer options
-  
-  const securityLevel = await LocalAuthentication.getEnrolledLevelAsync();
-  
-  let status: SecurityCheckStatus = 'unknown';
-  let details = 'Unable to determine full device security level';
-  
-  if (securityLevel === LocalAuthentication.SecurityLevel.BIOMETRIC_STRONG) {
-    status = 'pass';
-    details = 'Strong biometric security enabled';
-  } else if (securityLevel === LocalAuthentication.SecurityLevel.BIOMETRIC_WEAK) {
-    status = 'warning';
-    details = 'Weak biometric security (consider upgrading)';
-  } else if (securityLevel === LocalAuthentication.SecurityLevel.SECRET) {
-    status = 'warning';
-    details = 'PIN/Pattern only (biometrics recommended)';
-  } else {
-    status = 'fail';
-    details = 'No device security configured';
-  }
-  
-  return {
-    id: 'device_security',
-    name: 'Device Security Level',
-    description: 'Screen lock, encryption, and device integrity',
-    status,
-    details,
-    lastChecked: Date.now(),
-  };
-}
-
-/**
- * Check app permissions (placeholder)
- */
-async function checkPermissions(): Promise<SecurityCheck> {
-  // In a real implementation, check granted permissions vs needed
-  return {
-    id: 'permissions',
-    name: 'App Permissions',
-    description: 'Review granted permissions',
-    status: 'pass',
-    details: 'Only essential permissions requested',
-    lastChecked: Date.now(),
-  };
-}
-
-/**
- * Check network security (placeholder)
- */
-async function checkNetwork(): Promise<SecurityCheck> {
-  // In a real implementation:
-  // - Check if on VPN
-  // - Check WiFi security (WPA2/WPA3)
-  // - Check for MITM indicators
-  
-  return {
-    id: 'network',
-    name: 'Network Security',
-    description: 'Connection type and security',
-    status: 'warning',
-    details: 'VPN not detected (recommended for sensitive operations)',
-    lastChecked: Date.now(),
-  };
-}
-
-/**
- * Check for pending OS updates (placeholder)
- */
-async function checkUpdates(): Promise<SecurityCheck> {
-  // Would need native module to check OS update status
-  return {
-    id: 'updates',
-    name: 'System Updates',
-    description: 'Operating system security patches',
-    status: 'unknown',
-    details: 'Check Settings > System > Updates manually',
-    lastChecked: Date.now(),
-  };
-}
-
-/**
- * Check secure storage availability
- */
-async function checkSecureStorage(): Promise<SecurityCheck> {
-  // Expo SecureStore uses Keychain (iOS) and EncryptedSharedPreferences (Android)
-  return {
-    id: 'secure_storage',
-    name: 'Secure Storage',
-    description: 'Hardware-backed key storage',
-    status: 'pass',
-    details: Platform.OS === 'ios' 
-      ? 'Using iOS Keychain Services'
-      : 'Using Android EncryptedSharedPreferences',
-    lastChecked: Date.now(),
-  };
-}
-
-// ============================================
-// Status Icon Component
-// ============================================
-
-interface StatusIconProps {
-  status: SecurityCheckStatus;
-  colors: any;
-}
-
-function StatusIcon({ status, colors }: StatusIconProps) {
-  const config = {
-    pass: { icon: 'checkmark-circle', color: colors.success },
-    warning: { icon: 'warning', color: colors.warning },
-    fail: { icon: 'close-circle', color: colors.error },
-    unknown: { icon: 'help-circle', color: colors.textDim },
-  };
-  
-  const { icon, color } = config[status];
-  
-  return <Ionicons name={icon as any} size={28} color={color} />;
-}
-
-// ============================================
-// Check Card Component
-// ============================================
-
-interface CheckCardProps {
-  check: SecurityCheck;
-  colors: any;
-}
-
-function CheckCard({ check, colors }: CheckCardProps) {
-  const statusLabels = {
-    pass: 'Secure',
-    warning: 'Attention',
-    fail: 'Risk',
-    unknown: 'Unknown',
-  };
-  
-  const statusColors = {
-    pass: colors.success,
-    warning: colors.warning,
-    fail: colors.error,
-    unknown: colors.textDim,
-  };
-  
+function NoteCard({ note, colors, onPress, onTogglePin }: {
+  note: BrainNote; colors: any; onPress: () => void; onTogglePin: () => void;
+}) {
+  const noteColor = NOTE_COLORS.find((c) => c.id === note.color)?.color || '#64748b';
   return (
-    <View style={[styles.checkCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-      <StatusIcon status={check.status} colors={colors} />
-      
-      <View style={styles.checkContent}>
-        <Text style={[styles.checkName, { color: colors.text }]}>{check.name}</Text>
-        <Text style={[styles.checkDescription, { color: colors.textDim }]}>{check.description}</Text>
-        {check.details && (
-          <Text style={[styles.checkDetails, { color: statusColors[check.status] }]}>
-            {check.details}
-          </Text>
-        )}
-      </View>
-      
-      <View style={[styles.statusBadge, { backgroundColor: `${statusColors[check.status]}20` }]}>
-        <Text style={[styles.statusBadgeText, { color: statusColors[check.status] }]}>
-          {statusLabels[check.status]}
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-// ============================================
-// Score Ring Component
-// ============================================
-
-interface ScoreRingProps {
-  score: number;
-  colors: any;
-}
-
-function ScoreRing({ score, colors }: ScoreRingProps) {
-  const getScoreColor = () => {
-    if (score >= 80) return colors.success;
-    if (score >= 60) return colors.warning;
-    return colors.error;
-  };
-  
-  const getScoreLabel = () => {
-    if (score >= 80) return 'Good';
-    if (score >= 60) return 'Fair';
-    return 'Poor';
-  };
-  
-  return (
-    <View style={styles.scoreContainer}>
-      <View style={[styles.scoreRing, { borderColor: getScoreColor() }]}>
-        <Text style={[styles.scoreValue, { color: colors.text }]}>{score}</Text>
-        <Text style={[styles.scoreMax, { color: colors.textDim }]}>/100</Text>
-      </View>
-      <Text style={[styles.scoreLabel, { color: getScoreColor() }]}>{getScoreLabel()}</Text>
-      <Text style={[styles.scoreSubtext, { color: colors.textDim }]}>Basic Check Score</Text>
-      <Text style={[styles.scoreDisclaimer, { color: colors.textMuted }]}>
-        Based on {6} device checks • Not a security audit
-      </Text>
-    </View>
-  );
-}
-
-// ============================================
-// Scanner Screen
-// ============================================
-
-export default function ScannerScreen() {
-  const { colors } = useTheme();
-  const [checks, setChecks] = useState<SecurityCheck[]>([]);
-  const [isScanning, setIsScanning] = useState(false);
-  const [lastScan, setLastScan] = useState<number | null>(null);
-  
-  /**
-   * Calculate overall security score
-   */
-  const calculateScore = useCallback(() => {
-    if (checks.length === 0) return 0;
-    
-    const weights = {
-      pass: 100,
-      warning: 60,
-      fail: 0,
-      unknown: 50,
-    };
-    
-    const total = checks.reduce((sum, check) => sum + weights[check.status], 0);
-    return Math.round(total / checks.length);
-  }, [checks]);
-  
-  /**
-   * Run all security checks
-   */
-  const runScan = useCallback(async () => {
-    setIsScanning(true);
-    
-    try {
-      const results = await Promise.all([
-        checkBiometrics(),
-        checkDeviceSecurity(),
-        checkPermissions(),
-        checkNetwork(),
-        checkUpdates(),
-        checkSecureStorage(),
-      ]);
-      
-      setChecks(results);
-      setLastScan(Date.now());
-    } catch (error) {
-      logger.error('Scan failed:', error);
-    } finally {
-      setIsScanning(false);
-    }
-  }, []);
-  
-  // Run scan on mount
-  useEffect(() => {
-    runScan();
-  }, []);
-  
-  const score = calculateScore();
-  const passCount = checks.filter(c => c.status === 'pass').length;
-  const warnCount = checks.filter(c => c.status === 'warning').length;
-  const failCount = checks.filter(c => c.status === 'fail').length;
-  
-  return (
-    <ScrollView 
-      style={[styles.container, { backgroundColor: colors.bg }]}
-      contentContainerStyle={styles.content}
-      refreshControl={
-        <RefreshControl
-          refreshing={isScanning}
-          onRefresh={runScan}
-          tintColor={colors.accent}
-        />
-      }
+    <TouchableOpacity
+      style={[styles.noteCard, { backgroundColor: colors.surface, borderColor: colors.border, borderLeftColor: noteColor, borderLeftWidth: 3 }]}
+      onPress={onPress}
+      activeOpacity={0.7}
     >
-      {/* Score Section */}
-      <View style={[styles.scoreSection, { backgroundColor: colors.surface }]}>
-        <ScoreRing score={score} colors={colors} />
-        
-        <View style={styles.statsRow}>
-          <View style={styles.stat}>
-            <Ionicons name="checkmark-circle" size={20} color={colors.success} />
-            <Text style={[styles.statValue, { color: colors.text }]}>{passCount}</Text>
-            <Text style={[styles.statLabel, { color: colors.textDim }]}>Passed</Text>
-          </View>
-          <View style={styles.stat}>
-            <Ionicons name="warning" size={20} color={colors.warning} />
-            <Text style={[styles.statValue, { color: colors.text }]}>{warnCount}</Text>
-            <Text style={[styles.statLabel, { color: colors.textDim }]}>Warnings</Text>
-          </View>
-          <View style={styles.stat}>
-            <Ionicons name="close-circle" size={20} color={colors.error} />
-            <Text style={[styles.statValue, { color: colors.text }]}>{failCount}</Text>
-            <Text style={[styles.statLabel, { color: colors.textDim }]}>Failed</Text>
-          </View>
-        </View>
-        
-        {lastScan && (
-          <Text style={[styles.lastScan, { color: colors.textMuted }]}>
-            Last scan: {new Date(lastScan).toLocaleDateString([], { 
-              month: 'short', 
-              day: 'numeric', 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            })}
-          </Text>
-        )}
-      </View>
-      
-      {/* Checks List */}
-      <View style={styles.checksSection}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Security Checks</Text>
-        
-        {checks.map((check) => (
-          <CheckCard key={check.id} check={check} colors={colors} />
-        ))}
-        
-        {checks.length === 0 && (
-          <Text style={[styles.emptyText, { color: colors.textDim }]}>
-            Pull down to run security scan
-          </Text>
-        )}
-      </View>
-      
-      {/* Recommendations */}
-      {(warnCount > 0 || failCount > 0) && (
-        <View style={styles.recommendationsSection}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Recommendations</Text>
-          
-          <View style={[styles.recommendationCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Ionicons name="shield" size={24} color={colors.accent} />
-            <View style={styles.recommendationContent}>
-              <Text style={[styles.recommendationTitle, { color: colors.text }]}>
-                Improve Your Security
-              </Text>
-              <Text style={[styles.recommendationText, { color: colors.textDim }]}>
-                {failCount > 0 
-                  ? 'Address failed checks first for maximum security improvement.'
-                  : 'Review warnings to enhance your security posture.'}
-              </Text>
-            </View>
-          </View>
-        </View>
-      )}
-      
-      {/* Scan Button */}
-      <TouchableOpacity 
-        style={[styles.scanButton, { backgroundColor: colors.accent }]}
-        onPress={runScan}
-        disabled={isScanning}
-      >
-        <Ionicons name="refresh" size={20} color="#ffffff" />
-        <Text style={styles.scanButtonText}>
-          {isScanning ? 'Scanning...' : 'Run Full Scan'}
+      <View style={styles.noteHeader}>
+        <Ionicons name={getCategoryIcon(note.category) as any} size={16} color={noteColor} />
+        <Text style={[styles.noteCat, { color: noteColor }]}>
+          {note.category.charAt(0).toUpperCase() + note.category.slice(1)}
         </Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <View style={{ flex: 1 }} />
+        <TouchableOpacity onPress={onTogglePin} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Ionicons name={note.pinned ? 'pin' : 'pin-outline'} size={16} color={note.pinned ? colors.primary : colors.textMuted} />
+        </TouchableOpacity>
+      </View>
+      <Text style={[styles.noteTitle, { color: colors.text }]} numberOfLines={2}>{note.title}</Text>
+      {note.content ? (
+        <Text style={[styles.noteContent, { color: colors.textDim }]} numberOfLines={3}>{note.content}</Text>
+      ) : null}
+      <Text style={[styles.noteDate, { color: colors.textMuted }]}>
+        {new Date(note.updated_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+      </Text>
+    </TouchableOpacity>
   );
 }
 
-// ============================================
-// Styles
-// ============================================
+function NoteModal({ visible, note, onClose, onSave, onDelete, colors }: {
+  visible: boolean; note?: BrainNote | null; onClose: () => void;
+  onSave: (d: { title: string; content: string; category: NoteCategory; color: string }) => void;
+  onDelete?: () => void; colors: any;
+}) {
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [category, setCategory] = useState<NoteCategory>('note');
+  const [color, setColor] = useState('default');
+  const isEdit = !!note;
+
+  useEffect(() => {
+    if (visible) {
+      setTitle(note?.title || '');
+      setContent(note?.content || '');
+      setCategory(note?.category || 'note');
+      setColor(note?.color || 'default');
+    }
+  }, [visible, note]);
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.overlay}>
+        <View style={[styles.modal, { backgroundColor: colors.surface }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{isEdit ? 'Edit Note' : 'New Note'}</Text>
+            <TouchableOpacity onPress={onClose}><Ionicons name="close" size={24} color={colors.textDim} /></TouchableOpacity>
+          </View>
+          <ScrollView style={styles.modalBody} keyboardShouldPersistTaps="handled">
+            <TextInput
+              style={[styles.titleInput, { color: colors.text }]}
+              value={title}
+              onChangeText={setTitle}
+              placeholder="Title"
+              placeholderTextColor={colors.textMuted}
+            />
+            <TextInput
+              style={[styles.contentInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.bg }]}
+              value={content}
+              onChangeText={setContent}
+              placeholder="Write your thoughts..."
+              placeholderTextColor={colors.textMuted}
+              multiline
+              textAlignVertical="top"
+            />
+            <Text style={[styles.label, { color: colors.textDim }]}>Category</Text>
+            <View style={styles.catRow}>
+              {CATEGORIES.filter((c) => c.id !== 'all').map((cat) => (
+                <TouchableOpacity key={cat.id}
+                  style={[styles.catPill, { borderColor: category === cat.id ? colors.primary : colors.border }, category === cat.id && { backgroundColor: colors.primaryBg }]}
+                  onPress={() => setCategory(cat.id as NoteCategory)}>
+                  <Ionicons name={cat.icon as any} size={16} color={category === cat.id ? colors.primary : colors.textDim} />
+                  <Text style={{ color: category === cat.id ? colors.primary : colors.textDim, fontSize: 13 }}>{cat.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <Text style={[styles.label, { color: colors.textDim }]}>Color</Text>
+            <View style={styles.colorRow}>
+              {NOTE_COLORS.map((c) => (
+                <TouchableOpacity key={c.id}
+                  style={[styles.colorDot, { backgroundColor: c.color }, color === c.id && styles.colorDotActive]}
+                  onPress={() => setColor(c.id)} />
+              ))}
+            </View>
+          </ScrollView>
+          <View style={[styles.modalFooter, { borderTopColor: colors.border }]}>
+            {isEdit && onDelete && (
+              <TouchableOpacity style={[styles.deleteBtn, { borderColor: colors.error }]}
+                onPress={() => Alert.alert('Delete Note', 'Are you sure?', [{ text: 'Cancel' }, { text: 'Delete', style: 'destructive', onPress: onDelete }])}>
+                <Text style={{ color: colors.error, fontWeight: '600' }}>Delete</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity style={[styles.saveBtn, { backgroundColor: colors.primary }]}
+              onPress={() => {
+                if (!title.trim()) { Alert.alert('Error', 'Title is required'); return; }
+                onSave({ title: title.trim(), content: content.trim(), category, color });
+                onClose();
+              }}>
+              <Text style={styles.saveBtnText}>Save</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+export default function BrainScreen() {
+  const { colors } = useTheme();
+  const { fetchNotes, addNote, updateNote, deleteNote, togglePin, setFilterCategory, filterCategory, getFilteredNotes, isLoading, searchQuery, setSearchQuery } = useBrainStore();
+  const [selected, setSelected] = useState<BrainNote | null>(null);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => { fetchNotes(); }, []);
+
+  const filtered = getFilteredNotes();
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      <View style={[styles.searchWrap, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <View style={[styles.searchBox, { backgroundColor: colors.bg, borderColor: colors.border }]}>
+          <Ionicons name="search" size={18} color={colors.textMuted} />
+          <TextInput
+            style={[styles.searchInput, { color: colors.text }]}
+            placeholder="Search notes..."
+            placeholderTextColor={colors.textMuted}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+      </View>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterBar} contentContainerStyle={styles.filterContent}>
+        {CATEGORIES.map((cat) => (
+          <TouchableOpacity key={cat.id}
+            style={[styles.filterPill, { borderColor: filterCategory === cat.id ? colors.primary : colors.border }, filterCategory === cat.id && { backgroundColor: colors.primaryBg }]}
+            onPress={() => setFilterCategory(cat.id)}>
+            <Ionicons name={cat.icon as any} size={15} color={filterCategory === cat.id ? colors.primary : colors.textDim} />
+            <Text style={{ color: filterCategory === cat.id ? colors.primary : colors.textDim, fontSize: 13, fontWeight: '500' }}>{cat.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <ScrollView contentContainerStyle={styles.notesGrid}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={fetchNotes} tintColor={colors.primary} />}>
+        {filtered.map((note) => (
+          <NoteCard key={note.id} note={note} colors={colors}
+            onPress={() => { setSelected(note); setShowModal(true); }}
+            onTogglePin={() => togglePin(note.id)} />
+        ))}
+        {filtered.length === 0 && (
+          <View style={styles.emptyState}>
+            <Ionicons name="bulb-outline" size={48} color={colors.textMuted} />
+            <Text style={[styles.emptyText, { color: colors.textDim }]}>No notes yet</Text>
+            <Text style={[styles.emptySubtext, { color: colors.textMuted }]}>Tap + to capture your first idea</Text>
+          </View>
+        )}
+      </ScrollView>
+
+      <TouchableOpacity
+        style={[styles.fab, { backgroundColor: colors.primary }]}
+        onPress={() => { setSelected(null); setShowModal(true); }}>
+        <Ionicons name="add" size={28} color="#fff" />
+      </TouchableOpacity>
+
+      <NoteModal visible={showModal} note={selected} colors={colors}
+        onClose={() => setShowModal(false)}
+        onSave={(data) => {
+          if (selected) updateNote(selected.id, data);
+          else addNote(data);
+        }}
+        onDelete={selected ? () => { deleteNote(selected.id); setShowModal(false); } : undefined} />
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    paddingBottom: 32,
-  },
-  scoreSection: {
-    margin: 16,
-    padding: 24,
-    borderRadius: 16,
-    alignItems: 'center',
-  },
-  scoreContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  scoreRing: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scoreValue: {
-    fontSize: 36,
-    fontWeight: '700',
-  },
-  scoreMax: {
-    fontSize: 14,
-  },
-  scoreLabel: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 12,
-  },
-  scoreSubtext: {
-    fontSize: 13,
-    marginTop: 4,
-  },
-  scoreDisclaimer: {
-    fontSize: 11,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-  },
-  stat: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginTop: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-  },
-  lastScan: {
-    fontSize: 12,
-    marginTop: 16,
-  },
-  checksSection: {
-    paddingHorizontal: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-    marginTop: 8,
-  },
-  checkCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    marginBottom: 8,
-  },
-  checkContent: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  checkName: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  checkDescription: {
-    fontSize: 13,
-    marginTop: 2,
-  },
-  checkDetails: {
-    fontSize: 12,
-    marginTop: 4,
-    fontStyle: 'italic',
-  },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  emptyText: {
-    textAlign: 'center',
-    paddingVertical: 32,
-    fontSize: 14,
-  },
-  recommendationsSection: {
-    paddingHorizontal: 16,
-    marginTop: 8,
-  },
-  recommendationCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  recommendationContent: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  recommendationTitle: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  recommendationText: {
-    fontSize: 13,
-    marginTop: 4,
-  },
-  scanButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 16,
-    marginTop: 24,
-    paddingVertical: 14,
-    borderRadius: 12,
-    gap: 8,
-  },
-  scanButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  container: { flex: 1 },
+  searchWrap: { paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1 },
+  searchBox: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, height: 42, gap: 8 },
+  searchInput: { flex: 1, fontSize: 15 },
+  filterBar: { maxHeight: 52 },
+  filterContent: { paddingHorizontal: 16, paddingVertical: 10, gap: 8 },
+  filterPill: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, borderWidth: 1, gap: 6 },
+  notesGrid: { padding: 16, gap: 10 },
+  noteCard: { borderRadius: 12, padding: 14, borderWidth: 1 },
+  noteHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
+  noteCat: { fontSize: 12, fontWeight: '600' },
+  noteTitle: { fontSize: 16, fontWeight: '600', lineHeight: 22 },
+  noteContent: { fontSize: 14, marginTop: 6, lineHeight: 20 },
+  noteDate: { fontSize: 12, marginTop: 10 },
+  emptyState: { alignItems: 'center', paddingVertical: 60 },
+  emptyText: { fontSize: 18, fontWeight: '600', marginTop: 16 },
+  emptySubtext: { fontSize: 14, marginTop: 6 },
+  fab: { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4 },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
+  modal: { width: '92%', maxHeight: '85%', borderRadius: 18, overflow: 'hidden' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1 },
+  modalTitle: { fontSize: 18, fontWeight: '600' },
+  modalBody: { padding: 16 },
+  titleInput: { fontSize: 20, fontWeight: '600', paddingVertical: 8, marginBottom: 12 },
+  contentInput: { minHeight: 120, borderWidth: 1, borderRadius: 12, padding: 14, fontSize: 15, lineHeight: 22 },
+  label: { fontSize: 13, fontWeight: '600', marginBottom: 8, marginTop: 16 },
+  catRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  catPill: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, borderWidth: 1, gap: 6 },
+  colorRow: { flexDirection: 'row', gap: 12 },
+  colorDot: { width: 28, height: 28, borderRadius: 14 },
+  colorDotActive: { borderWidth: 3, borderColor: '#fff' },
+  modalFooter: { flexDirection: 'row', justifyContent: 'flex-end', padding: 16, gap: 12, borderTopWidth: 1 },
+  deleteBtn: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 10, borderWidth: 1.5 },
+  saveBtn: { paddingVertical: 12, paddingHorizontal: 24, borderRadius: 10 },
+  saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
 });

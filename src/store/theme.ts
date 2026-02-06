@@ -1,99 +1,111 @@
-/**
- * OpenClaw Mobile - Theme Store
- * Manages app theme (light/dark/system)
- */
-
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Appearance, ColorSchemeName } from 'react-native';
-import { ThemeMode } from '../types';
 
-// ============================================
-// Theme Colors
-// ============================================
+export type ThemeMode = 'light' | 'dark' | 'system';
 
 export const lightTheme = {
-  // Background
-  bg: '#f5f6f8',
+  bg: '#f8fafc',
   surface: '#ffffff',
-  surface2: '#f0f1f3',
-  
-  // Text
-  text: '#1a1d21',
-  textDim: '#5a6270',
-  textMuted: '#8b949e',
-  
-  // Borders
-  border: '#d8dce2',
-  borderLight: '#e8eaed',
-  
-  // Accent
-  accent: '#2563eb',
-  accentHover: '#3b82f6',
-  
-  // Status
-  success: '#16a34a',
-  warning: '#ca8a04',
+  surface2: '#f1f5f9',
+  surface3: '#e2e8f0',
+
+  text: '#0f172a',
+  textDim: '#475569',
+  textMuted: '#94a3b8',
+
+  border: '#e2e8f0',
+  borderLight: '#f1f5f9',
+
+  primary: '#0d9488',
+  primaryLight: '#14b8a6',
+  primaryDark: '#0f766e',
+  primaryBg: '#f0fdfa',
+
+  accent: '#0284c7',
+  accentLight: '#38bdf8',
+
+  success: '#059669',
+  successLight: '#d1fae5',
+  warning: '#d97706',
+  warningLight: '#fef3c7',
   error: '#dc2626',
-  
-  // Priority colors
+  errorLight: '#fee2e2',
+
   priorityHigh: '#dc2626',
-  priorityMedium: '#ca8a04',
-  priorityLow: '#16a34a',
-  
-  // Tag colors
-  tagInfra: { bg: '#dbeafe', text: '#1d4ed8' },
-  tagResearch: { bg: '#ede9fe', text: '#7c3aed' },
-  tagContent: { bg: '#ffedd5', text: '#c2410c' },
-  tagCoding: { bg: '#dcfce7', text: '#15803d' },
-  tagOrg: { bg: '#fef9c3', text: '#a16207' },
-  tagDefault: { bg: '#e5e7eb', text: '#6b7280' },
+  priorityMedium: '#d97706',
+  priorityLow: '#059669',
+
+  card1: '#f0fdfa',
+  card2: '#eff6ff',
+  card3: '#fef3c7',
+  card4: '#fce7f3',
+  card5: '#f0fdf4',
+  card6: '#fff7ed',
+
+  tagDefault: { bg: '#f1f5f9', text: '#475569' },
+  tagBlue: { bg: '#dbeafe', text: '#1d4ed8' },
+  tagGreen: { bg: '#dcfce7', text: '#15803d' },
+  tagAmber: { bg: '#fef3c7', text: '#92400e' },
+  tagRose: { bg: '#ffe4e6', text: '#be123c' },
+  tagTeal: { bg: '#ccfbf1', text: '#0f766e' },
+
+  shadow: 'rgba(0, 0, 0, 0.08)',
+  overlay: 'rgba(0, 0, 0, 0.4)',
 };
 
 export const darkTheme = {
-  // Background
-  bg: '#0d1117',
-  surface: '#161b22',
-  surface2: '#1c2129',
-  
-  // Text
-  text: '#e6edf3',
-  textDim: '#8b949e',
-  textMuted: '#6e7681',
-  
-  // Borders
-  border: '#30363d',
-  borderLight: '#21262d',
-  
-  // Accent
-  accent: '#58a6ff',
-  accentHover: '#79c0ff',
-  
-  // Status
-  success: '#3fb950',
-  warning: '#d29922',
-  error: '#f85149',
-  
-  // Priority colors
-  priorityHigh: '#f85149',
-  priorityMedium: '#d29922',
-  priorityLow: '#3fb950',
-  
-  // Tag colors
-  tagInfra: { bg: '#388bfd33', text: '#58a6ff' },
-  tagResearch: { bg: '#a371f733', text: '#bc8cff' },
-  tagContent: { bg: '#f7883533', text: '#ffa657' },
-  tagCoding: { bg: '#3fb95033', text: '#56d364' },
-  tagOrg: { bg: '#d2992233', text: '#e3b341' },
-  tagDefault: { bg: '#30363d', text: '#8b949e' },
+  bg: '#0f172a',
+  surface: '#1e293b',
+  surface2: '#283548',
+  surface3: '#334155',
+
+  text: '#f1f5f9',
+  textDim: '#94a3b8',
+  textMuted: '#64748b',
+
+  border: '#334155',
+  borderLight: '#1e293b',
+
+  primary: '#14b8a6',
+  primaryLight: '#2dd4bf',
+  primaryDark: '#0d9488',
+  primaryBg: '#042f2e',
+
+  accent: '#38bdf8',
+  accentLight: '#7dd3fc',
+
+  success: '#10b981',
+  successLight: '#064e3b',
+  warning: '#f59e0b',
+  warningLight: '#451a03',
+  error: '#f43f5e',
+  errorLight: '#4c0519',
+
+  priorityHigh: '#f43f5e',
+  priorityMedium: '#f59e0b',
+  priorityLow: '#10b981',
+
+  card1: '#042f2e',
+  card2: '#0c1929',
+  card3: '#451a03',
+  card4: '#4c0519',
+  card5: '#052e16',
+  card6: '#431407',
+
+  tagDefault: { bg: '#334155', text: '#94a3b8' },
+  tagBlue: { bg: '#1e3a5f', text: '#7dd3fc' },
+  tagGreen: { bg: '#14532d', text: '#86efac' },
+  tagAmber: { bg: '#451a03', text: '#fbbf24' },
+  tagRose: { bg: '#4c0519', text: '#fda4af' },
+  tagTeal: { bg: '#042f2e', text: '#5eead4' },
+
+  shadow: 'rgba(0, 0, 0, 0.3)',
+  overlay: 'rgba(0, 0, 0, 0.6)',
 };
 
 export type Theme = typeof lightTheme;
-
-// ============================================
-// Theme Store
-// ============================================
 
 interface ThemeState {
   mode: ThemeMode;
@@ -106,13 +118,10 @@ interface ThemeState {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
-      mode: 'system',
-      systemTheme: Appearance.getColorScheme(),
-      
+      mode: 'dark',
+      systemTheme: Appearance.getColorScheme() ?? 'dark',
       setMode: (mode) => set({ mode }),
-      
       updateSystemTheme: (scheme) => set({ systemTheme: scheme }),
-      
       getTheme: () => {
         const { mode, systemTheme } = get();
         if (mode === 'system') {
@@ -129,16 +138,11 @@ export const useThemeStore = create<ThemeState>()(
   )
 );
 
-// Hook to get current theme colors
 export const useTheme = () => {
   const { mode, systemTheme, getTheme } = useThemeStore();
-  const isDark = mode === 'system' 
-    ? systemTheme === 'dark' 
+  const isDark = mode === 'system'
+    ? systemTheme === 'dark'
     : mode === 'dark';
-  
-  return {
-    colors: getTheme(),
-    isDark,
-    mode,
-  };
+
+  return { colors: getTheme(), isDark, mode };
 };

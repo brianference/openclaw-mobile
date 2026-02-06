@@ -1,94 +1,51 @@
-/**
- * OpenClaw Mobile - Root Layout
- * Handles auth gate, theme provider, and navigation structure
- */
-
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { ActivityIndicator, View, Appearance } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator, Appearance } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuthStore } from '../src/store/auth';
 import { useThemeStore, useTheme } from '../src/store/theme';
 import AuthScreen from '../src/components/AuthScreen';
 
 export default function RootLayout() {
-  const [isLoading, setIsLoading] = useState(true);
-  const { isUnlocked, isSetup, initialize } = useAuthStore();
-  const { updateSystemTheme } = useThemeStore();
+  const { session, isLoading, isInitialized, initialize } = useAuthStore();
   const { colors, isDark } = useTheme();
-  
-  // Initialize auth on app start
+  const { updateSystemTheme } = useThemeStore();
+
   useEffect(() => {
-    const init = async () => {
-      await initialize();
-      setIsLoading(false);
-    };
-    init();
+    initialize();
   }, []);
-  
-  // Listen for system theme changes
+
   useEffect(() => {
-    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+    const sub = Appearance.addChangeListener(({ colorScheme }) => {
       updateSystemTheme(colorScheme);
     });
-    return () => subscription.remove();
+    return () => sub.remove();
   }, []);
-  
-  // Check auto-lock periodically
-  useEffect(() => {
-    const interval = setInterval(() => {
-      useAuthStore.getState().checkAutoLock();
-    }, 30000); // Check every 30 seconds
-    
-    return () => clearInterval(interval);
-  }, []);
-  
-  // Loading state
-  if (isLoading) {
+
+  if (!isInitialized || isLoading) {
     return (
-      <View style={{ 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        backgroundColor: colors.bg,
-      }}>
-        <ActivityIndicator size="large" color={colors.accent} />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bg }}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
-  
-  // Show auth screen if locked or not set up
-  if (!isUnlocked) {
+
+  if (!session) {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={{ flex: 1, backgroundColor: colors.bg }}>
-          <StatusBar style={isDark ? 'light' : 'dark'} />
-          <AuthScreen isSetup={isSetup} />
-        </View>
+        <StatusBar style={isDark ? 'light' : 'dark'} />
+        <AuthScreen />
       </GestureHandlerRootView>
     );
   }
-  
-  // Main app navigation
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={{ flex: 1, backgroundColor: colors.bg }}>
-        <StatusBar style={isDark ? 'light' : 'dark'} />
-        <Stack
-          screenOptions={{
-            headerStyle: { backgroundColor: colors.surface },
-            headerTintColor: colors.text,
-            headerTitleStyle: { fontWeight: '600' },
-            contentStyle: { backgroundColor: colors.bg },
-          }}
-        >
-          <Stack.Screen 
-            name="(tabs)" 
-            options={{ headerShown: false }} 
-          />
-        </Stack>
-      </View>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+      </Stack>
     </GestureHandlerRootView>
   );
 }

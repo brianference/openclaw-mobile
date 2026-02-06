@@ -1,160 +1,69 @@
-/**
- * OpenClaw Mobile - Type Definitions
- * Core types used throughout the app
- */
-
-// ============================================
-// Chat Types
-// ============================================
+export type ThemeMode = 'light' | 'dark' | 'system';
 
 export interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
-  timestamp: number;
+  conversation_id?: string;
+  created_at: string;
   status?: 'sending' | 'sent' | 'error';
-  attachments?: Attachment[];
 }
 
-export interface Attachment {
+export interface Conversation {
   id: string;
-  type: 'image' | 'file';
-  uri: string;
-  name?: string;
-  size?: number;
+  user_id: string;
+  title: string;
+  model: string;
+  created_at: string;
+  updated_at: string;
 }
-
-export interface ChatState {
-  messages: Message[];
-  isConnected: boolean;
-  isTyping: boolean;
-  error: string | null;
-}
-
-// ============================================
-// Kanban Types
-// ============================================
 
 export type Priority = 'high' | 'medium' | 'low';
 export type ColumnId = 'backlog' | 'progress' | 'done';
 
 export interface KanbanCard {
   id: string;
+  user_id: string;
   title: string;
   description?: string;
+  column_id: ColumnId;
   priority: Priority;
   tags: string[];
-  dueDate?: number;
-  createdAt: number;
-  updatedAt: number;
+  position: number;
+  created_at: string;
+  updated_at: string;
 }
 
-export interface KanbanColumn {
-  id: ColumnId;
+export type NoteCategory = 'idea' | 'note' | 'todo' | 'research';
+
+export interface BrainNote {
+  id: string;
+  user_id: string;
   title: string;
-  cards: KanbanCard[];
+  content: string;
+  category: NoteCategory;
+  color: string;
+  pinned: boolean;
+  created_at: string;
+  updated_at: string;
 }
-
-export interface KanbanState {
-  columns: KanbanColumn[];
-  lastSync: number | null;
-  isSyncing: boolean;
-}
-
-// ============================================
-// Vault Types
-// ============================================
-
-export type SecretCategory = 'api_key' | 'password' | 'note' | 'other';
 
 export interface VaultItem {
   id: string;
   name: string;
-  category: SecretCategory;
-  value: string; // Encrypted
+  category: 'api_key' | 'password' | 'note' | 'other';
+  value: string;
   notes?: string;
   createdAt: number;
   updatedAt: number;
 }
 
-export interface VaultState {
-  items: VaultItem[];
-  isUnlocked: boolean;
-  lastUnlock: number | null;
-}
-
-// ============================================
-// Security Scanner Types
-// ============================================
-
-export type SecurityCheckStatus = 'pass' | 'warning' | 'fail' | 'unknown';
-
-export interface SecurityCheck {
+export interface UserProfile {
   id: string;
-  name: string;
-  description: string;
-  status: SecurityCheckStatus;
-  details?: string;
-  lastChecked: number;
-}
-
-export interface SecurityState {
-  checks: SecurityCheck[];
-  overallScore: number;
-  lastScan: number | null;
-  isScanning: boolean;
-}
-
-// ============================================
-// Research Hub Types
-// ============================================
-
-export interface ResearchItem {
-  id: string;
-  url: string;
-  title: string;
-  description?: string;
-  content?: string; // Extracted content
-  tags: string[];
-  projectId?: string;
-  createdAt: number;
-  updatedAt: number;
-}
-
-export interface Project {
-  id: string;
-  name: string;
-  color: string;
-  itemCount: number;
-}
-
-// ============================================
-// App Settings Types
-// ============================================
-
-export type ThemeMode = 'light' | 'dark' | 'system';
-
-export interface AppSettings {
-  theme: ThemeMode;
-  biometricEnabled: boolean;
-  autoLockMinutes: number;
-  notificationsEnabled: boolean;
-  gatewayUrl: string;
-  gatewayToken: string;
-}
-
-// ============================================
-// WebSocket Types
-// ============================================
-
-export interface WSMessage {
-  type: 'message' | 'typing' | 'status' | 'error';
-  payload: unknown;
-}
-
-export interface WSConfig {
-  url: string;
-  token: string;
-  reconnectAttempts?: number;
-  reconnectInterval?: number;
+  email: string;
+  display_name: string;
+  avatar_url?: string;
+  credits: number;
+  created_at: string;
+  updated_at: string;
 }

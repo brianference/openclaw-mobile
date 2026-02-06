@@ -1,8 +1,3 @@
-/**
- * OpenClaw Mobile - Chat Screen
- * Real-time AI chat with OpenClaw backend
- */
-
 import { useState, useRef, useEffect } from 'react';
 import {
   View,
@@ -17,371 +12,277 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useChatStore } from '../../src/store/chat';
-import { useTheme } from '../../src/store/theme';
+import { useTheme, Theme } from '../../src/store/theme';
 import { Message } from '../../src/types';
 
-// ============================================
-// Message Bubble Component
-// ============================================
-
-interface MessageBubbleProps {
-  message: Message;
-  colors: any;
-}
-
-/**
- * Format timestamp for display
- */
-function formatMessageTime(timestamp: number): string {
-  const date = new Date(timestamp);
+function formatTime(dateStr: string): string {
+  const d = new Date(dateStr);
   const now = new Date();
-  const isToday = date.toDateString() === now.toDateString();
-  
-  if (isToday) {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (d.toDateString() === now.toDateString()) {
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
-  return date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
-function MessageBubble({ message, colors }: MessageBubbleProps) {
+function MessageBubble({ message, colors }: { message: Message; colors: Theme }) {
   const isUser = message.role === 'user';
-  
   return (
     <View style={[
-      styles.messageBubble,
-      isUser ? styles.userBubble : styles.assistantBubble,
-      { 
-        backgroundColor: isUser ? colors.accent : colors.surface,
-        borderColor: isUser ? colors.accent : colors.border,
-      }
+      styles.bubble,
+      isUser ? styles.bubbleUser : styles.bubbleAssistant,
+      { backgroundColor: isUser ? colors.primary : colors.surface },
     ]}>
-      <Text style={[
-        styles.messageText,
-        { color: isUser ? '#ffffff' : colors.text }
-      ]}>
-        {message.content}
-      </Text>
-      
-      {/* Timestamp and status */}
-      <View style={styles.messageFooter}>
-        <Text style={[
-          styles.messageTime,
-          { color: isUser ? '#ffffff80' : colors.textMuted }
-        ]}>
-          {formatMessageTime(message.timestamp)}
+      {!isUser && (
+        <View style={[styles.avatarSmall, { backgroundColor: colors.primaryBg }]}>
+          <Ionicons name="flash" size={12} color={colors.primary} />
+        </View>
+      )}
+      <View style={styles.bubbleContent}>
+        <Text style={[styles.messageText, { color: isUser ? '#fff' : colors.text }]}>
+          {message.content}
         </Text>
-        
-        {/* Status indicator for user messages */}
-        {isUser && message.status && (
-          <View style={styles.statusContainer}>
-            {message.status === 'sending' && (
-              <Ionicons name="time-outline" size={12} color="#ffffff80" />
-            )}
-            {message.status === 'sent' && (
-              <Ionicons name="checkmark" size={12} color="#ffffff80" />
-            )}
-            {message.status === 'error' && (
-              <Ionicons name="alert-circle" size={12} color="#ff6b6b" />
-            )}
-          </View>
-        )}
+        <View style={styles.messageFooter}>
+          <Text style={[styles.timeText, { color: isUser ? 'rgba(255,255,255,0.6)' : colors.textMuted }]}>
+            {formatTime(message.created_at)}
+          </Text>
+          {isUser && message.status === 'error' && (
+            <Ionicons name="alert-circle" size={12} color="#ff6b6b" />
+          )}
+        </View>
       </View>
     </View>
   );
 }
 
-// ============================================
-// Typing Indicator Component
-// ============================================
-
-function TypingIndicator({ colors }: { colors: any }) {
+function TypingDots({ colors }: { colors: Theme }) {
   return (
-    <View style={[styles.typingContainer, { backgroundColor: colors.surface }]}>
-      <View style={[styles.typingDot, { backgroundColor: colors.textDim }]} />
-      <View style={[styles.typingDot, styles.typingDotDelay1, { backgroundColor: colors.textDim }]} />
-      <View style={[styles.typingDot, styles.typingDotDelay2, { backgroundColor: colors.textDim }]} />
+    <View style={[styles.bubble, styles.bubbleAssistant, { backgroundColor: colors.surface }]}>
+      <View style={[styles.avatarSmall, { backgroundColor: colors.primaryBg }]}>
+        <Ionicons name="flash" size={12} color={colors.primary} />
+      </View>
+      <View style={styles.dotsWrap}>
+        {[0.6, 0.4, 0.2].map((opacity, i) => (
+          <View key={i} style={[styles.dot, { backgroundColor: colors.textMuted, opacity }]} />
+        ))}
+      </View>
     </View>
   );
 }
 
-// ============================================
-// Chat Screen
-// ============================================
-
 export default function ChatScreen() {
   const [inputText, setInputText] = useState('');
-  const flatListRef = useRef<FlatList>(null);
-  
-  const { 
-    messages, 
-    isConnected, 
-    isTyping, 
-    error,
-    connect,
-    sendMessage,
-    gatewayUrl,
-  } = useChatStore();
-  
+  const listRef = useRef<FlatList>(null);
   const { colors } = useTheme();
-  
-  // Connect on mount
+  const {
+    messages,
+    isTyping,
+    activeConversation,
+    conversations,
+    fetchConversations,
+    createConversation,
+    setActiveConversation,
+    sendMessage,
+    isLoading,
+  } = useChatStore();
+
   useEffect(() => {
-    if (gatewayUrl) {
-      connect();
-    }
-  }, [gatewayUrl]);
-  
-  // Scroll to bottom on new messages
+    fetchConversations();
+  }, []);
+
   useEffect(() => {
     if (messages.length > 0) {
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+      setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
     }
   }, [messages.length]);
-  
-  /**
-   * Handle send message
-   */
-  const handleSend = () => {
+
+  const handleSend = async () => {
     const text = inputText.trim();
     if (!text) return;
-    
-    sendMessage(text);
     setInputText('');
+
+    if (!activeConversation) {
+      const conv = await createConversation(text.slice(0, 40));
+      if (!conv) return;
+    }
+    sendMessage(text);
   };
-  
-  /**
-   * Render empty state
-   */
-  const renderEmptyState = () => (
-    <View style={styles.emptyContainer}>
-      <Ionicons name="chatbubbles-outline" size={64} color={colors.textMuted} />
-      <Text style={[styles.emptyTitle, { color: colors.text }]}>
-        Welcome to OpenClaw
-      </Text>
-      <Text style={[styles.emptySubtitle, { color: colors.textDim }]}>
-        {isConnected 
-          ? 'Send a message to start chatting'
-          : 'Configure gateway in Settings to connect'
-        }
-      </Text>
-    </View>
-  );
-  
+
+  if (!activeConversation) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.bg }]}>
+        <View style={styles.emptyCenter}>
+          <View style={[styles.emptyIcon, { backgroundColor: colors.primaryBg }]}>
+            <Ionicons name="chatbubbles" size={40} color={colors.primary} />
+          </View>
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>OpenClaw AI</Text>
+          <Text style={[styles.emptySubtitle, { color: colors.textDim }]}>
+            Your intelligent assistant for coding, writing, analysis, and brainstorming
+          </Text>
+
+          <TouchableOpacity
+            style={[styles.newChatBtn, { backgroundColor: colors.primary }]}
+            onPress={() => createConversation()}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="add" size={22} color="#fff" />
+            <Text style={styles.newChatBtnText}>New Conversation</Text>
+          </TouchableOpacity>
+
+          {conversations.length > 0 && (
+            <View style={styles.recentSection}>
+              <Text style={[styles.recentLabel, { color: colors.textMuted }]}>RECENT</Text>
+              {conversations.slice(0, 5).map((conv) => (
+                <TouchableOpacity
+                  key={conv.id}
+                  style={[styles.recentItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  onPress={() => setActiveConversation(conv)}
+                >
+                  <Ionicons name="chatbubble-outline" size={18} color={colors.textDim} />
+                  <Text style={[styles.recentText, { color: colors.text }]} numberOfLines={1}>
+                    {conv.title}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  }
+
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: colors.bg }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={90}
     >
-      {/* Connection Status Bar */}
-      {!isConnected && gatewayUrl && (
-        <View style={[styles.statusBar, { backgroundColor: colors.warning }]}>
-          <Ionicons name="cloud-offline" size={16} color="#000" />
-          <Text style={styles.statusBarText}>Disconnected</Text>
-          <TouchableOpacity onPress={connect}>
-            <Text style={styles.statusBarAction}>Retry</Text>
-          </TouchableOpacity>
+      <View style={[styles.chatHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <TouchableOpacity onPress={() => useChatStore.setState({ activeConversation: null, messages: [] })}>
+          <Ionicons name="chevron-back" size={24} color={colors.primary} />
+        </TouchableOpacity>
+        <View style={styles.chatHeaderInfo}>
+          <Text style={[styles.chatHeaderTitle, { color: colors.text }]} numberOfLines={1}>
+            {activeConversation.title}
+          </Text>
         </View>
-      )}
-      
-      {/* Error Banner */}
-      {error && (
-        <View style={[styles.errorBar, { backgroundColor: colors.error }]}>
-          <Text style={styles.errorBarText}>{error}</Text>
-        </View>
-      )}
-      
-      {/* Messages List */}
+        <View style={[styles.statusDot, { backgroundColor: colors.success }]} />
+      </View>
+
       <FlatList
-        ref={flatListRef}
+        ref={listRef}
         data={messages}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <MessageBubble message={item} colors={colors} />
-        )}
+        renderItem={({ item }) => <MessageBubble message={item} colors={colors} />}
         contentContainerStyle={[
           styles.messagesList,
           messages.length === 0 && styles.messagesListEmpty,
         ]}
-        ListEmptyComponent={renderEmptyState}
-        ListFooterComponent={isTyping ? <TypingIndicator colors={colors} /> : null}
+        ListEmptyComponent={
+          isLoading ? (
+            <ActivityIndicator size="large" color={colors.primary} />
+          ) : (
+            <View style={styles.emptyCenter}>
+              <Ionicons name="chatbubble-ellipses-outline" size={48} color={colors.textMuted} />
+              <Text style={[styles.chatEmptyText, { color: colors.textDim }]}>
+                Start the conversation
+              </Text>
+            </View>
+          )
+        }
+        ListFooterComponent={isTyping ? <TypingDots colors={colors} /> : null}
       />
-      
-      {/* Input Area */}
-      <View style={[styles.inputArea, { 
-        backgroundColor: colors.surface,
-        borderTopColor: colors.border,
-      }]}>
+
+      <View style={[styles.inputArea, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
         <TextInput
-          style={[styles.textInput, { 
-            backgroundColor: colors.bg,
-            color: colors.text,
-            borderColor: colors.border,
-          }]}
-          placeholder="Type a message..."
+          style={[styles.textInput, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
+          placeholder="Message OpenClaw..."
           placeholderTextColor={colors.textMuted}
           value={inputText}
           onChangeText={setInputText}
           multiline
           maxLength={4000}
-          returnKeyType="send"
-          onSubmitEditing={handleSend}
-          blurOnSubmit={false}
         />
-        <TouchableOpacity 
-          style={[
-            styles.sendButton,
-            { backgroundColor: inputText.trim() ? colors.accent : colors.border }
-          ]}
+        <TouchableOpacity
+          style={[styles.sendBtn, { backgroundColor: inputText.trim() ? colors.primary : colors.border }]}
           onPress={handleSend}
           disabled={!inputText.trim()}
         >
-          <Ionicons 
-            name="send" 
-            size={20} 
-            color={inputText.trim() ? '#ffffff' : colors.textMuted} 
-          />
+          <Ionicons name="arrow-up" size={20} color={inputText.trim() ? '#fff' : colors.textMuted} />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
-// ============================================
-// Styles
-// ============================================
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  statusBar: {
+  container: { flex: 1 },
+  chatHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
     paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    gap: 12,
+  },
+  chatHeaderInfo: { flex: 1 },
+  chatHeaderTitle: { fontSize: 16, fontWeight: '600' },
+  statusDot: { width: 8, height: 8, borderRadius: 4 },
+  emptyCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 },
+  emptyIcon: { width: 88, height: 88, borderRadius: 28, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+  emptyTitle: { fontSize: 26, fontWeight: '700', letterSpacing: -0.3 },
+  emptySubtitle: { fontSize: 15, textAlign: 'center', marginTop: 8, lineHeight: 22 },
+  newChatBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 14,
+    marginTop: 28,
     gap: 8,
   },
-  statusBarText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  statusBarAction: {
-    fontSize: 14,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
-  },
-  errorBar: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+  newChatBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  recentSection: { width: '100%', marginTop: 36, gap: 8 },
+  recentLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 4, marginLeft: 4 },
+  recentItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  errorBarText: {
-    color: '#ffffff',
-    fontSize: 14,
-  },
-  messagesList: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-  },
-  messagesListEmpty: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginTop: 16,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  messageBubble: {
-    maxWidth: '80%',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-    marginBottom: 8,
+    padding: 14,
+    borderRadius: 12,
     borderWidth: 1,
+    gap: 12,
   },
-  userBubble: {
-    alignSelf: 'flex-end',
-    borderBottomRightRadius: 4,
-  },
-  assistantBubble: {
-    alignSelf: 'flex-start',
-    borderBottomLeftRadius: 4,
-  },
-  messageText: {
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  messageFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginTop: 4,
-    gap: 4,
-  },
-  messageTime: {
-    fontSize: 11,
-  },
-  statusContainer: {
-    marginLeft: 2,
-  },
-  typingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-    gap: 4,
-  },
-  typingDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    opacity: 0.6,
-  },
-  typingDotDelay1: {
-    opacity: 0.4,
-  },
-  typingDotDelay2: {
-    opacity: 0.2,
-  },
+  recentText: { flex: 1, fontSize: 15 },
+  messagesList: { paddingHorizontal: 16, paddingVertical: 12 },
+  messagesListEmpty: { flex: 1, justifyContent: 'center' },
+  chatEmptyText: { fontSize: 15, marginTop: 12 },
+  bubble: { flexDirection: 'row', maxWidth: '85%', marginBottom: 10, borderRadius: 18, padding: 14, gap: 10 },
+  bubbleUser: { alignSelf: 'flex-end', borderBottomRightRadius: 4 },
+  bubbleAssistant: { alignSelf: 'flex-start', borderBottomLeftRadius: 4 },
+  avatarSmall: { width: 24, height: 24, borderRadius: 8, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
+  bubbleContent: { flex: 1 },
+  messageText: { fontSize: 15, lineHeight: 22 },
+  messageFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 4, gap: 4 },
+  timeText: { fontSize: 11 },
+  dotsWrap: { flexDirection: 'row', gap: 4, paddingVertical: 6 },
+  dot: { width: 7, height: 7, borderRadius: 4 },
   inputArea: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderTopWidth: 1,
-    gap: 12,
+    gap: 10,
   },
   textInput: {
     flex: 1,
-    minHeight: 40,
+    minHeight: 42,
     maxHeight: 120,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 22,
     borderWidth: 1,
-    fontSize: 16,
+    fontSize: 15,
   },
-  sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  sendBtn: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
 });
