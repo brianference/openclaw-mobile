@@ -1,10 +1,27 @@
+export type MessageStatus = 'pending' | 'sending' | 'sent' | 'failed';
+
 export interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
   conversation_id?: string;
   created_at: string;
-  status?: 'sending' | 'sent' | 'error';
+  status?: MessageStatus;
+  attachments?: MessageAttachment[];
+}
+
+export type AttachmentType = 'image' | 'markdown';
+
+export interface MessageAttachment {
+  id: string;
+  message_id: string;
+  user_id: string;
+  file_name: string;
+  file_type: AttachmentType;
+  mime_type: string;
+  file_size: number;
+  storage_path: string;
+  created_at: string;
 }
 
 export interface Conversation {
@@ -56,6 +73,14 @@ export interface VaultItem {
   updatedAt: number;
 }
 
+export type APIEndpointType = 'default' | 'local' | 'cloud';
+
+export interface APIEndpointConfig {
+  type: APIEndpointType;
+  url?: string;
+  enabled: boolean;
+}
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -63,6 +88,7 @@ export interface UserProfile {
   avatar_url?: string;
   credits: number;
   subscription_tier: SubscriptionTier;
+  api_endpoint?: APIEndpointConfig;
   created_at: string;
   updated_at: string;
 }

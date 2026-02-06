@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Linking, Modal, TextInput,
+  View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Linking, Modal, TextInput, Switch,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeStore, useTheme, ThemeMode } from '../../src/store/theme';
 import { useAuthStore } from '../../src/store/auth';
 import { useSubscriptionStore, TIER_CONFIG } from '../../src/store/subscription';
+import { useChatStore } from '../../src/store/chat';
 import { useToast } from '../../src/components/Toast';
 import { supabase } from '../../src/lib/supabase';
 import PaywallModal from '../../src/components/PaywallModal';
+import { APIEndpointType, APIEndpointConfig } from '../../src/types';
 
 function SettingRow({ icon, title, subtitle, colors, onPress, rightElement, danger }: {
   icon: string; title: string; subtitle?: string; colors: any; onPress?: () => void;
@@ -74,6 +76,110 @@ function ProfileEditModal({ visible, onClose, colors, currentName, onSave }: {
   );
 }
 
+function ConnectionModal({ visible, onClose, colors, currentConfig, onSave }: {
+  visible: boolean; onClose: () => void; colors: any; currentConfig: APIEndpointConfig;
+  onSave: (config: APIEndpointConfig) => void;
+}) {
+  const [type, setType] = useState<APIEndpointType>(currentConfig.type);
+  const [url, setUrl] = useState(currentConfig.url || '');
+  const [enabled, setEnabled] = useState(currentConfig.enabled);
+
+  useEffect(() => {
+    setType(currentConfig.type);
+    setUrl(currentConfig.url || '');
+    setEnabled(currentConfig.enabled);
+  }, [currentConfig]);
+
+  const handleSave = () => {
+    if (type !== 'default' && enabled && !url.trim()) {
+      Alert.alert('Error', 'URL is required for custom endpoints');
+      return;
+    }
+    onSave({ type, url: url.trim() || undefined, enabled });
+    onClose();
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.overlay}>
+        <View style={[styles.modal, { backgroundColor: colors.surface }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>AI Connection</Text>
+            <TouchableOpacity onPress={onClose}>
+              <Ionicons name="close" size={24} color={colors.textDim} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.modalBody}>
+            <View style={styles.switchRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.label, { color: colors.text }]}>Use Custom Endpoint</Text>
+                <Text style={[styles.helpText, { color: colors.textMuted }]}>
+                  Connect to a local or cloud OpenClaw instance
+                </Text>
+              </View>
+              <Switch value={enabled} onValueChange={setEnabled} />
+            </View>
+
+            {enabled && (
+              <>
+                <Text style={[styles.label, { color: colors.text, marginTop: 16 }]}>Endpoint Type</Text>
+                <View style={styles.radioGroup}>
+                  {(['default', 'local', 'cloud'] as APIEndpointType[]).map((t) => (
+                    <TouchableOpacity
+                      key={t}
+                      style={[
+                        styles.radioOption,
+                        { backgroundColor: type === t ? colors.primaryBg : colors.bg, borderColor: colors.border },
+                      ]}
+                      onPress={() => setType(t)}
+                    >
+                      <Ionicons
+                        name={type === t ? 'radio-button-on' : 'radio-button-off'}
+                        size={20}
+                        color={type === t ? colors.primary : colors.textMuted}
+                      />
+                      <Text style={[styles.radioLabel, { color: colors.text }]}>
+                        {t === 'default' ? 'Default (Supabase)' : t === 'local' ? 'Local Network' : 'Cloud'}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {type !== 'default' && (
+                  <>
+                    <Text style={[styles.label, { color: colors.text, marginTop: 16 }]}>
+                      {type === 'local' ? 'Local URL' : 'Cloud URL'}
+                    </Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
+                      value={url}
+                      onChangeText={setUrl}
+                      placeholder={type === 'local' ? 'http://192.168.1.100:8000' : 'https://api.openclaw.ai'}
+                      placeholderTextColor={colors.textMuted}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
+                    <Text style={[styles.helpText, { color: colors.textMuted }]}>
+                      {type === 'local'
+                        ? 'Enter your local machine IP address and port'
+                        : 'Enter your cloud OpenClaw API endpoint'}
+                    </Text>
+                  </>
+                )}
+              </>
+            )}
+          </View>
+          <View style={[styles.modalFooter, { borderTopColor: colors.border }]}>
+            <TouchableOpacity style={[styles.saveBtn, { backgroundColor: colors.primary }]} onPress={handleSave}>
+              <Text style={styles.saveBtnText}>Save</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 const TIER_BADGES: Record<string, { icon: string; color: string }> = {
   free: { icon: 'flash-outline', color: '#64748b' },
   pro: { icon: 'flash', color: '#0d9488' },
@@ -85,13 +191,25 @@ export default function SettingsScreen() {
   const { setMode } = useThemeStore();
   const { profile, signOut, fetchProfile } = useAuthStore();
   const { subscription, fetchSubscription } = useSubscriptionStore();
+  const { setCustomEndpoint } = useChatStore();
   const toast = useToast();
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showConnection, setShowConnection] = useState(false);
+  const [connectionConfig, setConnectionConfig] = useState<APIEndpointConfig>(
+    profile?.api_endpoint || { type: 'default', enabled: false }
+  );
 
   useEffect(() => {
     fetchSubscription();
   }, []);
+
+  useEffect(() => {
+    if (profile?.api_endpoint) {
+      setConnectionConfig(profile.api_endpoint);
+      setCustomEndpoint(profile.api_endpoint);
+    }
+  }, [profile]);
 
   const themeLabels: Record<ThemeMode, string> = { system: 'System', light: 'Light', dark: 'Dark' };
   const themeIcons: Record<ThemeMode, string> = { system: 'phone-portrait-outline', light: 'sunny-outline', dark: 'moon-outline' };
@@ -129,6 +247,22 @@ export default function SettingsScreen() {
       `To upgrade to ${TIER_CONFIG[tier as keyof typeof TIER_CONFIG].name}, payment processing needs to be configured. Contact support for early access.`,
       [{ text: 'OK' }]
     );
+  };
+
+  const handleSaveConnection = async (config: APIEndpointConfig) => {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ api_endpoint: config, updated_at: new Date().toISOString() })
+      .eq('id', profile!.id);
+
+    if (error) {
+      toast.show('Failed to save connection settings', 'error');
+    } else {
+      setConnectionConfig(config);
+      setCustomEndpoint(config);
+      await fetchProfile();
+      toast.show('Connection settings saved', 'success');
+    }
   };
 
   const currentTier = subscription?.tier || 'free';
@@ -200,6 +334,21 @@ export default function SettingsScreen() {
         />
       </View>
 
+      <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>AI CONNECTION</Text>
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
+        <SettingRow
+          icon="server-outline"
+          title="Endpoint Configuration"
+          subtitle={
+            connectionConfig.enabled
+              ? `${connectionConfig.type === 'local' ? 'Local' : connectionConfig.type === 'cloud' ? 'Cloud' : 'Default'} ${connectionConfig.url ? `(${connectionConfig.url})` : ''}`
+              : 'Using default Supabase endpoint'
+          }
+          colors={colors}
+          onPress={() => setShowConnection(true)}
+        />
+      </View>
+
       <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>PREFERENCES</Text>
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <SettingRow
@@ -252,6 +401,14 @@ export default function SettingsScreen() {
         onClose={() => setShowPaywall(false)}
         onUpgrade={handleUpgrade}
       />
+
+      <ConnectionModal
+        visible={showConnection}
+        onClose={() => setShowConnection(false)}
+        colors={colors}
+        currentConfig={connectionConfig}
+        onSave={handleSaveConnection}
+      />
     </ScrollView>
   );
 }
@@ -292,4 +449,9 @@ const styles = StyleSheet.create({
   modalFooter: { flexDirection: 'row', justifyContent: 'flex-end', padding: 16, borderTopWidth: 1 },
   saveBtn: { paddingVertical: 12, paddingHorizontal: 24, borderRadius: 10 },
   saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  helpText: { fontSize: 12, marginTop: 4, lineHeight: 16 },
+  radioGroup: { marginTop: 8, gap: 8 },
+  radioOption: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 10, borderWidth: 1, gap: 10 },
+  radioLabel: { fontSize: 15, fontWeight: '500' },
 });

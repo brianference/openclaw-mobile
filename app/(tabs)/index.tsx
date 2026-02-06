@@ -11,17 +11,22 @@ import {
   ActivityIndicator,
   Alert,
   RefreshControl,
+  Image,
+  ActionSheetIOS,
 } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming, withDelay, withSequence } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
+import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
 import { useChatStore } from '../../src/store/chat';
 import { useAuthStore } from '../../src/store/auth';
 import { useSubscriptionStore } from '../../src/store/subscription';
 import { useToast } from '../../src/components/Toast';
 import { useTheme, Theme } from '../../src/store/theme';
 import { Message } from '../../src/types';
+import { getAttachmentUrl } from '../../src/lib/fileUpload';
 
 function formatTime(dateStr: string): string {
   const d = new Date(dateStr);
@@ -34,6 +39,19 @@ function formatTime(dateStr: string): string {
 
 function MessageBubble({ message, colors }: { message: Message; colors: Theme }) {
   const isUser = message.role === 'user';
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (message.attachments && message.attachments.length > 0) {
+      message.attachments.forEach(async (att) => {
+        const url = await getAttachmentUrl(att.storage_path);
+        if (url) {
+          setImageUrls(prev => ({ ...prev, [att.id]: url }));
+        }
+      });
+    }
+  }, [message.attachments]);
+
   const mdStyles = {
     body: { color: isUser ? '#fff' : colors.text, fontSize: 15, lineHeight: 22 },
     strong: { fontWeight: '700' as const },
@@ -77,6 +95,24 @@ function MessageBubble({ message, colors }: { message: Message; colors: Theme })
         </View>
       )}
       <View style={styles.bubbleContent}>
+        {message.attachments && message.attachments.length > 0 && (
+          <View style={styles.attachmentsWrap}>
+            {message.attachments.map((att) => (
+              <View key={att.id} style={[styles.attachmentItem, { backgroundColor: isUser ? 'rgba(255,255,255,0.1)' : colors.bg }]}>
+                {att.file_type === 'image' && imageUrls[att.id] ? (
+                  <Image source={{ uri: imageUrls[att.id] }} style={styles.attachmentImage} resizeMode="cover" />
+                ) : (
+                  <View style={styles.fileAttachment}>
+                    <Ionicons name="document-text" size={20} color={isUser ? '#fff' : colors.text} />
+                    <Text style={[styles.fileName, { color: isUser ? '#fff' : colors.text }]} numberOfLines={1}>
+                      {att.file_name}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
         {isUser ? (
           <Text style={[styles.messageText, { color: '#fff' }]}>{message.content}</Text>
         ) : (
@@ -86,7 +122,7 @@ function MessageBubble({ message, colors }: { message: Message; colors: Theme })
           <Text style={[styles.timeText, { color: isUser ? 'rgba(255,255,255,0.6)' : colors.textMuted }]}>
             {formatTime(message.created_at)}
           </Text>
-          {isUser && message.status === 'error' && (
+          {isUser && message.status === 'failed' && (
             <Ionicons name="alert-circle" size={12} color="#ff6b6b" />
           )}
         </View>
@@ -131,6 +167,7 @@ function TypingDots({ colors }: { colors: Theme }) {
 
 export default function ChatScreen() {
   const [inputText, setInputText] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<(ImagePicker.ImagePickerAsset | DocumentPicker.DocumentPickerAsset)[]>([]);
   const listRef = useRef<FlatList>(null);
   const { colors } = useTheme();
   const { profile, fetchProfile } = useAuthStore();
@@ -160,21 +197,87 @@ export default function ChatScreen() {
     }
   }, [messages.length]);
 
+  const handlePickFile = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    const showPicker = () => {
+      if (Platform.OS === 'ios') {
+        ActionSheetIOS.showActionSheetWithOptions(
+          {
+            options: ['Cancel', 'Choose Image', 'Choose Markdown File'],
+            cancelButtonIndex: 0,
+          },
+          async (buttonIndex) => {
+            if (buttonIndex === 1) await handlePickImage();
+            if (buttonIndex === 2) await handlePickDocument();
+          }
+        );
+      } else {
+        Alert.alert('Add Attachment', 'Choose file type', [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Image', onPress: handlePickImage },
+          { text: 'Markdown File', onPress: handlePickDocument },
+        ]);
+      }
+    };
+
+    showPicker();
+  };
+
+  const handlePickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setSelectedFiles(prev => [...prev, result.assets[0]]);
+        toast.show('Image added', 'success');
+      }
+    } catch (error) {
+      toast.show('Failed to pick image', 'error');
+    }
+  };
+
+  const handlePickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['text/markdown', 'text/plain'],
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setSelectedFiles(prev => [...prev, result.assets[0]]);
+        toast.show('Document added', 'success');
+      }
+    } catch (error) {
+      toast.show('Failed to pick document', 'error');
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSend = async () => {
     const text = inputText.trim();
-    if (!text || isTyping) return;
+    if ((!text && selectedFiles.length === 0) || isTyping) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setInputText('');
+    const filesToSend = [...selectedFiles];
+    setSelectedFiles([]);
 
     if (!activeConversation) {
       if (!canCreateConversation(conversations.length)) {
         toast.show('Conversation limit reached. Upgrade your plan.', 'error');
         return;
       }
-      const conv = await createConversation(text.slice(0, 40));
+      const conv = await createConversation(text.slice(0, 40) || 'New Chat');
       if (!conv) return;
     }
-    await sendMessage(text);
+    await sendMessage(text || '(Attachment)', filesToSend);
     fetchProfile();
   };
 
@@ -329,22 +432,49 @@ export default function ChatScreen() {
       />
 
       <View style={[styles.inputArea, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-        <TextInput
-          style={[styles.textInput, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
-          placeholder="Message OpenClaw..."
-          placeholderTextColor={colors.textMuted}
-          value={inputText}
-          onChangeText={setInputText}
-          multiline
-          maxLength={4000}
-        />
-        <TouchableOpacity
-          style={[styles.sendBtn, { backgroundColor: inputText.trim() && !isTyping ? colors.primary : colors.border }]}
-          onPress={handleSend}
-          disabled={!inputText.trim() || isTyping}
-        >
-          <Ionicons name="arrow-up" size={20} color={inputText.trim() && !isTyping ? '#fff' : colors.textMuted} />
-        </TouchableOpacity>
+        {selectedFiles.length > 0 && (
+          <View style={styles.filesPreview}>
+            {selectedFiles.map((file, index) => (
+              <View key={index} style={[styles.fileChip, { backgroundColor: colors.primaryBg }]}>
+                <Ionicons
+                  name={'mimeType' in file && file.mimeType?.startsWith('image/') ? 'image' : 'document-text'}
+                  size={14}
+                  color={colors.primary}
+                />
+                <Text style={[styles.fileChipText, { color: colors.text }]} numberOfLines={1}>
+                  {'name' in file ? file.name : 'Image'}
+                </Text>
+                <TouchableOpacity onPress={() => handleRemoveFile(index)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                  <Ionicons name="close-circle" size={16} color={colors.textMuted} />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
+        <View style={styles.inputRow}>
+          <TouchableOpacity
+            style={[styles.attachBtn, { backgroundColor: colors.bg }]}
+            onPress={handlePickFile}
+          >
+            <Ionicons name="attach" size={20} color={colors.primary} />
+          </TouchableOpacity>
+          <TextInput
+            style={[styles.textInput, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
+            placeholder="Message OpenClaw..."
+            placeholderTextColor={colors.textMuted}
+            value={inputText}
+            onChangeText={setInputText}
+            multiline
+            maxLength={4000}
+          />
+          <TouchableOpacity
+            style={[styles.sendBtn, { backgroundColor: (inputText.trim() || selectedFiles.length > 0) && !isTyping ? colors.primary : colors.border }]}
+            onPress={handleSend}
+            disabled={(!inputText.trim() && selectedFiles.length === 0) || isTyping}
+          >
+            <Ionicons name="arrow-up" size={20} color={(inputText.trim() || selectedFiles.length > 0) && !isTyping ? '#fff' : colors.textMuted} />
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -408,12 +538,40 @@ const styles = StyleSheet.create({
   dotsWrap: { flexDirection: 'row', gap: 4, paddingVertical: 6 },
   dot: { width: 7, height: 7, borderRadius: 4 },
   inputArea: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderTopWidth: 1,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
     gap: 10,
+  },
+  filesPreview: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 10,
+  },
+  fileChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    gap: 6,
+    maxWidth: 150,
+  },
+  fileChipText: {
+    fontSize: 13,
+    flex: 1,
+  },
+  attachBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   textInput: {
     flex: 1,
@@ -426,4 +584,27 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   sendBtn: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
+  attachmentsWrap: {
+    gap: 8,
+    marginBottom: 8,
+  },
+  attachmentItem: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  attachmentImage: {
+    width: 200,
+    height: 150,
+    borderRadius: 12,
+  },
+  fileAttachment: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    padding: 12,
+  },
+  fileName: {
+    fontSize: 13,
+    flex: 1,
+  },
 });
