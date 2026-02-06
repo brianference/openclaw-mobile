@@ -16,6 +16,7 @@ interface ChatState {
   setActiveConversation: (conversation: Conversation) => void;
   fetchMessages: (conversationId: string) => Promise<void>;
   sendMessage: (content: string) => Promise<void>;
+  renameConversation: (id: string, title: string) => Promise<void>;
   deleteConversation: (id: string) => Promise<void>;
   reset: () => void;
 }
@@ -191,6 +192,25 @@ export const useChatStore = create<ChatState>()((set, get) => ({
         .from('conversations')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', activeConversation.id);
+    }
+  },
+
+  renameConversation: async (id, title) => {
+    const { error } = await supabase
+      .from('conversations')
+      .update({ title, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (!error) {
+      set((state) => ({
+        conversations: state.conversations.map((c) =>
+          c.id === id ? { ...c, title } : c
+        ),
+        activeConversation:
+          state.activeConversation?.id === id
+            ? { ...state.activeConversation, title }
+            : state.activeConversation,
+      }));
     }
   },
 

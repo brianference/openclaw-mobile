@@ -18,6 +18,8 @@ import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
 import { useChatStore } from '../../src/store/chat';
 import { useAuthStore } from '../../src/store/auth';
+import { useSubscriptionStore } from '../../src/store/subscription';
+import { useToast } from '../../src/components/Toast';
 import { useTheme, Theme } from '../../src/store/theme';
 import { Message } from '../../src/types';
 
@@ -132,6 +134,8 @@ export default function ChatScreen() {
   const listRef = useRef<FlatList>(null);
   const { colors } = useTheme();
   const { profile, fetchProfile } = useAuthStore();
+  const { canCreateConversation } = useSubscriptionStore();
+  const toast = useToast();
   const {
     messages,
     isTyping,
@@ -141,6 +145,7 @@ export default function ChatScreen() {
     createConversation,
     setActiveConversation,
     sendMessage,
+    renameConversation,
     deleteConversation,
     isLoading,
   } = useChatStore();
@@ -162,6 +167,10 @@ export default function ChatScreen() {
     setInputText('');
 
     if (!activeConversation) {
+      if (!canCreateConversation(conversations.length)) {
+        toast.show('Conversation limit reached. Upgrade your plan.', 'error');
+        return;
+      }
       const conv = await createConversation(text.slice(0, 40));
       if (!conv) return;
     }
@@ -174,6 +183,28 @@ export default function ChatScreen() {
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: () => deleteConversation(id) },
     ]);
+  };
+
+  const handleRenameConversation = () => {
+    if (!activeConversation) return;
+    Alert.prompt(
+      'Rename Chat',
+      'Enter a new title:',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Rename',
+          onPress: (newTitle?: string) => {
+            if (newTitle?.trim()) {
+              renameConversation(activeConversation.id, newTitle.trim());
+              toast.show('Chat renamed', 'success');
+            }
+          },
+        },
+      ],
+      'plain-text',
+      activeConversation.title
+    );
   };
 
   if (!activeConversation) {
@@ -199,7 +230,13 @@ export default function ChatScreen() {
 
           <TouchableOpacity
             style={[styles.newChatBtn, { backgroundColor: colors.primary }]}
-            onPress={() => createConversation()}
+            onPress={() => {
+              if (!canCreateConversation(conversations.length)) {
+                toast.show('Conversation limit reached. Upgrade your plan.', 'error');
+                return;
+              }
+              createConversation();
+            }}
             activeOpacity={0.8}
           >
             <Ionicons name="add" size={22} color="#fff" />
@@ -250,11 +287,15 @@ export default function ChatScreen() {
         <TouchableOpacity onPress={() => useChatStore.setState({ activeConversation: null, messages: [] })}>
           <Ionicons name="chevron-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <View style={styles.chatHeaderInfo}>
+        <TouchableOpacity
+          style={styles.chatHeaderInfo}
+          onPress={Platform.OS === 'ios' ? handleRenameConversation : undefined}
+          activeOpacity={0.7}
+        >
           <Text style={[styles.chatHeaderTitle, { color: colors.text }]} numberOfLines={1}>
             {activeConversation.title}
           </Text>
-        </View>
+        </TouchableOpacity>
         {profile && (
           <View style={[styles.creditsChip, { backgroundColor: colors.primaryBg }]}>
             <Ionicons name="flash" size={12} color={colors.primary} />

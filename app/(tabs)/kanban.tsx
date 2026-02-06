@@ -5,6 +5,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useKanbanStore } from '../../src/store/kanban';
+import { useSubscriptionStore } from '../../src/store/subscription';
 import { useTheme } from '../../src/store/theme';
 import { useToast } from '../../src/components/Toast';
 import { KanbanCard, ColumnId, Priority } from '../../src/types';
@@ -149,6 +150,7 @@ export default function KanbanScreen() {
   const { colors } = useTheme();
   const toast = useToast();
   const { cards, fetchCards, addCard, updateCard, moveCard, deleteCard, isLoading } = useKanbanStore();
+  const { canCreateCard } = useSubscriptionStore();
   const [selected, setSelected] = useState<KanbanCard | null>(null);
   const [addColumn, setAddColumn] = useState<ColumnId | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -171,7 +173,13 @@ export default function KanbanScreen() {
                 <View style={[styles.countBadge, { backgroundColor: colors.border }]}>
                   <Text style={[styles.countText, { color: colors.textDim }]}>{colCards.length}</Text>
                 </View>
-                <TouchableOpacity onPress={() => { setSelected(null); setAddColumn(id); setShowModal(true); }} style={styles.addBtn}>
+                <TouchableOpacity onPress={() => {
+                  if (!canCreateCard(cards.length)) {
+                    toast.show('Card limit reached. Upgrade your plan.', 'error');
+                    return;
+                  }
+                  setSelected(null); setAddColumn(id); setShowModal(true);
+                }} style={styles.addBtn}>
                   <Ionicons name="add-circle-outline" size={22} color={colors.primary} />
                 </TouchableOpacity>
               </View>

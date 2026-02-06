@@ -5,6 +5,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useBrainStore } from '../../src/store/brain';
+import { useSubscriptionStore } from '../../src/store/subscription';
 import { useTheme } from '../../src/store/theme';
 import { useToast } from '../../src/components/Toast';
 import { BrainNote, NoteCategory } from '../../src/types';
@@ -156,7 +157,8 @@ function NoteModal({ visible, note, onClose, onSave, onDelete, colors }: {
 export default function BrainScreen() {
   const { colors } = useTheme();
   const toast = useToast();
-  const { fetchNotes, addNote, updateNote, deleteNote, togglePin, setFilterCategory, filterCategory, getFilteredNotes, isLoading, searchQuery, setSearchQuery } = useBrainStore();
+  const { fetchNotes, addNote, updateNote, deleteNote, togglePin, setFilterCategory, filterCategory, getFilteredNotes, isLoading, searchQuery, setSearchQuery, notes } = useBrainStore();
+  const { canCreateNote } = useSubscriptionStore();
   const [selected, setSelected] = useState<BrainNote | null>(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -208,7 +210,14 @@ export default function BrainScreen() {
 
       <TouchableOpacity
         style={[styles.fab, { backgroundColor: colors.primary }]}
-        onPress={() => { setSelected(null); setShowModal(true); }}>
+        onPress={() => {
+          if (!canCreateNote(notes.length)) {
+            toast.show('Note limit reached. Upgrade your plan.', 'error');
+            return;
+          }
+          setSelected(null);
+          setShowModal(true);
+        }}>
         <Ionicons name="add" size={28} color="#fff" />
       </TouchableOpacity>
 

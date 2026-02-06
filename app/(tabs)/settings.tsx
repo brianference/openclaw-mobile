@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Linking, Modal, TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeStore, useTheme, ThemeMode } from '../../src/store/theme';
 import { useAuthStore } from '../../src/store/auth';
+import { useSubscriptionStore, TIER_CONFIG } from '../../src/store/subscription';
 import { useToast } from '../../src/components/Toast';
 import { supabase } from '../../src/lib/supabase';
+import PaywallModal from '../../src/components/PaywallModal';
 
 function SettingRow({ icon, title, subtitle, colors, onPress, rightElement, danger }: {
   icon: string; title: string; subtitle?: string; colors: any; onPress?: () => void;
@@ -72,12 +74,24 @@ function ProfileEditModal({ visible, onClose, colors, currentName, onSave }: {
   );
 }
 
+const TIER_BADGES: Record<string, { icon: string; color: string }> = {
+  free: { icon: 'flash-outline', color: '#64748b' },
+  pro: { icon: 'flash', color: '#0d9488' },
+  premium: { icon: 'diamond', color: '#d97706' },
+};
+
 export default function SettingsScreen() {
   const { colors, mode } = useTheme();
   const { setMode } = useThemeStore();
   const { profile, signOut, fetchProfile } = useAuthStore();
+  const { subscription, fetchSubscription } = useSubscriptionStore();
   const toast = useToast();
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  useEffect(() => {
+    fetchSubscription();
+  }, []);
 
   const themeLabels: Record<ThemeMode, string> = { system: 'System', light: 'Light', dark: 'Dark' };
   const themeIcons: Record<ThemeMode, string> = { system: 'phone-portrait-outline', light: 'sunny-outline', dark: 'moon-outline' };
@@ -109,6 +123,22 @@ export default function SettingsScreen() {
     ]);
   };
 
+  const handleUpgrade = (tier: string) => {
+    Alert.alert(
+      'Upgrade Plan',
+      `To upgrade to ${TIER_CONFIG[tier as keyof typeof TIER_CONFIG].name}, payment processing needs to be configured. Contact support for early access.`,
+      [{ text: 'OK' }]
+    );
+  };
+
+  const currentTier = subscription?.tier || 'free';
+  const tierBadge = TIER_BADGES[currentTier];
+  const tierConfig = TIER_CONFIG[currentTier];
+  const creditsUsed = profile ? tierConfig.credits_per_month - profile.credits : 0;
+  const creditsProgress = tierConfig.credits_per_month > 0
+    ? Math.min(1, Math.max(0, creditsUsed / tierConfig.credits_per_month))
+    : 0;
+
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.bg }]}>
       {profile && (
@@ -126,12 +156,49 @@ export default function SettingsScreen() {
             <Text style={[styles.profileName, { color: colors.text }]}>{profile.display_name}</Text>
             <Text style={[styles.profileEmail, { color: colors.textDim }]}>{profile.email}</Text>
           </View>
-          <View style={[styles.creditsBadge, { backgroundColor: colors.primaryBg }]}>
-            <Ionicons name="flash" size={14} color={colors.primary} />
-            <Text style={[styles.creditsText, { color: colors.primary }]}>{profile.credits}</Text>
+          <View style={[styles.tierBadge, { backgroundColor: `${tierBadge.color}18` }]}>
+            <Ionicons name={tierBadge.icon as any} size={14} color={tierBadge.color} />
+            <Text style={[styles.tierBadgeText, { color: tierBadge.color }]}>
+              {tierConfig.name}
+            </Text>
           </View>
         </TouchableOpacity>
       )}
+
+      <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>SUBSCRIPTION</Text>
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
+        <View style={[styles.creditsRow, { borderBottomColor: colors.border }]}>
+          <View style={styles.creditsInfo}>
+            <Text style={[styles.creditsTitle, { color: colors.text }]}>AI Credits</Text>
+            <Text style={[styles.creditsCount, { color: colors.primary }]}>
+              {profile?.credits ?? 0}
+              <Text style={[styles.creditsTotal, { color: colors.textMuted }]}>
+                {tierConfig.credits_per_month > 0 ? ` / ${tierConfig.credits_per_month}` : ''}
+              </Text>
+            </Text>
+          </View>
+          {tierConfig.credits_per_month > 0 && (
+            <View style={[styles.progressBar, { backgroundColor: colors.surface2 }]}>
+              <View
+                style={[
+                  styles.progressFill,
+                  {
+                    backgroundColor: creditsProgress > 0.8 ? colors.warning : colors.primary,
+                    width: `${(1 - creditsProgress) * 100}%`,
+                  },
+                ]}
+              />
+            </View>
+          )}
+        </View>
+        <SettingRow
+          icon="rocket-outline"
+          title="Upgrade Plan"
+          subtitle={currentTier === 'premium' ? 'You have the best plan' : 'Get more credits and features'}
+          colors={colors}
+          onPress={() => setShowPaywall(true)}
+        />
+      </View>
 
       <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>PREFERENCES</Text>
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
@@ -179,6 +246,12 @@ export default function SettingsScreen() {
           onSave={handleUpdateProfile}
         />
       )}
+
+      <PaywallModal
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        onUpgrade={handleUpgrade}
+      />
     </ScrollView>
   );
 }
@@ -191,8 +264,8 @@ const styles = StyleSheet.create({
   profileInfo: { flex: 1 },
   profileName: { fontSize: 17, fontWeight: '600' },
   profileEmail: { fontSize: 13, marginTop: 2 },
-  creditsBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, gap: 4 },
-  creditsText: { fontSize: 14, fontWeight: '700' },
+  tierBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, gap: 4 },
+  tierBadgeText: { fontSize: 13, fontWeight: '700' },
   sectionTitle: { fontSize: 12, fontWeight: '600', letterSpacing: 0.5, marginHorizontal: 16, marginTop: 24, marginBottom: 8 },
   section: { marginHorizontal: 16, borderRadius: 12, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', padding: 14, borderBottomWidth: 1 },
@@ -200,6 +273,13 @@ const styles = StyleSheet.create({
   rowContent: { flex: 1, marginLeft: 12 },
   rowTitle: { fontSize: 15, fontWeight: '500' },
   rowSub: { fontSize: 13, marginTop: 2 },
+  creditsRow: { padding: 16, borderBottomWidth: 1 },
+  creditsInfo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  creditsTitle: { fontSize: 15, fontWeight: '500' },
+  creditsCount: { fontSize: 16, fontWeight: '700' },
+  creditsTotal: { fontSize: 14, fontWeight: '400' },
+  progressBar: { height: 6, borderRadius: 3, overflow: 'hidden' },
+  progressFill: { height: '100%', borderRadius: 3 },
   footer: { alignItems: 'center', paddingVertical: 32 },
   footerText: { fontSize: 13 },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../store/auth';
-import { useTheme, Theme } from '../store/theme';
+import { useTheme } from '../store/theme';
 
 export default function AuthScreen() {
   const [isLogin, setIsLogin] = useState(true);
@@ -23,7 +23,6 @@ export default function AuthScreen() {
   const [error, setError] = useState<string | null>(null);
   const { signIn, signUp, isLoading } = useAuthStore();
   const { colors } = useTheme();
-  const s = makeStyles(colors);
 
   const handleSubmit = async () => {
     setError(null);
@@ -52,37 +51,39 @@ export default function AuthScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={[s.container, { backgroundColor: colors.bg }]}
+      style={[styles.container, { backgroundColor: colors.bg }]}
     >
       <ScrollView
-        contentContainerStyle={s.scrollContent}
+        contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={s.header}>
-          <View style={[s.logoContainer, { backgroundColor: colors.primaryBg }]}>
-            <Ionicons name="flash" size={40} color={colors.primary} />
+        <View style={styles.header}>
+          <View style={[styles.logoOuter, { backgroundColor: colors.primaryBg }]}>
+            <View style={[styles.logoInner, { backgroundColor: `${colors.primary}20` }]}>
+              <Ionicons name="flash" size={32} color={colors.primary} />
+            </View>
           </View>
-          <Text style={[s.title, { color: colors.text }]}>OpenClaw</Text>
-          <Text style={[s.subtitle, { color: colors.textDim }]}>
-            {isLogin ? 'Welcome back' : 'Create your account'}
+          <Text style={[styles.brand, { color: colors.text }]}>OpenClaw</Text>
+          <Text style={[styles.tagline, { color: colors.textDim }]}>
+            {isLogin ? 'Sign in to continue' : 'Create your account'}
           </Text>
         </View>
 
         {error && (
-          <View style={[s.errorBox, { backgroundColor: colors.errorLight }]}>
+          <View style={[styles.errorBox, { backgroundColor: colors.errorLight }]}>
             <Ionicons name="alert-circle" size={18} color={colors.error} />
-            <Text style={[s.errorText, { color: colors.error }]}>{error}</Text>
+            <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
           </View>
         )}
 
-        <View style={s.form}>
+        <View style={[styles.formCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {!isLogin && (
-            <View style={s.inputGroup}>
-              <Text style={[s.label, { color: colors.textDim }]}>Name</Text>
-              <View style={[s.inputWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <Ionicons name="person-outline" size={18} color={colors.textMuted} style={s.inputIcon} />
+            <View style={styles.fieldGroup}>
+              <Text style={[styles.fieldLabel, { color: colors.textDim }]}>Name</Text>
+              <View style={[styles.inputWrap, { backgroundColor: colors.bg, borderColor: colors.border }]}>
+                <Ionicons name="person-outline" size={18} color={colors.textMuted} />
                 <TextInput
-                  style={[s.input, { color: colors.text }]}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder="Your name"
                   placeholderTextColor={colors.textMuted}
                   value={displayName}
@@ -94,12 +95,12 @@ export default function AuthScreen() {
             </View>
           )}
 
-          <View style={s.inputGroup}>
-            <Text style={[s.label, { color: colors.textDim }]}>Email</Text>
-            <View style={[s.inputWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <Ionicons name="mail-outline" size={18} color={colors.textMuted} style={s.inputIcon} />
+          <View style={styles.fieldGroup}>
+            <Text style={[styles.fieldLabel, { color: colors.textDim }]}>Email</Text>
+            <View style={[styles.inputWrap, { backgroundColor: colors.bg, borderColor: colors.border }]}>
+              <Ionicons name="mail-outline" size={18} color={colors.textMuted} />
               <TextInput
-                style={[s.input, { color: colors.text }]}
+                style={[styles.input, { color: colors.text }]}
                 placeholder="you@example.com"
                 placeholderTextColor={colors.textMuted}
                 value={email}
@@ -112,12 +113,12 @@ export default function AuthScreen() {
             </View>
           </View>
 
-          <View style={s.inputGroup}>
-            <Text style={[s.label, { color: colors.textDim }]}>Password</Text>
-            <View style={[s.inputWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <Ionicons name="lock-closed-outline" size={18} color={colors.textMuted} style={s.inputIcon} />
+          <View style={styles.fieldGroup}>
+            <Text style={[styles.fieldLabel, { color: colors.textDim }]}>Password</Text>
+            <View style={[styles.inputWrap, { backgroundColor: colors.bg, borderColor: colors.border }]}>
+              <Ionicons name="lock-closed-outline" size={18} color={colors.textMuted} />
               <TextInput
-                style={[s.input, { color: colors.text }]}
+                style={[styles.input, { color: colors.text }]}
                 placeholder="Min 6 characters"
                 placeholderTextColor={colors.textMuted}
                 value={password}
@@ -126,14 +127,14 @@ export default function AuthScreen() {
                 autoCapitalize="none"
                 editable={!isLoading}
               />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={s.eyeBtn}>
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
                 <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.textMuted} />
               </TouchableOpacity>
             </View>
           </View>
 
           <TouchableOpacity
-            style={[s.submitBtn, { backgroundColor: colors.primary }, isLoading && { opacity: 0.6 }]}
+            style={[styles.submitBtn, { backgroundColor: colors.primary }, isLoading && { opacity: 0.6 }]}
             onPress={handleSubmit}
             disabled={isLoading}
             activeOpacity={0.8}
@@ -141,13 +142,16 @@ export default function AuthScreen() {
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={s.submitText}>{isLogin ? 'Sign In' : 'Create Account'}</Text>
+              <>
+                <Text style={styles.submitText}>{isLogin ? 'Sign In' : 'Create Account'}</Text>
+                <Ionicons name="arrow-forward" size={18} color="#fff" />
+              </>
             )}
           </TouchableOpacity>
         </View>
 
-        <View style={s.switchRow}>
-          <Text style={[s.switchText, { color: colors.textDim }]}>
+        <View style={styles.switchRow}>
+          <Text style={[styles.switchText, { color: colors.textDim }]}>
             {isLogin ? "Don't have an account?" : 'Already have an account?'}
           </Text>
           <TouchableOpacity
@@ -156,74 +160,117 @@ export default function AuthScreen() {
               setError(null);
             }}
           >
-            <Text style={[s.switchLink, { color: colors.primary }]}>
+            <Text style={[styles.switchLink, { color: colors.primary }]}>
               {isLogin ? 'Sign Up' : 'Sign In'}
             </Text>
           </TouchableOpacity>
+        </View>
+
+        <View style={styles.features}>
+          {[
+            { icon: 'chatbubbles-outline', label: 'AI Chat' },
+            { icon: 'grid-outline', label: 'Kanban' },
+            { icon: 'bulb-outline', label: 'Brain' },
+            { icon: 'shield-checkmark-outline', label: 'Vault' },
+          ].map((f) => (
+            <View key={f.label} style={[styles.featureChip, { backgroundColor: colors.surface }]}>
+              <Ionicons name={f.icon as any} size={14} color={colors.primary} />
+              <Text style={[styles.featureLabel, { color: colors.textDim }]}>{f.label}</Text>
+            </View>
+          ))}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-const makeStyles = (colors: Theme) =>
-  StyleSheet.create({
-    container: { flex: 1 },
-    scrollContent: {
-      flexGrow: 1,
-      justifyContent: 'center',
-      paddingHorizontal: 28,
-      paddingVertical: 40,
-    },
-    header: { alignItems: 'center', marginBottom: 36 },
-    logoContainer: {
-      width: 80,
-      height: 80,
-      borderRadius: 24,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 20,
-    },
-    title: { fontSize: 30, fontWeight: '700', letterSpacing: -0.5 },
-    subtitle: { fontSize: 16, marginTop: 6, lineHeight: 24 },
-    errorBox: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      padding: 14,
-      borderRadius: 12,
-      marginBottom: 20,
-      gap: 10,
-    },
-    errorText: { fontSize: 14, flex: 1, lineHeight: 20 },
-    form: { gap: 18 },
-    inputGroup: { gap: 6 },
-    label: { fontSize: 13, fontWeight: '600', marginLeft: 4 },
-    inputWrap: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      borderWidth: 1,
-      borderRadius: 14,
-      paddingHorizontal: 14,
-      height: 52,
-    },
-    inputIcon: { marginRight: 10 },
-    input: { flex: 1, fontSize: 16, height: '100%' },
-    eyeBtn: { padding: 6 },
-    submitBtn: {
-      height: 52,
-      borderRadius: 14,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: 6,
-    },
-    submitText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-    switchRow: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 28,
-      gap: 6,
-    },
-    switchText: { fontSize: 14 },
-    switchLink: { fontSize: 14, fontWeight: '600' },
-  });
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 40,
+  },
+  header: { alignItems: 'center', marginBottom: 32 },
+  logoOuter: {
+    width: 80,
+    height: 80,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  logoInner: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brand: { fontSize: 28, fontWeight: '800', letterSpacing: -0.5 },
+  tagline: { fontSize: 16, marginTop: 6, lineHeight: 24 },
+  errorBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 16,
+    gap: 10,
+  },
+  errorText: { fontSize: 14, flex: 1, lineHeight: 20 },
+  formCard: {
+    borderRadius: 20,
+    padding: 24,
+    borderWidth: 1,
+    gap: 20,
+  },
+  fieldGroup: { gap: 6 },
+  fieldLabel: { fontSize: 13, fontWeight: '600', marginLeft: 4 },
+  inputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    height: 52,
+    gap: 10,
+  },
+  input: { flex: 1, fontSize: 16, height: '100%' },
+  eyeBtn: { padding: 6 },
+  submitBtn: {
+    height: 52,
+    borderRadius: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+    gap: 8,
+  },
+  submitText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 24,
+    gap: 6,
+  },
+  switchText: { fontSize: 14 },
+  switchLink: { fontSize: 14, fontWeight: '700' },
+  features: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 32,
+  },
+  featureChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 6,
+  },
+  featureLabel: { fontSize: 12, fontWeight: '500' },
+});

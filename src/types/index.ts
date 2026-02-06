@@ -62,6 +62,24 @@ export interface UserProfile {
   display_name: string;
   avatar_url?: string;
   credits: number;
+  subscription_tier: SubscriptionTier;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SubscriptionTier = 'free' | 'pro' | 'premium';
+export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'trialing';
+
+export interface Subscription {
+  id: string;
+  user_id: string;
+  tier: SubscriptionTier;
+  status: SubscriptionStatus;
+  credits_per_month: number;
+  current_period_start: string;
+  current_period_end: string;
+  stripe_customer_id?: string;
+  stripe_subscription_id?: string;
   created_at: string;
   updated_at: string;
 }

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { UserProfile } from '../types';
+import { useSubscriptionStore } from './subscription';
 
 interface AuthState {
   session: Session | null;
@@ -29,6 +30,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       set({ session, user: session?.user ?? null, isLoading: false, isInitialized: true });
       if (session?.user) {
         get().fetchProfile();
+        useSubscriptionStore.getState().fetchSubscription();
       }
     });
 
@@ -37,6 +39,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       if (session?.user) {
         (async () => {
           await get().fetchProfile();
+          await useSubscriptionStore.getState().fetchSubscription();
         })();
       } else {
         set({ profile: null });
