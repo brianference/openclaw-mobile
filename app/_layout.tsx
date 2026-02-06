@@ -33,18 +33,6 @@ export default function RootLayout() {
     );
   }
 
-  if (!session) {
-    return (
-      <ErrorBoundary>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <StatusBar style={isDark ? 'light' : 'dark'} />
-          <AuthScreen />
-          <ToastProvider />
-        </GestureHandlerRootView>
-      </ErrorBoundary>
-    );
-  }
-
   return (
     <ErrorBoundary>
       <GestureHandlerRootView style={{ flex: 1 }}>
