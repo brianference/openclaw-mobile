@@ -32,6 +32,7 @@ export default [
         beforeAll: 'readonly',
         afterAll: 'readonly',
         test: 'readonly',
+        __DEV__: 'readonly',
       },
     },
     plugins: {
