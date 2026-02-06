@@ -39,18 +39,8 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      [
-        "expo-local-authentication",
-        {
-          "faceIDPermission": "Allow OpenClaw to use Face ID for authentication"
-        }
-      ],
-      [
-        "expo-sqlite",
-        {
-          "enableFTS": true
-        }
-      ]
+      "expo-document-picker",
+      "expo-image-picker"
     ],
     "experiments": {
       "typedRoutes": true
