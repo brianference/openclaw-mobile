@@ -12,6 +12,7 @@ import { KanbanCard, ColumnId, Priority } from '../../src/types';
 
 const COLUMNS: { id: ColumnId; title: string; icon: string }[] = [
   { id: 'backlog', title: 'Backlog', icon: 'albums-outline' },
+  { id: 'next-up', title: 'Next Up', icon: 'arrow-forward-circle-outline' },
   { id: 'progress', title: 'In Progress', icon: 'play-circle-outline' },
   { id: 'done', title: 'Done', icon: 'checkmark-circle-outline' },
 ];
@@ -157,7 +158,7 @@ export default function KanbanScreen() {
 
   useEffect(() => { fetchCards(); }, []);
 
-  const colColors: Record<ColumnId, string> = { backlog: colors.accent, progress: colors.warning, done: colors.success };
+  const colColors: Record<ColumnId, string> = { backlog: colors.accent, 'next-up': colors.primary, progress: colors.warning, done: colors.success };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>

@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   searchWrap: { paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1 },
   searchBox: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, height: 42, gap: 8 },
-  searchInput: { flex: 1, fontSize: 15 },
+  searchInput: { flex: 1, fontSize: 15, paddingVertical: 0 },
   list: { padding: 16, gap: 12 },
   vaultCard: { borderRadius: 14, padding: 16, borderWidth: 1 },
   vaultHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },

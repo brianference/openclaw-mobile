@@ -217,6 +217,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
         if (!customEndpoint?.enabled || customEndpoint.type === 'default') {
           headers['Authorization'] = `Bearer ${session.access_token}`;
           headers['Apikey'] = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+        } else if (customEndpoint.token) {
+          headers['Authorization'] = `Bearer ${customEndpoint.token}`;
         }
 
         const response = await fetch(apiUrl, {

@@ -34,7 +34,7 @@ export interface Conversation {
 }
 
 export type Priority = 'high' | 'medium' | 'low';
-export type ColumnId = 'backlog' | 'progress' | 'done';
+export type ColumnId = 'backlog' | 'next-up' | 'progress' | 'done';
 
 export interface KanbanCard {
   id: string;
@@ -78,6 +78,7 @@ export type APIEndpointType = 'default' | 'local' | 'cloud';
 export interface APIEndpointConfig {
   type: APIEndpointType;
   url?: string;
+  token?: string;
   enabled: boolean;
 }
 

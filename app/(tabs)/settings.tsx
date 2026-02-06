@@ -82,11 +82,13 @@ function ConnectionModal({ visible, onClose, colors, currentConfig, onSave }: {
 }) {
   const [type, setType] = useState<APIEndpointType>(currentConfig.type);
   const [url, setUrl] = useState(currentConfig.url || '');
+  const [token, setToken] = useState(currentConfig.token || '');
   const [enabled, setEnabled] = useState(currentConfig.enabled);
 
   useEffect(() => {
     setType(currentConfig.type);
     setUrl(currentConfig.url || '');
+    setToken(currentConfig.token || '');
     setEnabled(currentConfig.enabled);
   }, [currentConfig]);
 
@@ -95,7 +97,7 @@ function ConnectionModal({ visible, onClose, colors, currentConfig, onSave }: {
       Alert.alert('Error', 'URL is required for custom endpoints');
       return;
     }
-    onSave({ type, url: url.trim() || undefined, enabled });
+    onSave({ type, url: url.trim() || undefined, token: token.trim() || undefined, enabled });
     onClose();
   };
 
@@ -122,6 +124,20 @@ function ConnectionModal({ visible, onClose, colors, currentConfig, onSave }: {
 
             {enabled && (
               <>
+                <TouchableOpacity
+                  style={[styles.helpCard, { backgroundColor: colors.primaryBg, borderColor: colors.primary }]}
+                  onPress={() => Linking.openURL('https://docs.openclaw.ai/getting-started')}
+                >
+                  <Ionicons name="information-circle" size={20} color={colors.primary} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.helpCardTitle, { color: colors.primary }]}>Setup Guide</Text>
+                    <Text style={[styles.helpCardText, { color: colors.textDim }]}>
+                      Learn how to install and configure OpenClaw
+                    </Text>
+                  </View>
+                  <Ionicons name="open-outline" size={18} color={colors.primary} />
+                </TouchableOpacity>
+
                 <Text style={[styles.label, { color: colors.text, marginTop: 16 }]}>Endpoint Type</Text>
                 <View style={styles.radioGroup}>
                   {(['default', 'local', 'cloud'] as APIEndpointType[]).map((t) => (
@@ -148,21 +164,38 @@ function ConnectionModal({ visible, onClose, colors, currentConfig, onSave }: {
                 {type !== 'default' && (
                   <>
                     <Text style={[styles.label, { color: colors.text, marginTop: 16 }]}>
-                      {type === 'local' ? 'Local URL' : 'Cloud URL'}
+                      Gateway URL
                     </Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
                       value={url}
                       onChangeText={setUrl}
-                      placeholder={type === 'local' ? 'http://192.168.1.100:8000' : 'https://api.openclaw.ai'}
+                      placeholder={type === 'local' ? 'http://192.168.1.100:18789' : 'https://your-server.com:18789'}
                       placeholderTextColor={colors.textMuted}
                       autoCapitalize="none"
                       autoCorrect={false}
                     />
                     <Text style={[styles.helpText, { color: colors.textMuted }]}>
                       {type === 'local'
-                        ? 'Enter your local machine IP address and port'
-                        : 'Enter your cloud OpenClaw API endpoint'}
+                        ? 'OpenClaw Gateway runs on port 18789 by default'
+                        : 'Enter your OpenClaw Gateway URL (default port: 18789)'}
+                    </Text>
+
+                    <Text style={[styles.label, { color: colors.text, marginTop: 16 }]}>
+                      Gateway Token (Optional)
+                    </Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }]}
+                      value={token}
+                      onChangeText={setToken}
+                      placeholder="Enter your gateway token"
+                      placeholderTextColor={colors.textMuted}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      secureTextEntry
+                    />
+                    <Text style={[styles.helpText, { color: colors.textMuted }]}>
+                      Found in your OpenClaw config (gateway.auth.token)
                     </Text>
                   </>
                 )}
@@ -454,4 +487,7 @@ const styles = StyleSheet.create({
   radioGroup: { marginTop: 8, gap: 8 },
   radioOption: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 10, borderWidth: 1, gap: 10 },
   radioLabel: { fontSize: 15, fontWeight: '500' },
+  helpCard: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 10, borderWidth: 1, gap: 10, marginTop: 12 },
+  helpCardTitle: { fontSize: 14, fontWeight: '600' },
+  helpCardText: { fontSize: 12, marginTop: 2 },
 });
