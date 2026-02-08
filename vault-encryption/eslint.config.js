@@ -20,10 +20,12 @@ module.exports = [
         beforeEach: 'readonly',
         afterEach: 'readonly',
         test: 'readonly',
+        TextEncoder: 'readonly',
+        TextDecoder: 'readonly',
       },
     },
     rules: {
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }],
       'no-console': 'error',
       'no-var': 'error',
       'prefer-const': 'error',
