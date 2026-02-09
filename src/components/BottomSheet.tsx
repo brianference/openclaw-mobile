@@ -1,4 +1,4 @@
-import { forwardRef, ReactNode, useEffect, useCallback } from 'react';
+import { forwardRef, ReactNode, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Modal,
@@ -98,8 +98,8 @@ export const BottomSheet = forwardRef<View, BottomSheetProps>(
     },
     ref
   ) => {
-    const translateY = new Animated.Value(SCREEN_HEIGHT);
-    const backdropOpacity = new Animated.Value(0);
+    const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+    const backdropOpacity = useRef(new Animated.Value(0)).current;
 
     const panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => !disableSwipeDismiss,
