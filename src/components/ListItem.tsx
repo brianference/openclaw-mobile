@@ -8,7 +8,7 @@ import {
   TextStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, touchTargets, radius } from '../design/tokens';
+import { colors, spacing, typography } from '../design/tokens';
 
 export type ListItemAccessory = 'chevron' | 'badge' | 'toggle' | 'none';
 

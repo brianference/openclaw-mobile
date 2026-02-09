@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, shadows, radius } from '../design/tokens';
+import { colors, shadows } from '../design/tokens';
 
 export type FABSize = 'default' | 'mini';
 export type FABPosition = 'bottom-right' | 'bottom-left' | 'bottom-center';

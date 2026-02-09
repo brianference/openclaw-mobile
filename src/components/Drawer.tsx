@@ -4,7 +4,6 @@ import {
   Modal,
   TouchableWithoutFeedback,
   StyleSheet,
-  Dimensions,
   ViewStyle,
   Platform,
   StatusBar,
@@ -14,7 +13,6 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
-  runOnJS,
 } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 import { colors, spacing, shadows, zIndex } from '../design/tokens';
@@ -82,8 +80,6 @@ export interface DrawerProps {
    */
   accessibilityLabel?: string;
 }
-
-const SCREEN_WIDTH = Dimensions.get('window').width;
 
 /**
  * Drawer Component (Navigation Drawer)
@@ -162,6 +158,8 @@ export const Drawer = forwardRef<View, DrawerProps>(
           duration: animationDuration,
         });
       }
+      // SharedValues from useSharedValue are stable refs and don't need to be in deps
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visible, position, width, backdropOpacity, animationDuration]);
 
     const drawerAnimatedStyle = useAnimatedStyle(() => ({
