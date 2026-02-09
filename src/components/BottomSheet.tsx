@@ -1,4 +1,4 @@
-import { forwardRef, ReactNode, useEffect } from 'react';
+import { forwardRef, ReactNode, useEffect, useCallback } from 'react';
 import {
   View,
   Modal,
@@ -125,7 +125,7 @@ export const BottomSheet = forwardRef<View, BottomSheetProps>(
       },
     });
 
-    const showSheet = () => {
+    const showSheet = useCallback(() => {
       Animated.parallel([
         Animated.spring(translateY, {
           toValue: 0,
@@ -145,9 +145,9 @@ export const BottomSheet = forwardRef<View, BottomSheetProps>(
           accessibilityLabel || 'Bottom sheet opened'
         );
       }
-    };
+    }, [accessibilityLabel, backdropOpacity, translateY]);
 
-    const dismissSheet = () => {
+    const dismissSheet = useCallback(() => {
       Animated.parallel([
         Animated.spring(translateY, {
           toValue: SCREEN_HEIGHT,
@@ -163,14 +163,14 @@ export const BottomSheet = forwardRef<View, BottomSheetProps>(
       ]).start(() => {
         onDismiss();
       });
-    };
+    }, [backdropOpacity, onDismiss, translateY]);
 
     useEffect(() => {
       if (visible) {
         translateY.setValue(SCREEN_HEIGHT);
         showSheet();
       }
-    }, [visible]);
+    }, [visible, showSheet, translateY]);
 
     if (!visible) {
       return null;
