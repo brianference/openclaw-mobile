@@ -175,8 +175,39 @@ export const runConnectionTests = async (
       { name: 'Firestore database ready', status: 'pending' },
     ];
     
-    // Similar implementation for Google Cloud...
-    // (Omitted for brevity, follows same pattern)
+    // Test 1: Credentials
+    tests[0].status = 'running';
+    onProgress([...tests]);
+    const credResult = await validateGcpCredentials(
+      config.gcpProjectId,
+      config.gcpServiceAccountKey
+    );
+    tests[0].status = credResult.success ? 'success' : 'error';
+    tests[0].error = credResult.error;
+    onProgress([...tests]);
+    
+    if (!credResult.success) return tests;
+    
+    // Test 2: Cloud Storage
+    tests[1].status = 'running';
+    onProgress([...tests]);
+    const bucketResult = await createCloudStorageBucket(
+      config.bucketName,
+      config.gcpProjectId
+    );
+    tests[1].status = bucketResult.success ? 'success' : 'error';
+    tests[1].error = bucketResult.error;
+    onProgress([...tests]);
+    
+    if (!bucketResult.success) return tests;
+    
+    // Test 3: Firestore
+    tests[2].status = 'running';
+    onProgress([...tests]);
+    const firestoreResult = await setupFirestore(config.gcpProjectId);
+    tests[2].status = firestoreResult.success ? 'success' : 'error';
+    tests[2].error = firestoreResult.error;
+    onProgress([...tests]);
     
     return tests;
   }

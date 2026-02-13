@@ -1,0 +1,14 @@
+version: 2
+static:
+  cleanUrls: true
+snapshot:
+  widths:
+    - 393   # Pixel 5
+    - 390   # iPhone 12
+    - 1280  # Desktop
+  minHeight: 1024
+  percyCSS: ''
+discovery:
+  allowedHostnames:
+    - localhost
+  networkIdleTimeout: 750

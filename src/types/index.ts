@@ -110,3 +110,18 @@ export interface Subscription {
   created_at: string;
   updated_at: string;
 }
+
+export type TaskCategory = 'work' | 'personal' | 'shopping';
+export type ReminderType = 'none' | '1h' | '2h' | '1d' | '1w';
+
+export interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+  dueDate?: string; // ISO 8601 format
+  category: TaskCategory;
+  reminder?: ReminderType;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}

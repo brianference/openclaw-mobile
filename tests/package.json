@@ -1,0 +1,27 @@
+{
+  "name": "mobileclaw-tests",
+  "version": "1.0.0",
+  "description": "Playwright E2E tests for MobileClaw",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "test:p0": "playwright test --grep @P0",
+    "test:p1": "playwright test --grep @P1",
+    "test:desktop": "playwright test --project=Desktop",
+    "test:iphone": "playwright test --project='iPhone 12'",
+    "test:pixel": "playwright test --project='Pixel 5'",
+    "test:accessibility": "playwright test --project=accessibility",
+    "test:report": "playwright show-report",
+    "test:screenshot": "playwright test --update-snapshots"
+  },
+  "keywords": ["playwright", "e2e", "testing", "mobileclaw"],
+  "author": "Test Case Writing Agent",
+  "license": "MIT",
+  "devDependencies": {
+    "@axe-core/playwright": "^4.8.3",
+    "@playwright/test": "^1.40.1",
+    "typescript": "^5.3.3"
+  }
+}

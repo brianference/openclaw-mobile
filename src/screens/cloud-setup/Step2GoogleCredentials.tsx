@@ -41,6 +41,46 @@ export const Step2GoogleCredentials: React.FC<Step2GoogleProps> = ({
     );
   };
   
+  const handleUploadJSON = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: 'application/json',
+        copyToCacheDirectory: true
+      });
+      
+      if (result.assets && result.assets.length > 0) {
+        const file = result.assets[0];
+        const response = await fetch(file.uri);
+        const content = await response.text();
+        
+        // Validate JSON format
+        try {
+          const parsed = JSON.parse(content);
+          
+          // Basic validation for service account key
+          if (parsed.type !== 'service_account') {
+            Alert.alert('Invalid File', 'This doesn\'t appear to be a service account key');
+            return;
+          }
+          
+          onUpdate('gcpServiceAccountKey', content);
+          
+          // Auto-fill project ID if available
+          if (parsed.project_id && !projectId) {
+            onUpdate('gcpProjectId', parsed.project_id);
+          }
+          
+          Alert.alert('Success', 'Service account key loaded successfully');
+        } catch (parseError) {
+          Alert.alert('Invalid JSON', 'The file contains invalid JSON');
+        }
+      }
+    } catch (error) {
+      console.error('Error picking document:', error);
+      Alert.alert('Error', 'Failed to read the file');
+    }
+  };
+  
   return (
     <ScrollView>
       <ProgressIndicator steps={6} currentStep={2} />
@@ -70,7 +110,11 @@ export const Step2GoogleCredentials: React.FC<Step2GoogleProps> = ({
         placeholder='{"type": "service_account", ...}'
       />
       
-      <TouchableOpacity style={styles.uploadButton}>
+      <TouchableOpacity 
+        style={styles.uploadButton}
+        onPress={handleUploadJSON}
+        activeOpacity={0.7}
+      >
         <Text style={styles.uploadButtonText}>📁 Upload JSON File</Text>
       </TouchableOpacity>
       

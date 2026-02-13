@@ -163,6 +163,8 @@ export const CloudSetupWizard: React.FC<CloudSetupWizardProps> = ({
         return (
           <Step3Storage
             bucketName={state.bucketName}
+            enableEncryption={state.enableEncryption}
+            enableVersioning={state.enableVersioning}
             onUpdate={updateField}
             onNext={nextStep}
             onBack={prevStep}
@@ -173,6 +175,10 @@ export const CloudSetupWizard: React.FC<CloudSetupWizardProps> = ({
         return (
           <Step4Database
             tableName={state.tableName}
+            capacityMode={state.capacityMode}
+            readCapacity={state.readCapacity}
+            writeCapacity={state.writeCapacity}
+            enableBackups={state.enableBackups}
             onUpdate={updateField}
             onNext={nextStep}
             onBack={prevStep}

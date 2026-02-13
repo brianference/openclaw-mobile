@@ -1,0 +1,19 @@
+{
+  "name": "mobileclaw-visual-tests",
+  "version": "1.0.0",
+  "description": "Visual regression testing for MobileClaw using Playwright + Percy",
+  "scripts": {
+    "test": "playwright test",
+    "test:desktop": "playwright test --project=Desktop",
+    "test:iphone": "playwright test --project=\"iPhone 12\"",
+    "test:pixel": "playwright test --project=\"Pixel 5\"",
+    "test:percy": "percy exec -- playwright test",
+    "report": "playwright show-report",
+    "install-browsers": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@percy/cli": "^1.28.0"
+  },
+  "type": "module"
+}

@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { FormField } from '../../components/wizard/FormField';
 import { ButtonGroup } from '../../components/wizard/ButtonGroup';
 import { ProgressIndicator } from '../../components/wizard/ProgressIndicator';
 import { validateBucketName } from '../../services/cloudSetup/validation';
 import { colors, spacing } from '../../styles/wizard';
+import { Checkbox } from '../../components/Checkbox';
 
 interface Step3Props {
   bucketName: string;
+  enableEncryption?: boolean;
+  enableVersioning?: boolean;
   onUpdate: (field: string, value: any) => void;
   onNext: () => void;
   onBack: () => void;
@@ -15,6 +18,8 @@ interface Step3Props {
 
 export const Step3Storage: React.FC<Step3Props> = ({
   bucketName,
+  enableEncryption = true,
+  enableVersioning = true,
   onUpdate,
   onNext,
   onBack
@@ -37,13 +42,49 @@ export const Step3Storage: React.FC<Step3Props> = ({
         onChange={(val) => onUpdate('bucketName', val)}
         onBlur={validateField}
         error={error || undefined}
-        helpText="Must be globally unique"
+        helpText="Must be globally unique (lowercase, numbers, hyphens)"
         required
         placeholder="mobileclaw-backup-yourname"
       />
       
-      <Text style={styles.costEstimate}>💾 Estimated Cost: ~$0.50/month</Text>
-      <Text style={styles.costDescription}>(Based on 5GB storage)</Text>
+      <View style={styles.optionsContainer}>
+        <Text style={styles.optionsTitle}>Storage Options</Text>
+        
+        <TouchableOpacity 
+          style={styles.checkboxRow}
+          onPress={() => onUpdate('enableEncryption', !enableEncryption)}
+          activeOpacity={0.7}
+        >
+          <Checkbox
+            value={enableEncryption}
+            onChange={(val) => onUpdate('enableEncryption', val)}
+          />
+          <View style={styles.checkboxLabel}>
+            <Text style={styles.checkboxTitle}>Enable server-side encryption</Text>
+            <Text style={styles.checkboxDescription}>(Recommended for security)</Text>
+          </View>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.checkboxRow}
+          onPress={() => onUpdate('enableVersioning', !enableVersioning)}
+          activeOpacity={0.7}
+        >
+          <Checkbox
+            value={enableVersioning}
+            onChange={(val) => onUpdate('enableVersioning', val)}
+          />
+          <View style={styles.checkboxLabel}>
+            <Text style={styles.checkboxTitle}>Enable version history</Text>
+            <Text style={styles.checkboxDescription}>(Allows file recovery)</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+      
+      <View style={styles.costContainer}>
+        <Text style={styles.costEstimate}>💾 Estimated Cost: ~$0.50/month</Text>
+        <Text style={styles.costDescription}>(Based on 5GB storage)</Text>
+      </View>
       
       <ButtonGroup
         onBack={onBack}
@@ -63,10 +104,48 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   
+  optionsContainer: {
+    marginTop: spacing.lg,
+    marginBottom: spacing.lg,
+  },
+  
+  optionsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.gray800,
+    marginBottom: spacing.md,
+  },
+  
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: spacing.md,
+    gap: spacing.md,
+  },
+  
+  checkboxLabel: {
+    flex: 1,
+  },
+  
+  checkboxTitle: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.gray800,
+    marginBottom: spacing.xs,
+  },
+  
+  checkboxDescription: {
+    fontSize: 13,
+    color: colors.gray500,
+  },
+  
+  costContainer: {
+    marginTop: spacing.lg,
+  },
+  
   costEstimate: {
     fontSize: 16,
     color: colors.gray700,
-    marginTop: spacing.lg,
   },
   
   costDescription: {
