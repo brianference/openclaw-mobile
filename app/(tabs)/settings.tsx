@@ -11,6 +11,9 @@ import { useToast } from '../../src/components/Toast';
 import { supabase } from '../../src/lib/supabase';
 import PaywallModal from '../../src/components/PaywallModal';
 import { APIEndpointType, APIEndpointConfig } from '../../src/types';
+import { CloudSetupWizard } from '../../src/screens/cloud-setup/CloudSetupWizard';
+import { loadDraft, hasDraft } from '../../src/services/cloudSetup/storage';
+import { WizardState } from '../../src/types/cloudSetup';
 
 function SettingRow({ icon, title, subtitle, colors, onPress, rightElement, danger }: {
   icon: string; title: string; subtitle?: string; colors: any; onPress?: () => void;
@@ -229,13 +232,40 @@ export default function SettingsScreen() {
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showConnection, setShowConnection] = useState(false);
+  const [showCloudWizard, setShowCloudWizard] = useState(false);
+  const [cloudWizardDraft, setCloudWizardDraft] = useState<WizardState | null>(null);
+  const [hasCloudSetupDraft, setHasCloudSetupDraft] = useState(false);
   const [connectionConfig, setConnectionConfig] = useState<APIEndpointConfig>(
     profile?.api_endpoint || { type: 'default', enabled: false }
   );
 
   useEffect(() => {
     fetchSubscription();
+    checkForCloudSetupDraft();
   }, []);
+  
+  const checkForCloudSetupDraft = async () => {
+    const hasSavedDraft = await hasDraft();
+    setHasCloudSetupDraft(hasSavedDraft);
+    if (hasSavedDraft) {
+      const draft = await loadDraft();
+      setCloudWizardDraft(draft);
+    }
+  };
+  
+  const handleOpenCloudWizard = async () => {
+    if (hasCloudSetupDraft) {
+      const draft = await loadDraft();
+      setCloudWizardDraft(draft);
+    }
+    setShowCloudWizard(true);
+  };
+  
+  const handleCloseCloudWizard = async () => {
+    setShowCloudWizard(false);
+    // Check again if draft exists after closing
+    await checkForCloudSetupDraft();
+  };
 
   useEffect(() => {
     if (profile?.api_endpoint) {
@@ -367,6 +397,17 @@ export default function SettingsScreen() {
         />
       </View>
 
+      <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>CLOUD STORAGE</Text>
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
+        <SettingRow
+          icon="cloud-outline"
+          title={hasCloudSetupDraft ? "Resume Cloud Setup" : "Set Up Cloud Storage"}
+          subtitle={hasCloudSetupDraft ? `Continue from Step ${cloudWizardDraft?.currentStep || 1} of 6` : "Configure AWS or Google Cloud backup"}
+          colors={colors}
+          onPress={handleOpenCloudWizard}
+        />
+      </View>
+
       <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>AI CONNECTION</Text>
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <SettingRow
@@ -441,6 +482,12 @@ export default function SettingsScreen() {
         colors={colors}
         currentConfig={connectionConfig}
         onSave={handleSaveConnection}
+      />
+      
+      <CloudSetupWizard
+        visible={showCloudWizard}
+        onClose={handleCloseCloudWizard}
+        initialDraft={cloudWizardDraft}
       />
     </ScrollView>
   );
