@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { Message, Conversation, MessageAttachment, APIEndpointConfig } from '../types';
 import { uploadFile, getAttachmentUrl, deleteAttachment } from '../lib/fileUpload';
+import { gatewayClient } from '../lib/gatewayClient';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 
@@ -200,64 +201,194 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
       set({ isTyping: true });
 
+      const useGatewayWs =
+        customEndpoint?.enabled === true &&
+        customEndpoint.type !== 'default' &&
+        !!customEndpoint.url;
+
       try {
-        const chatMessages = [
-          ...messages.map((m) => ({ role: m.role, content: m.content })),
-          { role: 'user' as const, content: queuedMsg.content },
-        ];
+        if (useGatewayWs) {
+          // ── WebSocket Gateway streaming path (US-082) ──────────────────────
+          const wsUrl = customEndpoint!.url!;
+          const wsToken = customEndpoint!.token || '';
 
-        const apiUrl = customEndpoint?.enabled && customEndpoint.url
-          ? `${customEndpoint.url}/chat`
-          : `${DEFAULT_FUNCTIONS_URL}/chat-completion`;
+          // Connect if not already connected to this URL
+          if (!gatewayClient.isConnected || gatewayClient.currentUrl !== wsUrl) {
+            await new Promise<void>((resolve, reject) => {
+              const timeout = setTimeout(() => {
+                reject(new Error('Gateway connection timeout (10s). Check Gateway URL in Settings.'));
+              }, 10000);
 
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-        };
+              gatewayClient.onConnected = () => {
+                clearTimeout(timeout);
+                resolve();
+              };
 
-        if (!customEndpoint?.enabled || customEndpoint.type === 'default') {
-          headers['Authorization'] = `Bearer ${session.access_token}`;
-          headers['Apikey'] = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
-        } else if (customEndpoint.token) {
-          headers['Authorization'] = `Bearer ${customEndpoint.token}`;
-        }
+              gatewayClient.onError = (err: Error) => {
+                clearTimeout(timeout);
+                reject(err);
+              };
 
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            messages: chatMessages,
-            conversationId: activeConversation.id,
-            attachments: uploadedAttachments.map(a => ({
-              type: a.file_type,
-              name: a.file_name,
-              url: getAttachmentUrl(a.storage_path),
-            })),
-          }),
-        });
+              gatewayClient.connect(wsUrl, wsToken);
+            });
+          }
 
-        const result = await response.json();
+          // Streaming message placeholder
+          const streamingMsgId = `stream_${Date.now()}`;
+          let streamedContent = '';
+          let hasFirstChunk = false;
 
-        if (!response.ok) {
-          throw new Error(result.error || 'Failed to get response');
-        }
+          await new Promise<void>((resolve, reject) => {
+            gatewayClient.onChunk = (chunk: string) => {
+              streamedContent += chunk;
 
-        if (result.message) {
-          set((state) => ({
-            isTyping: false,
-            messages: [...state.messages, result.message as Message],
-          }));
+              if (!hasFirstChunk) {
+                hasFirstChunk = true;
+                // First chunk: replace typing dots with streaming bubble
+                set((state) => ({
+                  isTyping: false,
+                  messages: [
+                    ...state.messages,
+                    {
+                      id: streamingMsgId,
+                      role: 'assistant' as const,
+                      content: chunk,
+                      conversation_id: activeConversation!.id,
+                      created_at: new Date().toISOString(),
+                      status: 'sending' as const,
+                      isStreaming: true,
+                    } as Message,
+                  ],
+                }));
+              } else {
+                // Subsequent chunks: append to existing bubble
+                set((state) => ({
+                  messages: state.messages.map((m) =>
+                    m.id === streamingMsgId
+                      ? { ...m, content: m.content + chunk }
+                      : m
+                  ),
+                }));
+              }
+            };
+
+            gatewayClient.onDone = () => {
+              // Finalize the streaming bubble
+              set((state) => ({
+                isTyping: false,
+                messages: state.messages.map((m) =>
+                  m.id === streamingMsgId
+                    ? { ...m, status: 'sent' as const, isStreaming: false }
+                    : m
+                ),
+              }));
+              resolve();
+            };
+
+            gatewayClient.onError = (err: Error) => {
+              set((state) => ({
+                isTyping: false,
+                messages: state.messages.filter((m) => m.id !== streamingMsgId),
+              }));
+              reject(err);
+            };
+
+            gatewayClient.sendMessage(queuedMsg.content);
+          });
+
+          // Persist the gateway response to Supabase so history survives restarts
+          if (streamedContent) {
+            const { data: savedAssistant } = await supabase
+              .from('messages')
+              .insert({
+                conversation_id: activeConversation.id,
+                user_id: user.id,
+                role: 'assistant',
+                content: streamedContent,
+                status: 'sent',
+              })
+              .select()
+              .maybeSingle();
+
+            // Replace temp streaming ID with the real DB record ID
+            if (savedAssistant) {
+              set((state) => ({
+                messages: state.messages.map((m) =>
+                  m.id === streamingMsgId
+                    ? ({ ...savedAssistant, isStreaming: false } as Message)
+                    : m
+                ),
+              }));
+            }
+          }
 
           await supabase
             .from('conversations')
             .update({ updated_at: new Date().toISOString() })
             .eq('id', activeConversation.id);
+
         } else {
-          set({ isTyping: false });
+          // ── HTTP REST path (Supabase / default) ───────────────────────────
+          const chatMessages = [
+            ...messages.map((m) => ({ role: m.role, content: m.content })),
+            { role: 'user' as const, content: queuedMsg.content },
+          ];
+
+          const apiUrl = customEndpoint?.enabled && customEndpoint.url
+            ? `${customEndpoint.url}/chat`
+            : `${DEFAULT_FUNCTIONS_URL}/chat-completion`;
+
+          const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+          };
+
+          if (!customEndpoint?.enabled || customEndpoint.type === 'default') {
+            headers['Authorization'] = `Bearer ${session.access_token}`;
+            headers['Apikey'] = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+          } else if (customEndpoint.token) {
+            headers['Authorization'] = `Bearer ${customEndpoint.token}`;
+          }
+
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              messages: chatMessages,
+              conversationId: activeConversation.id,
+              attachments: uploadedAttachments.map(a => ({
+                type: a.file_type,
+                name: a.file_name,
+                url: getAttachmentUrl(a.storage_path),
+              })),
+            }),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.error || 'Failed to get response');
+          }
+
+          if (result.message) {
+            set((state) => ({
+              isTyping: false,
+              messages: [...state.messages, result.message as Message],
+            }));
+
+            await supabase
+              .from('conversations')
+              .update({ updated_at: new Date().toISOString() })
+              .eq('id', activeConversation.id);
+          } else {
+            set({ isTyping: false });
+          }
         }
       } catch (error) {
         set({ isTyping: false });
 
-        const fallbackContent = customEndpoint?.enabled
+        const fallbackContent = useGatewayWs
+          ? `OpenClaw Gateway connection failed. Check your Gateway URL and token in Settings, then try again.`
+          : customEndpoint?.enabled
           ? `Connection to ${customEndpoint.type} endpoint failed. Please check your connection settings.`
           : generateFallbackResponse(queuedMsg.content);
 

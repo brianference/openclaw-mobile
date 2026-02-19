@@ -8,6 +8,8 @@ export interface Message {
   created_at: string;
   status?: MessageStatus;
   attachments?: MessageAttachment[];
+  /** True while streaming content is being received from the Gateway WebSocket */
+  isStreaming?: boolean;
 }
 
 export type AttachmentType = 'image' | 'markdown';
