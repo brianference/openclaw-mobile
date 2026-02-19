@@ -66,6 +66,23 @@ export const colors = {
     info: '#0ea5e9', // Same as primary
     success: '#10b981', // Same as accent
   },
+
+
+  // Convenience aliases (default to dark mode)
+  text: {
+    primary: '#f5f5f5',
+    secondary: '#a3a3a3',
+    tertiary: '#737373',
+  },
+  background: {
+    primary: '#0a0a0a',
+    secondary: '#1a1a1a',
+    tertiary: '#252525',
+  },
+  border: {
+    default: '#333333',
+    light: '#404040',
+  },
 } as const;
 
 /**
@@ -107,12 +124,30 @@ export const typography = {
     '3xl': 32,
     '4xl': 40,
   },
+  // Convenience alias
+  size: {
+    xs: 12,
+    sm: 14,
+    md: 16,
+    lg: 18,
+    xl: 20,
+    '2xl': 24,
+    '3xl': 32,
+    '4xl': 40,
+  },
   lineHeight: {
     tight: 1.2,
     normal: 1.5,
     relaxed: 1.75,
   },
   fontWeight: {
+    normal: '400' as const,
+    medium: '500' as const,
+    semibold: '600' as const,
+    bold: '700' as const,
+  },
+  // Convenience alias
+  weight: {
     normal: '400' as const,
     medium: '500' as const,
     semibold: '600' as const,

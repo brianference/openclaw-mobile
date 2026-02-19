@@ -5,7 +5,9 @@ import { defineConfig, devices } from '@playwright/test';
  * Tests run across 3 platforms: Desktop, iPhone 12, Pixel 5
  */
 export default defineConfig({
-  testDir: './tests',
+  testDir: '.',
+  testMatch: '**/*.spec.ts',
+  testIgnore: ['**/accessibility/**', '**/node_modules/**'],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,

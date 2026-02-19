@@ -1,0 +1,5134 @@
+{
+  "config": {
+    "configFile": "/root/.openclaw/workspace/projects/mobileclaw/tests/playwright.config.ts",
+    "rootDir": "/root/.openclaw/workspace/projects/mobileclaw/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "Desktop",
+        "name": "Desktop",
+        "testDir": "/root/.openclaw/workspace/projects/mobileclaw/tests",
+        "testIgnore": [
+          "**/accessibility/**",
+          "**/node_modules/**"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "iPhone 12",
+        "name": "iPhone 12",
+        "testDir": "/root/.openclaw/workspace/projects/mobileclaw/tests",
+        "testIgnore": [
+          "**/accessibility/**",
+          "**/node_modules/**"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "Pixel 5",
+        "name": "Pixel 5",
+        "testDir": "/root/.openclaw/workspace/projects/mobileclaw/tests",
+        "testIgnore": [
+          "**/accessibility/**",
+          "**/node_modules/**"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "accessibility",
+        "name": "accessibility",
+        "testDir": "/root/.openclaw/workspace/projects/mobileclaw/tests",
+        "testIgnore": [
+          "**/accessibility/**",
+          "**/node_modules/**"
+        ],
+        "testMatch": [
+          "**/*.accessibility.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "runAgents": "none",
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.58.2",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run web",
+      "url": "http://localhost:19006",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "accessibility.spec.ts",
+      "file": "accessibility.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Accessibility Compliance",
+          "file": "accessibility.spec.ts",
+          "line": 8,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Run full accessibility audit",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ddd864604af8a6a0198f-e84ee6f3954700b66044",
+              "file": "accessibility.spec.ts",
+              "line": 426,
+              "column": 7
+            }
+          ],
+          "suites": [
+            {
+              "title": "Keyboard Navigation",
+              "file": "accessibility.spec.ts",
+              "line": 12,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-015: Tab through task creation form",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-53eea8f630c1fd257696",
+                  "file": "accessibility.spec.ts",
+                  "line": 13,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-015: Modal focus trap",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-c73354f2f4646a29a528",
+                  "file": "accessibility.spec.ts",
+                  "line": 44,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-015: Escape closes modal",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-02e2f633033be47aeed2",
+                  "file": "accessibility.spec.ts",
+                  "line": 68,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-015: Arrow keys navigate list",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-21226512f68eb002f32f",
+                  "file": "accessibility.spec.ts",
+                  "line": 82,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-015: Focus visible on all interactive elements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-05edfa6345acb84d1add",
+                  "file": "accessibility.spec.ts",
+                  "line": 102,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Color Contrast",
+              "file": "accessibility.spec.ts",
+              "line": 132,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-016: WCAG AA compliance - Dark mode",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-ddcb091a46f393004eaf",
+                  "file": "accessibility.spec.ts",
+                  "line": 133,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-016: WCAG AA compliance - Light mode",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-f806083cb468d4ef19b2",
+                  "file": "accessibility.spec.ts",
+                  "line": 154,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-016: Manual contrast verification",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-53bf18b45059e644bce3",
+                  "file": "accessibility.spec.ts",
+                  "line": 173,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Reduced Motion",
+              "file": "accessibility.spec.ts",
+              "line": 197,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-017: Animations respect prefers-reduced-motion",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-52367aec8c506e4c7930",
+                  "file": "accessibility.spec.ts",
+                  "line": 198,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-017: Modal animations reduced",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-ce4b9eb0bd7b2c66ffb8",
+                  "file": "accessibility.spec.ts",
+                  "line": 223,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-017: Loading spinners use pulsing opacity",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-977c2023f00bb6a08738",
+                  "file": "accessibility.spec.ts",
+                  "line": 239,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-017: Swipe actions instant reveal",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-c195995cafee97054ddb",
+                  "file": "accessibility.spec.ts",
+                  "line": 257,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Dynamic Text Scaling",
+              "file": "accessibility.spec.ts",
+              "line": 281,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-018: Layout adapts to large text size",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-99167c02a5d7a09b244b",
+                  "file": "accessibility.spec.ts",
+                  "line": 282,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-018: Form fields scale correctly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-97671fc5d8e0cb8403a3",
+                  "file": "accessibility.spec.ts",
+                  "line": 312,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-018: Bottom tabs wrap at large text size",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-3b48710bb592728f7f14",
+                  "file": "accessibility.spec.ts",
+                  "line": 334,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Screen Reader Support",
+              "file": "accessibility.spec.ts",
+              "line": 362,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-014: All buttons have accessible names",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-ee84fc3a62fa3a4cd84e",
+                  "file": "accessibility.spec.ts",
+                  "line": 363,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-014: Form fields have labels and hints",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-9d14f50ff8ef5fe424cf",
+                  "file": "accessibility.spec.ts",
+                  "line": 376,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-014: Live regions for dynamic content",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-facd3223c92d5a26244b",
+                  "file": "accessibility.spec.ts",
+                  "line": 387,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-014: Heading hierarchy",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ddd864604af8a6a0198f-05903c9fee4d1d5b518c",
+                  "file": "accessibility.spec.ts",
+                  "line": 400,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "cross-platform.spec.ts",
+      "file": "cross-platform.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Cross-Platform Compatibility",
+          "file": "cross-platform.spec.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Platform-Specific Features",
+              "file": "cross-platform.spec.ts",
+              "line": 11,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-024: iOS biometric prompt",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-6f695bc618d4ce2b9a30",
+                  "file": "cross-platform.spec.ts",
+                  "line": 12,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Android biometric prompt",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-67b5d58e867c1b3d411b",
+                  "file": "cross-platform.spec.ts",
+                  "line": 31,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: iOS date picker (wheel)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-1b8033e0084621d527b1",
+                  "file": "cross-platform.spec.ts",
+                  "line": 49,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Android date picker (calendar)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-1fd66542d5e543846de0",
+                  "file": "cross-platform.spec.ts",
+                  "line": 67,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: iOS swipe-to-go-back gesture",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-f09065645875b18e7182",
+                  "file": "cross-platform.spec.ts",
+                  "line": 84,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Android hardware back button",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-0736e2268927a3f98b76",
+                  "file": "cross-platform.spec.ts",
+                  "line": 105,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: iOS share sheet",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-df35d3d57c79d9645496",
+                  "file": "cross-platform.spec.ts",
+                  "line": 122,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Android share intent",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-b94e7159d913c8c21ea0",
+                  "file": "cross-platform.spec.ts",
+                  "line": 139,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Haptic feedback consistency",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-aeae959dbeca2a959bbc",
+                  "file": "cross-platform.spec.ts",
+                  "line": 154,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Status bar styling",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-315259c6b2dfd5be62bd",
+                  "file": "cross-platform.spec.ts",
+                  "line": 174,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Safe area handling (iOS notch)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-f8f60adb34d5c850d231",
+                  "file": "cross-platform.spec.ts",
+                  "line": 186,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Font consistency",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-c5928b2318dee62d985f",
+                  "file": "cross-platform.spec.ts",
+                  "line": 205,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Accessibility - VoiceOver vs TalkBack",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-640afc5d4c84a34b49e0",
+                  "file": "cross-platform.spec.ts",
+                  "line": 222,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "App Lifecycle & State Preservation",
+              "file": "cross-platform.spec.ts",
+              "line": 239,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-025: Task form state preserved on background",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-47b5647de7838ea2ddfb",
+                  "file": "cross-platform.spec.ts",
+                  "line": 240,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-025: Vault auto-lock after 5 minutes",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-dc95540f8538fa667ad1",
+                  "file": "cross-platform.spec.ts",
+                  "line": 282,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-025: Vault stays unlocked under 5 minutes",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-50d786c4412b442acc19",
+                  "file": "cross-platform.spec.ts",
+                  "line": 310,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-025: Return to previous screen after unlock",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-b7211a85f6d6f8e8b36f",
+                  "file": "cross-platform.spec.ts",
+                  "line": 333,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-025: No data loss on background/foreground",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-542695325a5515a425ae",
+                  "file": "cross-platform.spec.ts",
+                  "line": 363,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-025: Android app killed and restored",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-400a1c32f98820d467bd",
+                  "file": "cross-platform.spec.ts",
+                  "line": 395,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-025: Handle phone call interruption (iOS)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-d30e5d550017470fea5a",
+                  "file": "cross-platform.spec.ts",
+                  "line": 425,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Visual Platform Comparison",
+              "file": "cross-platform.spec.ts",
+              "line": 456,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-024: Screenshot comparison iOS vs Android",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-fb81fcf9b02312413435",
+                  "file": "cross-platform.spec.ts",
+                  "line": 457,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "edge-cases.spec.ts",
+      "file": "edge-cases.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Edge Cases",
+          "file": "edge-cases.spec.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Empty States",
+              "file": "edge-cases.spec.ts",
+              "line": 11,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-005: Tasks empty state",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-b0412dc41f0dbf54255f",
+                  "file": "edge-cases.spec.ts",
+                  "line": 20,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-005: Brain empty state",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-c0b9cce3d2ec8cff58b9",
+                  "file": "edge-cases.spec.ts",
+                  "line": 37,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-005: Vault empty state",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-8004889588cc8b6f97f5",
+                  "file": "edge-cases.spec.ts",
+                  "line": 49,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-005: Places empty state",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-aac05c4a9d9765675877",
+                  "file": "edge-cases.spec.ts",
+                  "line": 62,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-005: Scanner documents empty state",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-5ca6b9df7088c3a9a3f7",
+                  "file": "edge-cases.spec.ts",
+                  "line": 76,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-005: Accessibility - Empty state announcements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-86c23e6676274436e0c6",
+                  "file": "edge-cases.spec.ts",
+                  "line": 88,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Maximum Length Inputs",
+              "file": "edge-cases.spec.ts",
+              "line": 104,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-006: Task title max 200 chars",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-8ae9f818fdecf0c76efd",
+                  "file": "edge-cases.spec.ts",
+                  "line": 105,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-006: Task notes 5000 chars scrollable",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-bb828fbb6a635aac5da1",
+                  "file": "edge-cases.spec.ts",
+                  "line": 126,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-006: Vault secret max lengths",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-73029cb0b1d166b42770",
+                  "file": "edge-cases.spec.ts",
+                  "line": 147,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-006: Accessibility - Character counter announced",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-ecb12e1112791e93fe82",
+                  "file": "edge-cases.spec.ts",
+                  "line": 173,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Overflow & Scroll Performance",
+              "file": "edge-cases.spec.ts",
+              "line": 188,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-008: Task list scroll performance",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-eee4300eab5d18ccd0e1",
+                  "file": "edge-cases.spec.ts",
+                  "line": 197,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-008: Vault scroll with decryption",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-beed8dda1448a2d2b3cb",
+                  "file": "edge-cases.spec.ts",
+                  "line": 232,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-008: Long notes field scroll",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-2eacba9d63d078ab23f5",
+                  "file": "edge-cases.spec.ts",
+                  "line": 247,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Boundary Values & Validation",
+              "file": "edge-cases.spec.ts",
+              "line": 269,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-009: Task title validation",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-fce960cdbacc3d9b18a6",
+                  "file": "edge-cases.spec.ts",
+                  "line": 270,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-009: Past due date warning",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-a60fccba037d9ef5179d",
+                  "file": "edge-cases.spec.ts",
+                  "line": 291,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-009: Vault weak password warnings",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-ab0971ab78b3ad403ab5",
+                  "file": "edge-cases.spec.ts",
+                  "line": 312,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-009: Vault URL validation",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-5e69ec72bf3f8ca5c8f3",
+                  "file": "edge-cases.spec.ts",
+                  "line": 337,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "error-handling.spec.ts",
+      "file": "error-handling.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Error Handling",
+          "file": "error-handling.spec.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Permission Handling",
+              "file": "error-handling.spec.ts",
+              "line": 11,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-012: Camera permission denied - Scanner",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "1a72721d9ac5c938e1fe-e242b16de5f8c492deda",
+                  "file": "error-handling.spec.ts",
+                  "line": 12,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-012: Location permission denied - Places",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "1a72721d9ac5c938e1fe-7a6ebb1a22f379d424cd",
+                  "file": "error-handling.spec.ts",
+                  "line": 40,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-012: Privacy settings screen",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "1a72721d9ac5c938e1fe-c725f63f6e78892dce4b",
+                  "file": "error-handling.spec.ts",
+                  "line": 69,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-012: Accessibility - Permission error announcements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "1a72721d9ac5c938e1fe-7a9cc4c876c75bc8b37c",
+                  "file": "error-handling.spec.ts",
+                  "line": 86,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Network Timeouts",
+              "file": "error-handling.spec.ts",
+              "line": 101,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-013: Chat message timeout",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "1a72721d9ac5c938e1fe-7092a376fe2eed27d1bc",
+                  "file": "error-handling.spec.ts",
+                  "line": 102,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-013: Chat retry after timeout",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "1a72721d9ac5c938e1fe-83f75c1c8be7e7060ced",
+                  "file": "error-handling.spec.ts",
+                  "line": 135,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-013: Cloud sync timeout",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "1a72721d9ac5c938e1fe-9616f4fd46d71ed146a9",
+                  "file": "error-handling.spec.ts",
+                  "line": 164,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-013: Retry sync with fast connection",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "1a72721d9ac5c938e1fe-13a3a797effa81754755",
+                  "file": "error-handling.spec.ts",
+                  "line": 192,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-013: Accessibility - Timeout announcements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "1a72721d9ac5c938e1fe-db438c33a45e86c337dd",
+                  "file": "error-handling.spec.ts",
+                  "line": 218,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-013: No indefinite spinners",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "1a72721d9ac5c938e1fe-a6aff67cda60128daccb",
+                  "file": "error-handling.spec.ts",
+                  "line": 236,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "onboarding.spec.ts",
+      "file": "onboarding.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Onboarding Flow",
+          "file": "onboarding.spec.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC-MOBILE-004: Complete onboarding and create first task",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "fe534f0825407f213faa-91a5d2e083c7c01f33ee",
+              "file": "onboarding.spec.ts",
+              "line": 14,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-004: Accessibility - VoiceOver announcements",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "fe534f0825407f213faa-aa0c0fd0ff1baaa19a97",
+              "file": "onboarding.spec.ts",
+              "line": 106,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-004: Responsive - Different breakpoints",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "fe534f0825407f213faa-49fc4d2b8f7e881123c9",
+              "file": "onboarding.spec.ts",
+              "line": 116,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "performance.spec.ts",
+      "file": "performance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Performance",
+          "file": "performance.spec.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Slow Network Handling",
+              "file": "performance.spec.ts",
+              "line": 11,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-023: Chat message on 2G network",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "b15d6361b2fc38288977-a2f31533c0c2014d413f",
+                  "file": "performance.spec.ts",
+                  "line": 12,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-023: Image upload with progress bar",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "b15d6361b2fc38288977-8042cc3ea93f141f3765",
+                  "file": "performance.spec.ts",
+                  "line": 41,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-023: Cancel long upload",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "b15d6361b2fc38288977-cbce150eefe6247aee91",
+                  "file": "performance.spec.ts",
+                  "line": 87,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-023: Cloud sync with large dataset",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "b15d6361b2fc38288977-3199c2741b74bc97330e",
+                  "file": "performance.spec.ts",
+                  "line": 120,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-023: Partial sync success",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "b15d6361b2fc38288977-c900ee2dec3ed0cf10e4",
+                  "file": "performance.spec.ts",
+                  "line": 161,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-023: No indefinite spinners",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "b15d6361b2fc38288977-f90b6e4e38c9c0c495b2",
+                  "file": "performance.spec.ts",
+                  "line": 191,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-023: App remains usable during background sync",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "b15d6361b2fc38288977-bb2d70c55b5d7f550afb",
+                  "file": "performance.spec.ts",
+                  "line": 216,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-023: Accessibility - Progress announcements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "b15d6361b2fc38288977-7576081e5723f3ede3ed",
+                  "file": "performance.spec.ts",
+                  "line": 242,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "General Performance Metrics",
+              "file": "performance.spec.ts",
+              "line": 264,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "Initial page load time",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "b15d6361b2fc38288977-6c06d8964f5a68774380",
+                  "file": "performance.spec.ts",
+                  "line": 265,
+                  "column": 9
+                },
+                {
+                  "title": "Time to interactive",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "b15d6361b2fc38288977-f477243355650a0c65c7",
+                  "file": "performance.spec.ts",
+                  "line": 279,
+                  "column": 9
+                },
+                {
+                  "title": "JavaScript bundle size check",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "b15d6361b2fc38288977-e3202bce00890521b670",
+                  "file": "performance.spec.ts",
+                  "line": 295,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "places.spec.ts",
+      "file": "places.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Places & Trip Planning",
+          "file": "places.spec.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC-MOBILE-003: Complete place search and trip creation flow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "dcb06c250fb04c2cfce7-f39cd31ae76a96164628",
+              "file": "places.spec.ts",
+              "line": 11,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-003: Map animation performance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "dcb06c250fb04c2cfce7-ad8f98ed0f890b65d19c",
+              "file": "places.spec.ts",
+              "line": 124,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-003: Accessibility - Map and place search",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "dcb06c250fb04c2cfce7-7ce7cc602f914925631f",
+              "file": "places.spec.ts",
+              "line": 158,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-003: Responsive - iPad side-by-side layout",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "dcb06c250fb04c2cfce7-eca25067d217569201b2",
+              "file": "places.spec.ts",
+              "line": 193,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-003: Mock location API responses",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "dcb06c250fb04c2cfce7-c691b6f93b003da28a72",
+              "file": "places.spec.ts",
+              "line": 221,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-003: Handle map idle event",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "dcb06c250fb04c2cfce7-b4e7fe80a1f2a66d62db",
+              "file": "places.spec.ts",
+              "line": 269,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "responsive.spec.ts",
+      "file": "responsive.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Responsive Design",
+          "file": "responsive.spec.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Breakpoint Testing",
+              "file": "responsive.spec.ts",
+              "line": 11,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-019: Task list at iPhone SE (375px)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-5b736611f74446d077e9",
+                  "file": "responsive.spec.ts",
+                  "line": 20,
+                  "column": 11
+                },
+                {
+                  "title": "TC-MOBILE-019: Task list at iPhone 14 Pro (430px)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-3252d87449a931f9b7b0",
+                  "file": "responsive.spec.ts",
+                  "line": 20,
+                  "column": 11
+                },
+                {
+                  "title": "TC-MOBILE-019: Task list at iPad Portrait (768px)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-5aa2b08ac95ab6ea7376",
+                  "file": "responsive.spec.ts",
+                  "line": 20,
+                  "column": 11
+                },
+                {
+                  "title": "TC-MOBILE-019: Task list at iPad Landscape (1024px)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-fd342345aae55ffc59d1",
+                  "file": "responsive.spec.ts",
+                  "line": 20,
+                  "column": 11
+                },
+                {
+                  "title": "TC-MOBILE-019: Task detail modal responsiveness",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-313f187c7cadba1f7d37",
+                  "file": "responsive.spec.ts",
+                  "line": 66,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-019: Settings layout at different breakpoints",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-7bfb5b10f1e49c7913d5",
+                  "file": "responsive.spec.ts",
+                  "line": 94,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-019: Bottom tab bar vs side tabs",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-de93f1caae4d66a2a77b",
+                  "file": "responsive.spec.ts",
+                  "line": 119,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Orientation Handling",
+              "file": "responsive.spec.ts",
+              "line": 145,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-020: Places map orientation change",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-752e6ca57e2bc9baa396",
+                  "file": "responsive.spec.ts",
+                  "line": 146,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-020: Scanner camera orientation",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-72d93f0f45cc424e5567",
+                  "file": "responsive.spec.ts",
+                  "line": 176,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-020: Scroll position preserved on rotation",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-aa5eb2838b2860b66876",
+                  "file": "responsive.spec.ts",
+                  "line": 208,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Master-Detail Layout",
+              "file": "responsive.spec.ts",
+              "line": 235,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-021: Task list master-detail on tablet",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-0863b6c2b00f3a4679a9",
+                  "file": "responsive.spec.ts",
+                  "line": 236,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-021: Task selection highlights in master pane",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-0295890280e4b7eb7c69",
+                  "file": "responsive.spec.ts",
+                  "line": 264,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-021: Optimistic UI update in master pane",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-18d2565754e2388664fd",
+                  "file": "responsive.spec.ts",
+                  "line": 285,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-021: Keyboard navigation between panes",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-751a9b28c6122c1f36bd",
+                  "file": "responsive.spec.ts",
+                  "line": 303,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-021: Mobile uses full-screen navigation",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-6b428ca0d831c8367325",
+                  "file": "responsive.spec.ts",
+                  "line": 325,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-021: Vault master-detail",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "iPhone 12",
+                      "projectName": "iPhone 12",
+                      "results": [],
+                      "status": "skipped"
+                    },
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Pixel 5",
+                      "projectName": "Pixel 5",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "e0223b006feb3d306446-647b80e7887ba797026b",
+                  "file": "responsive.spec.ts",
+                  "line": 345,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tasks.spec.ts",
+      "file": "tasks.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Task Board",
+          "file": "tasks.spec.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC-MOBILE-001: Create task with all fields",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d2d3f88df070d751ab05-d838a4fdb746c99e3f8d",
+              "file": "tasks.spec.ts",
+              "line": 16,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-001: VoiceOver announcements on task creation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d2d3f88df070d751ab05-47e3c80d3a5dc0849b4f",
+              "file": "tasks.spec.ts",
+              "line": 69,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-001: Tab navigates all fields in logical order",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d2d3f88df070d751ab05-53b28979c2ad3062f9ad",
+              "file": "tasks.spec.ts",
+              "line": 83,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-007: Debounced checkbox toggle",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d2d3f88df070d751ab05-3acfb2b79d7531667975",
+              "file": "tasks.spec.ts",
+              "line": 109,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-007: Queued swipe actions",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d2d3f88df070d751ab05-a6232c0ddae7d52b4148",
+              "file": "tasks.spec.ts",
+              "line": 131,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-010: Offline task creation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d2d3f88df070d751ab05-4d3dbf3d85667576adfc",
+              "file": "tasks.spec.ts",
+              "line": 152,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-010: Offline edit and delete",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d2d3f88df070d751ab05-92533d8ba63cc77ffb01",
+              "file": "tasks.spec.ts",
+              "line": 180,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-010: Pull-to-refresh offline",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d2d3f88df070d751ab05-1800cfac58747ab2d0a1",
+              "file": "tasks.spec.ts",
+              "line": 203,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-022: Render 500 tasks with virtualization",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d2d3f88df070d751ab05-e935fa5e7a54f3adba97",
+              "file": "tasks.spec.ts",
+              "line": 219,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-022: Memory usage with 500 tasks",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d2d3f88df070d751ab05-4ed4d21945d6d9d64af2",
+              "file": "tasks.spec.ts",
+              "line": 258,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "vault.spec.ts",
+      "file": "vault.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Encrypted Vault",
+          "file": "vault.spec.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC-MOBILE-002: Create login secret with password generator",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "21dcd72ff35c9ae6dfea-8eaf9484dc8f1a0a42b0",
+              "file": "vault.spec.ts",
+              "line": 19,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-002: Password field accessibility",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "21dcd72ff35c9ae6dfea-1fdb01b0043ff656396e",
+              "file": "vault.spec.ts",
+              "line": 91,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-002: Generated password matches pattern",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "21dcd72ff35c9ae6dfea-e31b7fa9c0436524be2f",
+              "file": "vault.spec.ts",
+              "line": 109,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-002: Password not logged",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "21dcd72ff35c9ae6dfea-4541fb88babc9d102acd",
+              "file": "vault.spec.ts",
+              "line": 127,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-011: Handle corrupted secret data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "21dcd72ff35c9ae6dfea-ca6907cb47bc21e0d661",
+              "file": "vault.spec.ts",
+              "line": 145,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-011: Retry decryption",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "21dcd72ff35c9ae6dfea-b552b909b2f4adc702da",
+              "file": "vault.spec.ts",
+              "line": 176,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-011: Mid-reveal decryption error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "21dcd72ff35c9ae6dfea-612db44d286c52177720",
+              "file": "vault.spec.ts",
+              "line": 197,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-011: Accessibility - Error modal focus trap",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "21dcd72ff35c9ae6dfea-aedef83b692584f5d79a",
+              "file": "vault.spec.ts",
+              "line": 222,
+              "column": 7
+            },
+            {
+              "title": "TC-MOBILE-011: Security - Error doesn't leak key material",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop",
+                  "projectName": "Desktop",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "iPhone 12",
+                  "projectName": "iPhone 12",
+                  "results": [],
+                  "status": "skipped"
+                },
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Pixel 5",
+                  "projectName": "Pixel 5",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "21dcd72ff35c9ae6dfea-5b448395227590fc95b8",
+              "file": "vault.spec.ts",
+              "line": 246,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-02-15T02:03:34.447Z",
+    "duration": 2550.993999999999,
+    "expected": 0,
+    "skipped": 369,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

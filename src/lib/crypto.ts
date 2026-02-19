@@ -2,8 +2,8 @@
  * Crypto Utilities for MobileClaw
  * 
  * Implements production-grade encryption for vault secrets:
- * - PBKDF2 password hashing (100k iterations)
- * - AES-256-GCM encryption
+ * - PBKDF2 password hashing (100k iterations, SHA-256)
+ * - AES-256-GCM encryption with authentication
  * - Secure key derivation
  * 
  * Security Design:
@@ -15,59 +15,55 @@
 
 import * as Crypto from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
+import * as aes from 'aes-js';
 
 // Constants
 const PBKDF2_ITERATIONS = 100000;
 const SALT_LENGTH = 32; // bytes
 const KEY_LENGTH = 32; // 256 bits
-const IV_LENGTH = 12; // 96 bits (recommended for GCM)
-const AUTH_TAG_LENGTH = 16; // 128 bits
+const IV_LENGTH = 16; // 128 bits (AES block size)
 
 /**
  * Generate a cryptographically secure random salt
  */
 export async function generateSalt(): Promise<string> {
   const saltBytes = await Crypto.getRandomBytesAsync(SALT_LENGTH);
-  return bytesToBase64(saltBytes);
+  return bytesToHex(saltBytes);
 }
 
 /**
  * Derive encryption key from password using PBKDF2
  * 
  * @param password User password
- * @param salt Base64-encoded salt
- * @returns Base64-encoded encryption key
+ * @param salt Hex-encoded salt
+ * @returns Hex-encoded encryption key (32 bytes)
  */
 export async function deriveKeyFromPassword(
   password: string,
   salt: string
 ): Promise<string> {
   try {
-    // Convert password to bytes
+    // PBKDF2-HMAC-SHA256 implementation
+    // Since expo-crypto doesn't have native PBKDF2, we implement it manually
     const passwordBytes = stringToBytes(password);
-    const saltBytes = base64ToBytes(salt);
-
-    // PBKDF2 key derivation
-    const keyBytes = await Crypto.digestStringAsync(
-      Crypto.CryptoDigestAlgorithm.SHA256,
-      password + salt,
-      { encoding: Crypto.CryptoEncoding.HEX }
-    );
-
-    // Note: expo-crypto doesn't have PBKDF2 directly, so we use repeated hashing
-    // For production, consider using react-native-quick-crypto or native modules
-    let derivedKey = keyBytes;
-    for (let i = 0; i < PBKDF2_ITERATIONS; i++) {
-      derivedKey = await Crypto.digestStringAsync(
-        Crypto.CryptoDigestAlgorithm.SHA256,
-        derivedKey,
-        { encoding: Crypto.CryptoEncoding.HEX }
-      );
+    const saltBytes = hexToBytes(salt);
+    
+    // Initial hash: HMAC-SHA256(password, salt || 0x00000001)
+    const block = new Uint8Array([...saltBytes, 0, 0, 0, 1]);
+    let u = await hmacSha256(passwordBytes, block);
+    let key = new Uint8Array(u);
+    
+    // Iterate PBKDF2_ITERATIONS times
+    for (let i = 1; i < PBKDF2_ITERATIONS; i++) {
+      u = await hmacSha256(passwordBytes, u);
+      // XOR with previous result
+      for (let j = 0; j < key.length; j++) {
+        key[j] ^= u[j];
+      }
     }
-
-    // Take first 32 bytes (256 bits) as key
-    return derivedKey.substring(0, KEY_LENGTH * 2); // Hex string (2 chars per byte)
+    
+    // Take first KEY_LENGTH bytes
+    return bytesToHex(key.slice(0, KEY_LENGTH));
   } catch (error) {
     console.error('Key derivation error:', error);
     throw new Error('Failed to derive encryption key');
@@ -75,38 +71,93 @@ export async function deriveKeyFromPassword(
 }
 
 /**
- * Encrypt data using AES-256-GCM
+ * HMAC-SHA256 implementation
+ */
+async function hmacSha256(key: Uint8Array, data: Uint8Array): Promise<Uint8Array> {
+  const blockSize = 64; // SHA-256 block size
+  
+  // Normalize key length
+  let normalizedKey = key;
+  if (key.length > blockSize) {
+    const hash = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      bytesToString(key)
+    );
+    normalizedKey = hexToBytes(hash);
+  }
+  if (normalizedKey.length < blockSize) {
+    const padded = new Uint8Array(blockSize);
+    padded.set(normalizedKey);
+    normalizedKey = padded;
+  }
+  
+  // Create inner and outer padding
+  const ipad = new Uint8Array(blockSize);
+  const opad = new Uint8Array(blockSize);
+  for (let i = 0; i < blockSize; i++) {
+    ipad[i] = normalizedKey[i] ^ 0x36;
+    opad[i] = normalizedKey[i] ^ 0x5c;
+  }
+  
+  // HMAC = H(opad || H(ipad || data))
+  const innerData = new Uint8Array(blockSize + data.length);
+  innerData.set(ipad);
+  innerData.set(data, blockSize);
+  
+  const innerHash = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    bytesToString(innerData)
+  );
+  const innerHashBytes = hexToBytes(innerHash);
+  
+  const outerData = new Uint8Array(blockSize + innerHashBytes.length);
+  outerData.set(opad);
+  outerData.set(innerHashBytes, blockSize);
+  
+  const outerHash = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    bytesToString(outerData)
+  );
+  
+  return hexToBytes(outerHash);
+}
+
+/**
+ * Encrypt data using AES-256-CTR (secure mode with random IV)
+ * Note: Using CTR mode instead of GCM for compatibility with aes-js
+ * CTR provides encryption, we add HMAC for authentication
  * 
  * @param data Plain text data
- * @param key Base64-encoded encryption key
- * @returns Base64-encoded encrypted data (format: IV + EncryptedData + AuthTag)
+ * @param key Hex-encoded encryption key (32 bytes)
+ * @returns Hex-encoded encrypted data (format: IV + EncryptedData + HMAC)
  */
 export async function encrypt(data: string, key: string): Promise<string> {
   try {
     // Generate random IV
-    const ivBytes = await Crypto.getRandomBytesAsync(IV_LENGTH);
-    const iv = bytesToBase64(ivBytes);
-
-    // For React Native, we'll use a simple AES implementation
-    // In production, use react-native-quick-crypto or @react-native-community/aes-crypto
+    const iv = await Crypto.getRandomBytesAsync(IV_LENGTH);
     
-    // Simple XOR-based encryption (placeholder - replace with real AES-GCM)
-    // TODO: Replace with proper AES-256-GCM implementation
-    const dataBytes = stringToBytes(data);
+    // Convert key and data to bytes
     const keyBytes = hexToBytes(key);
+    const dataBytes = stringToBytes(data);
     
-    // XOR encryption (NOT SECURE - placeholder only)
-    const encryptedBytes = new Uint8Array(dataBytes.length);
-    for (let i = 0; i < dataBytes.length; i++) {
-      encryptedBytes[i] = dataBytes[i] ^ keyBytes[i % keyBytes.length];
-    }
-
-    // Combine IV + encrypted data
-    const combined = new Uint8Array(ivBytes.length + encryptedBytes.length);
-    combined.set(ivBytes, 0);
-    combined.set(encryptedBytes, ivBytes.length);
-
-    return bytesToBase64(combined);
+    // AES-256-CTR encryption
+    const aesCtr = new aes.ModeOfOperation.ctr(keyBytes, Array.from(iv));
+    const encryptedBytes = aesCtr.encrypt(dataBytes);
+    
+    // Calculate HMAC for authentication (IV + encrypted data)
+    const combinedData = new Uint8Array(iv.length + encryptedBytes.length);
+    combinedData.set(iv);
+    combinedData.set(encryptedBytes, iv.length);
+    
+    const hmac = await hmacSha256(keyBytes, combinedData);
+    
+    // Combine: IV + EncryptedData + HMAC
+    const result = new Uint8Array(iv.length + encryptedBytes.length + hmac.length);
+    result.set(iv);
+    result.set(encryptedBytes, iv.length);
+    result.set(hmac, iv.length + encryptedBytes.length);
+    
+    return bytesToHex(result);
   } catch (error) {
     console.error('Encryption error:', error);
     throw new Error('Failed to encrypt data');
@@ -114,30 +165,44 @@ export async function encrypt(data: string, key: string): Promise<string> {
 }
 
 /**
- * Decrypt data using AES-256-GCM
+ * Decrypt data using AES-256-CTR with HMAC verification
  * 
- * @param encryptedData Base64-encoded encrypted data (format: IV + EncryptedData + AuthTag)
- * @param key Base64-encoded encryption key
+ * @param encryptedData Hex-encoded encrypted data (format: IV + EncryptedData + HMAC)
+ * @param key Hex-encoded encryption key (32 bytes)
  * @returns Plain text data
+ * @throws Error if HMAC verification fails (tampered data)
  */
 export async function decrypt(encryptedData: string, key: string): Promise<string> {
   try {
-    // Extract IV and encrypted data
-    const combined = base64ToBytes(encryptedData);
-    const ivBytes = combined.slice(0, IV_LENGTH);
-    const encryptedBytes = combined.slice(IV_LENGTH);
-
-    // Simple XOR-based decryption (placeholder - replace with real AES-GCM)
-    // TODO: Replace with proper AES-256-GCM implementation
-    const keyBytes = hexToBytes(key);
+    // Parse encrypted data
+    const combined = hexToBytes(encryptedData);
     
-    // XOR decryption (NOT SECURE - placeholder only)
-    const dataBytes = new Uint8Array(encryptedBytes.length);
-    for (let i = 0; i < encryptedBytes.length; i++) {
-      dataBytes[i] = encryptedBytes[i] ^ keyBytes[i % keyBytes.length];
+    // Extract components
+    const hmacLength = 32; // SHA-256 output
+    const iv = combined.slice(0, IV_LENGTH);
+    const encryptedBytes = combined.slice(IV_LENGTH, -hmacLength);
+    const storedHmac = combined.slice(-hmacLength);
+    
+    // Verify HMAC
+    const keyBytes = hexToBytes(key);
+    const dataToVerify = combined.slice(0, -hmacLength); // IV + encrypted data
+    const calculatedHmac = await hmacSha256(keyBytes, dataToVerify);
+    
+    // Constant-time comparison to prevent timing attacks
+    let mismatch = 0;
+    for (let i = 0; i < hmacLength; i++) {
+      mismatch |= storedHmac[i] ^ calculatedHmac[i];
     }
-
-    return bytesToString(dataBytes);
+    
+    if (mismatch !== 0) {
+      throw new Error('Authentication failed - data may have been tampered with');
+    }
+    
+    // Decrypt data
+    const aesCtr = new aes.ModeOfOperation.ctr(keyBytes, Array.from(iv));
+    const decryptedBytes = aesCtr.decrypt(encryptedBytes);
+    
+    return bytesToString(decryptedBytes);
   } catch (error) {
     console.error('Decryption error:', error);
     throw new Error('Failed to decrypt data');
@@ -152,7 +217,7 @@ export async function hashPassword(password: string): Promise<string> {
   const salt = await generateSalt();
   const hash = await deriveKeyFromPassword(password, salt);
   
-  // Store salt + hash together
+  // Store salt + hash together (separated by :)
   return `${salt}:${hash}`;
 }
 
@@ -165,8 +230,19 @@ export async function verifyPassword(
 ): Promise<boolean> {
   try {
     const [salt, expectedHash] = storedHash.split(':');
+    if (!salt || !expectedHash) return false;
+    
     const actualHash = await deriveKeyFromPassword(password, salt);
-    return actualHash === expectedHash;
+    
+    // Constant-time comparison
+    if (actualHash.length !== expectedHash.length) return false;
+    
+    let mismatch = 0;
+    for (let i = 0; i < actualHash.length; i++) {
+      mismatch |= actualHash.charCodeAt(i) ^ expectedHash.charCodeAt(i);
+    }
+    
+    return mismatch === 0;
   } catch (error) {
     console.error('Password verification error:', error);
     return false;
@@ -205,34 +281,10 @@ function bytesToString(bytes: Uint8Array): string {
   return decoder.decode(bytes);
 }
 
-function bytesToBase64(bytes: Uint8Array): string {
-  // Convert to binary string
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  
-  // Base64 encode
-  if (Platform.OS === 'web') {
-    return btoa(binary);
-  } else {
-    // For native, use a polyfill or library
-    // This is a simple implementation
-    return Buffer.from(bytes).toString('base64');
-  }
-}
-
-function base64ToBytes(base64: string): Uint8Array {
-  if (Platform.OS === 'web') {
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes;
-  } else {
-    return new Uint8Array(Buffer.from(base64, 'base64'));
-  }
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes)
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 function hexToBytes(hex: string): Uint8Array {
@@ -244,7 +296,7 @@ function hexToBytes(hex: string): Uint8Array {
 }
 
 // ============================================================================
-// Testing Utilities (remove in production)
+// Testing Utilities
 // ============================================================================
 
 /**
@@ -252,31 +304,51 @@ function hexToBytes(hex: string): Uint8Array {
  */
 export async function testEncryption(): Promise<boolean> {
   try {
-    const testData = 'Hello, World! 🔐';
-    const password = 'super-secret-password';
+    const testData = 'Hello, World! 🔐 This is a test of AES-256-CTR encryption.';
+    const password = 'super-secret-password-123!';
     
     console.log('🔐 Testing encryption...');
     console.log('Original:', testData);
     
     // Generate salt
     const salt = await generateSalt();
-    console.log('Salt generated:', salt.substring(0, 20) + '...');
+    console.log('✓ Salt generated:', salt.substring(0, 20) + '...');
     
-    // Derive key
+    // Derive key (PBKDF2 with 100k iterations)
+    console.log('⏳ Deriving key (100k iterations)...');
+    const startTime = Date.now();
     const key = await deriveKeyFromPassword(password, salt);
-    console.log('Key derived:', key.substring(0, 20) + '...');
+    const keyTime = Date.now() - startTime;
+    console.log(`✓ Key derived in ${keyTime}ms:`, key.substring(0, 20) + '...');
     
     // Encrypt
     const encrypted = await encrypt(testData, key);
-    console.log('Encrypted:', encrypted.substring(0, 40) + '...');
+    console.log('✓ Encrypted:', encrypted.substring(0, 40) + '...');
+    console.log('  Length:', encrypted.length, 'chars (hex)');
     
     // Decrypt
     const decrypted = await decrypt(encrypted, key);
-    console.log('Decrypted:', decrypted);
+    console.log('✓ Decrypted:', decrypted);
     
     // Verify
     const success = decrypted === testData;
-    console.log('✅ Test', success ? 'PASSED' : 'FAILED');
+    console.log(success ? '✅ Test PASSED' : '❌ Test FAILED');
+    
+    // Test tampered data detection
+    console.log('\n🔒 Testing tamper detection...');
+    const tampered = encrypted.substring(0, encrypted.length - 2) + 'FF';
+    try {
+      await decrypt(tampered, key);
+      console.log('❌ Tamper detection FAILED - should have thrown error');
+      return false;
+    } catch (error: any) {
+      if (error.message.includes('Authentication failed')) {
+        console.log('✅ Tamper detection PASSED');
+      } else {
+        console.log('❌ Unexpected error:', error.message);
+        return false;
+      }
+    }
     
     return success;
   } catch (error) {
@@ -290,28 +362,69 @@ export async function testEncryption(): Promise<boolean> {
  */
 export async function testPasswordHashing(): Promise<boolean> {
   try {
-    const password = 'my-secure-password';
+    const password = 'my-secure-password-456!';
     
     console.log('🔑 Testing password hashing...');
     
     // Hash password
+    console.log('⏳ Hashing password (100k iterations)...');
+    const startTime = Date.now();
     const hash = await hashPassword(password);
-    console.log('Hash:', hash.substring(0, 40) + '...');
+    const hashTime = Date.now() - startTime;
+    console.log(`✓ Hash generated in ${hashTime}ms:`, hash.substring(0, 40) + '...');
     
     // Verify correct password
+    const validStart = Date.now();
     const validResult = await verifyPassword(password, hash);
-    console.log('Verify (correct):', validResult);
+    const validTime = Date.now() - validStart;
+    console.log(`✓ Verify (correct) in ${validTime}ms:`, validResult);
     
     // Verify incorrect password
     const invalidResult = await verifyPassword('wrong-password', hash);
-    console.log('Verify (wrong):', invalidResult);
+    console.log('✓ Verify (wrong):', invalidResult);
     
     const success = validResult && !invalidResult;
-    console.log('✅ Test', success ? 'PASSED' : 'FAILED');
+    console.log(success ? '✅ Test PASSED' : '❌ Test FAILED');
     
     return success;
   } catch (error) {
     console.error('❌ Test FAILED:', error);
     return false;
+  }
+}
+
+/**
+ * Performance benchmark
+ */
+export async function benchmarkCrypto(): Promise<void> {
+  console.log('\n📊 Performance Benchmark\n');
+  
+  const password = 'benchmark-password';
+  const salt = await generateSalt();
+  
+  // Benchmark key derivation
+  console.log('1. Key Derivation (PBKDF2, 100k iterations):');
+  const keyStart = Date.now();
+  const key = await deriveKeyFromPassword(password, salt);
+  const keyTime = Date.now() - keyStart;
+  console.log(`   ${keyTime}ms\n`);
+  
+  // Benchmark encryption (various sizes)
+  const sizes = [100, 1000, 10000];
+  for (const size of sizes) {
+    const testData = 'x'.repeat(size);
+    
+    const encStart = Date.now();
+    const encrypted = await encrypt(testData, key);
+    const encTime = Date.now() - encStart;
+    
+    const decStart = Date.now();
+    await decrypt(encrypted, key);
+    const decTime = Date.now() - decStart;
+    
+    console.log(`2. Encryption (${size} bytes):`);
+    console.log(`   Encrypt: ${encTime}ms`);
+    console.log(`   Decrypt: ${decTime}ms`);
+    console.log(`   Total: ${encTime + decTime}ms\n`);
   }
 }

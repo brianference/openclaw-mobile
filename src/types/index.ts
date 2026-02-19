@@ -49,7 +49,7 @@ export interface KanbanCard {
   updated_at: string;
 }
 
-export type NoteCategory = 'idea' | 'note' | 'todo' | 'research';
+export type NoteCategory = 'skill' | 'idea' | 'note' | 'research' | 'memory';
 
 export interface BrainNote {
   id: string;
@@ -57,6 +57,7 @@ export interface BrainNote {
   title: string;
   content: string;
   category: NoteCategory;
+  type: FilterType; // Add this line
   color: string;
   pinned: boolean;
   created_at: string;
@@ -113,6 +114,7 @@ export interface Subscription {
 
 export type TaskCategory = 'work' | 'personal' | 'shopping';
 export type ReminderType = 'none' | '1h' | '2h' | '1d' | '1w';
+export type SyncStatus = 'synced' | 'pending' | 'offline';
 
 export interface Task {
   id: string;
@@ -122,6 +124,7 @@ export interface Task {
   category: TaskCategory;
   reminder?: ReminderType;
   notes?: string;
+  syncStatus?: SyncStatus; // For offline sync support
   createdAt: string;
   updatedAt: string;
 }
