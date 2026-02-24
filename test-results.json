@@ -1,0 +1,1418 @@
+{
+  "config": {
+    "configFile": "/root/.openclaw/workspace/projects/mobileclaw/tests/playwright-headless.config.ts",
+    "rootDir": "/root/.openclaw/workspace/projects/mobileclaw/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Desktop",
+        "name": "Desktop",
+        "testDir": "/root/.openclaw/workspace/projects/mobileclaw/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "runAgents": "none",
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.58.2",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "cross-platform.spec.ts",
+      "file": "cross-platform.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Cross-Platform Compatibility",
+          "file": "cross-platform.spec.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Platform-Specific Features",
+              "file": "cross-platform.spec.ts",
+              "line": 11,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-024: iOS biometric prompt",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "iOS-specific test",
+                          "location": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "line": 13,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "skipped",
+                          "duration": 910,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:39:45.328Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "iOS-specific test",
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "line": 13,
+                                "column": 12
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-6f695bc618d4ce2b9a30",
+                  "file": "cross-platform.spec.ts",
+                  "line": 12,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Android biometric prompt",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 557,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:34:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 34
+                            },
+                            "snippet": "  32 |       test.skip(browserName === 'webkit', 'Android-specific test');\n  33 |       \n> 34 |       await page.goto('/vault');\n     |                  ^\n  35 |       \n  36 |       // Mock Android fingerprint\n  37 |       await page.evaluate(() => {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 34
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n\n\n  32 |       test.skip(browserName === 'webkit', 'Android-specific test');\n  33 |       \n> 34 |       await page.goto('/vault');\n     |                  ^\n  35 |       \n  36 |       // Mock Android fingerprint\n  37 |       await page.evaluate(() => {\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:34:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:39:47.397Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-7e7e6-24-Android-biometric-prompt-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 34
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-67b5d58e867c1b3d411b",
+                  "file": "cross-platform.spec.ts",
+                  "line": 31,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: iOS date picker (wheel)",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 656,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:50:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 50
+                            },
+                            "snippet": "  48 |\n  49 |     test('TC-MOBILE-024: iOS date picker (wheel)', async ({ page }) => {\n> 50 |       await page.goto('/tasks');\n     |                  ^\n  51 |       await page.getByTestId('add-task-button').click();\n  52 |       \n  53 |       // iOS uses wheel picker"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 50
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n\n  48 |\n  49 |     test('TC-MOBILE-024: iOS date picker (wheel)', async ({ page }) => {\n> 50 |       await page.goto('/tasks');\n     |                  ^\n  51 |       await page.getByTestId('add-task-button').click();\n  52 |       \n  53 |       // iOS uses wheel picker\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:50:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:39:52.707Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-21a0f--024-iOS-date-picker-wheel--Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 50
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-1b8033e0084621d527b1",
+                  "file": "cross-platform.spec.ts",
+                  "line": 49,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Android date picker (calendar)",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 781,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:68:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 68
+                            },
+                            "snippet": "  66 |\n  67 |     test('TC-MOBILE-024: Android date picker (calendar)', async ({ page }) => {\n> 68 |       await page.goto('/tasks');\n     |                  ^\n  69 |       await page.getByTestId('add-task-button').click();\n  70 |       \n  71 |       await page.getByLabel(/due date/i).click();"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 68
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n\n  66 |\n  67 |     test('TC-MOBILE-024: Android date picker (calendar)', async ({ page }) => {\n> 68 |       await page.goto('/tasks');\n     |                  ^\n  69 |       await page.getByTestId('add-task-button').click();\n  70 |       \n  71 |       await page.getByLabel(/due date/i).click();\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:68:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:39:58.248Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-501c3-droid-date-picker-calendar--Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 68
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-1fd66542d5e543846de0",
+                  "file": "cross-platform.spec.ts",
+                  "line": 67,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: iOS swipe-to-go-back gesture",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "iOS-specific feature",
+                          "location": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "line": 85,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 0,
+                          "status": "skipped",
+                          "duration": 558,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:40:03.856Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "iOS-specific feature",
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "line": 85,
+                                "column": 12
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-f09065645875b18e7182",
+                  "file": "cross-platform.spec.ts",
+                  "line": 84,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Android hardware back button",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 423,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:108:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 108
+                            },
+                            "snippet": "  106 |       test.skip(browserName === 'webkit', 'Android-specific feature');\n  107 |       \n> 108 |       await page.goto('/tasks');\n      |                  ^\n  109 |       \n  110 |       const task = page.locator('[data-testid=\"task-card\"]').first();\n  111 |       await task.click();"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 108
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n\n  106 |       test.skip(browserName === 'webkit', 'Android-specific feature');\n  107 |       \n> 108 |       await page.goto('/tasks');\n      |                  ^\n  109 |       \n  110 |       const task = page.locator('[data-testid=\"task-card\"]').first();\n  111 |       await task.click();\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:108:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:40:04.813Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-32ad6-ndroid-hardware-back-button-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 108
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-0736e2268927a3f98b76",
+                  "file": "cross-platform.spec.ts",
+                  "line": 105,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: iOS share sheet",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "iOS-specific",
+                          "location": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "line": 123,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 0,
+                          "status": "skipped",
+                          "duration": 1017,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:40:09.828Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "iOS-specific",
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "line": 123,
+                                "column": 12
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-df35d3d57c79d9645496",
+                  "file": "cross-platform.spec.ts",
+                  "line": 122,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Android share intent",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 688,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:142:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 142
+                            },
+                            "snippet": "  140 |       test.skip(browserName === 'webkit', 'Android-specific');\n  141 |       \n> 142 |       await page.goto('/vault');\n      |                  ^\n  143 |       await page.getByRole('button', { name: /unlock/i }).click();\n  144 |       \n  145 |       const secret = page.locator('[data-testid=\"secret-card\"]').first();"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 142
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n\n\n  140 |       test.skip(browserName === 'webkit', 'Android-specific');\n  141 |       \n> 142 |       await page.goto('/vault');\n      |                  ^\n  143 |       await page.getByRole('button', { name: /unlock/i }).click();\n  144 |       \n  145 |       const secret = page.locator('[data-testid=\"secret-card\"]').first();\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:142:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:40:11.154Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-651f9-LE-024-Android-share-intent-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 142
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-b94e7159d913c8c21ea0",
+                  "file": "cross-platform.spec.ts",
+                  "line": 139,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Haptic feedback consistency",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 5,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 579,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:155:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 155
+                            },
+                            "snippet": "  153 |\n  154 |     test('TC-MOBILE-024: Haptic feedback consistency', async ({ page }) => {\n> 155 |       await page.goto('/tasks');\n      |                  ^\n  156 |       \n  157 |       // Monitor haptic feedback calls\n  158 |       await page.evaluate(() => {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 155
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n\n  153 |\n  154 |     test('TC-MOBILE-024: Haptic feedback consistency', async ({ page }) => {\n> 155 |       await page.goto('/tasks');\n      |                  ^\n  156 |       \n  157 |       // Monitor haptic feedback calls\n  158 |       await page.evaluate(() => {\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:155:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:40:15.234Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-04c0d-Haptic-feedback-consistency-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 155
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-aeae959dbeca2a959bbc",
+                  "file": "cross-platform.spec.ts",
+                  "line": 154,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Status bar styling",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 6,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 753,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:175:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 175
+                            },
+                            "snippet": "  173 |\n  174 |     test('TC-MOBILE-024: Status bar styling', async ({ page }) => {\n> 175 |       await page.goto('/');\n      |                  ^\n  176 |       \n  177 |       // iOS: Light content on dark bg\n  178 |       const statusBarStyle = await page.evaluate(() => {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 175
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n\n\n  173 |\n  174 |     test('TC-MOBILE-024: Status bar styling', async ({ page }) => {\n> 175 |       await page.goto('/');\n      |                  ^\n  176 |       \n  177 |       // iOS: Light content on dark bg\n  178 |       const statusBarStyle = await page.evaluate(() => {\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:175:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:40:20.530Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-3d8fd-BILE-024-Status-bar-styling-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 175
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-315259c6b2dfd5be62bd",
+                  "file": "cross-platform.spec.ts",
+                  "line": 174,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Safe area handling (iOS notch)",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 7,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 726,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:187:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 187
+                            },
+                            "snippet": "  185 |\n  186 |     test('TC-MOBILE-024: Safe area handling (iOS notch)', async ({ page }) => {\n> 187 |       await page.goto('/');\n      |                  ^\n  188 |       \n  189 |       // Check safe area insets\n  190 |       const hasSafeArea = await page.evaluate(() => {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 187
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n\n\n  185 |\n  186 |     test('TC-MOBILE-024: Safe area handling (iOS notch)', async ({ page }) => {\n> 187 |       await page.goto('/');\n      |                  ^\n  188 |       \n  189 |       // Check safe area insets\n  190 |       const hasSafeArea = await page.evaluate(() => {\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:187:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:40:26.282Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-f9a6b-fe-area-handling-iOS-notch--Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 187
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-f8f60adb34d5c850d231",
+                  "file": "cross-platform.spec.ts",
+                  "line": 186,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Font consistency",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 657,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:206:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 206
+                            },
+                            "snippet": "  204 |\n  205 |     test('TC-MOBILE-024: Font consistency', async ({ page }) => {\n> 206 |       await page.goto('/');\n      |                  ^\n  207 |       \n  208 |       const fontFamily = await page.evaluate(() => {\n  209 |         return window.getComputedStyle(document.body).fontFamily;"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 206
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n\n\n  204 |\n  205 |     test('TC-MOBILE-024: Font consistency', async ({ page }) => {\n> 206 |       await page.goto('/');\n      |                  ^\n  207 |       \n  208 |       const fontFamily = await page.evaluate(() => {\n  209 |         return window.getComputedStyle(document.body).fontFamily;\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:206:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:40:32.338Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-ef101-MOBILE-024-Font-consistency-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 206
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-c5928b2318dee62d985f",
+                  "file": "cross-platform.spec.ts",
+                  "line": 205,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-024: Accessibility - VoiceOver vs TalkBack",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 9,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 507,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:223:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 223
+                            },
+                            "snippet": "  221 |\n  222 |     test('TC-MOBILE-024: Accessibility - VoiceOver vs TalkBack', async ({ page }) => {\n> 223 |       await page.goto('/tasks');\n      |                  ^\n  224 |       \n  225 |       // Both should announce task list identically\n  226 |       const taskList = page.locator('[data-testid=\"task-list\"]');"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 223
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n\n  221 |\n  222 |     test('TC-MOBILE-024: Accessibility - VoiceOver vs TalkBack', async ({ page }) => {\n> 223 |       await page.goto('/tasks');\n      |                  ^\n  224 |       \n  225 |       // Both should announce task list identically\n  226 |       const taskList = page.locator('[data-testid=\"task-list\"]');\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:223:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:40:39.281Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-7cf06-ity---VoiceOver-vs-TalkBack-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 223
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-640afc5d4c84a34b49e0",
+                  "file": "cross-platform.spec.ts",
+                  "line": 222,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "App Lifecycle & State Preservation",
+              "file": "cross-platform.spec.ts",
+              "line": 239,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-025: Task form state preserved on background",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 10,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 645,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:241:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 241
+                            },
+                            "snippet": "  239 |   test.describe('App Lifecycle & State Preservation', () => {\n  240 |     test('TC-MOBILE-025: Task form state preserved on background', async ({ page }) => {\n> 241 |       await page.goto('/tasks');\n      |                  ^\n  242 |       await page.getByTestId('add-task-button').click();\n  243 |       \n  244 |       // Partially fill form"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 241
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n\n  239 |   test.describe('App Lifecycle & State Preservation', () => {\n  240 |     test('TC-MOBILE-025: Task form state preserved on background', async ({ page }) => {\n> 241 |       await page.goto('/tasks');\n      |                  ^\n  242 |       await page.getByTestId('add-task-button').click();\n  243 |       \n  244 |       // Partially fill form\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:241:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:40:44.182Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-3f598-ate-preserved-on-background-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 241
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-47b5647de7838ea2ddfb",
+                  "file": "cross-platform.spec.ts",
+                  "line": 240,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-025: Vault auto-lock after 5 minutes",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 11,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 561,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:283:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 283
+                            },
+                            "snippet": "  281 |\n  282 |     test('TC-MOBILE-025: Vault auto-lock after 5 minutes', async ({ page }) => {\n> 283 |       await page.goto('/vault');\n      |                  ^\n  284 |       await page.getByRole('button', { name: /unlock/i }).click();\n  285 |       \n  286 |       // Vault unlocked"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 283
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n\n\n  281 |\n  282 |     test('TC-MOBILE-025: Vault auto-lock after 5 minutes', async ({ page }) => {\n> 283 |       await page.goto('/vault');\n      |                  ^\n  284 |       await page.getByRole('button', { name: /unlock/i }).click();\n  285 |       \n  286 |       // Vault unlocked\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:283:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:40:49.107Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-6727a-t-auto-lock-after-5-minutes-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 283
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-dc95540f8538fa667ad1",
+                  "file": "cross-platform.spec.ts",
+                  "line": 282,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-025: Vault stays unlocked under 5 minutes",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 12,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 958,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:311:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 311
+                            },
+                            "snippet": "  309 |\n  310 |     test('TC-MOBILE-025: Vault stays unlocked under 5 minutes', async ({ page }) => {\n> 311 |       await page.goto('/vault');\n      |                  ^\n  312 |       await page.getByRole('button', { name: /unlock/i }).click();\n  313 |       \n  314 |       await expect(page.getByText(/vault contents/i)).toBeVisible();"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 311
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n\n\n  309 |\n  310 |     test('TC-MOBILE-025: Vault stays unlocked under 5 minutes', async ({ page }) => {\n> 311 |       await page.goto('/vault');\n      |                  ^\n  312 |       await page.getByRole('button', { name: /unlock/i }).click();\n  313 |       \n  314 |       await expect(page.getByText(/vault contents/i)).toBeVisible();\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:311:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:40:54.640Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-bedc6-ys-unlocked-under-5-minutes-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 311
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-50d786c4412b442acc19",
+                  "file": "cross-platform.spec.ts",
+                  "line": 310,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-025: Return to previous screen after unlock",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 13,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 802,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:334:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 334
+                            },
+                            "snippet": "  332 |\n  333 |     test('TC-MOBILE-025: Return to previous screen after unlock', async ({ page }) => {\n> 334 |       await page.goto('/vault');\n      |                  ^\n  335 |       await page.getByRole('button', { name: /unlock/i }).click();\n  336 |       \n  337 |       // Open a secret"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 334
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/vault\", waiting until \"load\"\u001b[22m\n\n\n  332 |\n  333 |     test('TC-MOBILE-025: Return to previous screen after unlock', async ({ page }) => {\n> 334 |       await page.goto('/vault');\n      |                  ^\n  335 |       await page.getByRole('button', { name: /unlock/i }).click();\n  336 |       \n  337 |       // Open a secret\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:334:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:41:00.593Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-b7227-revious-screen-after-unlock-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 334
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-b7211a85f6d6f8e8b36f",
+                  "file": "cross-platform.spec.ts",
+                  "line": 333,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-025: No data loss on background/foreground",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 14,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 761,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:364:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 364
+                            },
+                            "snippet": "  362 |\n  363 |     test('TC-MOBILE-025: No data loss on background/foreground', async ({ page }) => {\n> 364 |       await page.goto('/tasks');\n      |                  ^\n  365 |       \n  366 |       const initialTaskCount = await page.locator('[data-testid=\"task-card\"]').count();\n  367 |       "
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 364
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n\n  362 |\n  363 |     test('TC-MOBILE-025: No data loss on background/foreground', async ({ page }) => {\n> 364 |       await page.goto('/tasks');\n      |                  ^\n  365 |       \n  366 |       const initialTaskCount = await page.locator('[data-testid=\"task-card\"]').count();\n  367 |       \n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:364:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:41:06.122Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-72a96-ss-on-background-foreground-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 364
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-542695325a5515a425ae",
+                  "file": "cross-platform.spec.ts",
+                  "line": 363,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-025: Android app killed and restored",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 15,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 681,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:398:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 398
+                            },
+                            "snippet": "  396 |       test.skip(browserName === 'webkit', 'Android-specific behavior');\n  397 |       \n> 398 |       await page.goto('/tasks');\n      |                  ^\n  399 |       await page.getByTestId('add-task-button').click();\n  400 |       \n  401 |       await page.getByLabel(/title/i).fill('Test persistence');"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 398
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n\n  396 |       test.skip(browserName === 'webkit', 'Android-specific behavior');\n  397 |       \n> 398 |       await page.goto('/tasks');\n      |                  ^\n  399 |       await page.getByTestId('add-task-button').click();\n  400 |       \n  401 |       await page.getByLabel(/title/i).fill('Test persistence');\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:398:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:41:12.208Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-df9c8-oid-app-killed-and-restored-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 398
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-400a1c32f98820d467bd",
+                  "file": "cross-platform.spec.ts",
+                  "line": 395,
+                  "column": 9
+                },
+                {
+                  "title": "TC-MOBILE-025: Handle phone call interruption (iOS)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "iOS-specific",
+                          "location": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "line": 426,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 16,
+                          "parallelIndex": 0,
+                          "status": "skipped",
+                          "duration": 560,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:41:17.254Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "iOS-specific",
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "line": 426,
+                                "column": 12
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-d30e5d550017470fea5a",
+                  "file": "cross-platform.spec.ts",
+                  "line": 425,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Visual Platform Comparison",
+              "file": "cross-platform.spec.ts",
+              "line": 456,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-MOBILE-024: Screenshot comparison iOS vs Android",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop",
+                      "projectName": "Desktop",
+                      "results": [
+                        {
+                          "workerIndex": 16,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 472,
+                          "error": {
+                            "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:459:18",
+                            "location": {
+                              "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                              "column": 18,
+                              "line": 459
+                            },
+                            "snippet": "  457 |     test('TC-MOBILE-024: Screenshot comparison iOS vs Android', async ({ page }) => {\n  458 |       // Take screenshots of same screen on both platforms\n> 459 |       await page.goto('/tasks');\n      |                  ^\n  460 |       \n  461 |       const userAgent = await page.evaluate(() => navigator.userAgent);\n  462 |       const platform = userAgent.includes('iPhone') ? 'ios' : "
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                                "column": 18,
+                                "line": 459
+                              },
+                              "message": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/tasks\", waiting until \"load\"\u001b[22m\n\n\n  457 |     test('TC-MOBILE-024: Screenshot comparison iOS vs Android', async ({ page }) => {\n  458 |       // Take screenshots of same screen on both platforms\n> 459 |       await page.goto('/tasks');\n      |                  ^\n  460 |       \n  461 |       const userAgent = await page.evaluate(() => navigator.userAgent);\n  462 |       const platform = userAgent.includes('iPhone') ? 'ios' : \n    at /root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts:459:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-02-15T01:41:18.090Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/root/.openclaw/workspace/projects/mobileclaw/tests/test-results/cross-platform-Cross-Platf-7bfab-t-comparison-iOS-vs-Android-Desktop/test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/root/.openclaw/workspace/projects/mobileclaw/tests/cross-platform.spec.ts",
+                            "column": 18,
+                            "line": 459
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "c3a4512a57ffba0f4424-fb81fcf9b02312413435",
+                  "file": "cross-platform.spec.ts",
+                  "line": 457,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-02-15T01:39:39.072Z",
+    "duration": 98115.75600000001,
+    "expected": 0,
+    "skipped": 4,
+    "unexpected": 17,
+    "flaky": 0
+  }
+}

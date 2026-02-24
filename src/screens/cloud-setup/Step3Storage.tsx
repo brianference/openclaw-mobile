@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { FormField } from '../../components/wizard/FormField';
 import { ButtonGroup } from '../../components/wizard/ButtonGroup';
 import { ProgressIndicator } from '../../components/wizard/ProgressIndicator';
 import { validateBucketName } from '../../services/cloudSetup/validation';
+import { checkBucketAvailability } from '../../services/cloudSetup/api';
 import { colors, spacing } from '../../styles/wizard';
 import { Checkbox } from '../../components/Checkbox';
+
+// Debounce utility
+const debounce = <T extends (...args: any[]) => void>(
+  func: T,
+  delay: number
+): ((...args: Parameters<T>) => void) => {
+  let timeoutId: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
+  };
+};
 
 interface Step3Props {
   bucketName: string;
@@ -25,10 +38,46 @@ export const Step3Storage: React.FC<Step3Props> = ({
   onBack
 }) => {
   const [error, setError] = useState<string | null>(null);
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
+  const [availabilityMessage, setAvailabilityMessage] = useState<string | null>(null);
   
   const validateField = () => {
-    setError(validateBucketName(bucketName));
+    const validationError = validateBucketName(bucketName);
+    setError(validationError);
+    
+    // Only check availability if bucket name is valid
+    if (!validationError && bucketName) {
+      checkAvailability(bucketName);
+    }
   };
+  
+  const checkAvailability = useCallback(
+    debounce(async (name: string) => {
+      setIsCheckingAvailability(true);
+      setAvailabilityMessage(null);
+      
+      try {
+        const available = await checkBucketAvailability(name);
+        if (!available) {
+          const suggestion = `${name}-${Date.now().toString().slice(-4)}`;
+          setError(`Bucket name "${name}" is already taken. Try: ${suggestion}`);
+          setAvailabilityMessage(`❌ Name taken. Suggestion: ${suggestion}`);
+        } else {
+          setAvailabilityMessage('✅ Name available');
+        }
+      } catch (err) {
+        setAvailabilityMessage('⚠️ Could not check availability');
+      } finally {
+        setIsCheckingAvailability(false);
+      }
+    }, 800),
+    []
+  );
+  
+  useEffect(() => {
+    // Clear availability check when bucket name changes
+    setAvailabilityMessage(null);
+  }, [bucketName]);
   
   return (
     <ScrollView>
@@ -46,6 +95,25 @@ export const Step3Storage: React.FC<Step3Props> = ({
         required
         placeholder="mobileclaw-backup-yourname"
       />
+      
+      {isCheckingAvailability && (
+        <View style={styles.availabilityCheck}>
+          <ActivityIndicator size="small" color={colors.primaryBlue} />
+          <Text style={styles.availabilityText}>Checking availability...</Text>
+        </View>
+      )}
+      
+      {!isCheckingAvailability && availabilityMessage && (
+        <View style={styles.availabilityCheck}>
+          <Text style={[
+            styles.availabilityText,
+            availabilityMessage.startsWith('✅') && styles.availabilitySuccess,
+            availabilityMessage.startsWith('❌') && styles.availabilityError
+          ]}>
+            {availabilityMessage}
+          </Text>
+        </View>
+      )}
       
       <View style={styles.optionsContainer}>
         <Text style={styles.optionsTitle}>Storage Options</Text>
@@ -152,5 +220,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.gray500,
     marginTop: spacing.xs,
+  },
+  
+  availabilityCheck: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  
+  availabilityText: {
+    fontSize: 14,
+    color: colors.gray600,
+  },
+  
+  availabilitySuccess: {
+    color: colors.successGreen,
+    fontWeight: '500',
+  },
+  
+  availabilityError: {
+    color: colors.errorRed,
+    fontWeight: '500',
   },
 });

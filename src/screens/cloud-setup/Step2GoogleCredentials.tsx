@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
 import { FormField } from '../../components/wizard/FormField';
 import { ButtonGroup } from '../../components/wizard/ButtonGroup';
 import { ProgressIndicator } from '../../components/wizard/ProgressIndicator';
