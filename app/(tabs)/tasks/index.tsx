@@ -7,7 +7,7 @@ import {
   RefreshControl,
   Pressable,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, Layout } from 'react-native-reanimated';
@@ -23,6 +23,8 @@ import {
 import { colors, spacing, typography, radius } from '../../../src/design/tokens';
 import { Task, TaskCategory } from '../../../src/types';
 import { useTaskStore } from '../../../src/store/task';
+import { BannerAd } from '../../../src/lib/adManager';
+import { shouldShowBanner } from '../../../src/config/admob';
 
 type FilterType = 'all' | 'active' | 'completed';
 type CategoryType = 'all' | TaskCategory;
@@ -46,12 +48,16 @@ const CATEGORY_COLORS: Record<string, string> = {
  */
 export default function TaskListScreen() {
   const router = useRouter();
+  const pathname = usePathname();
   
   const { tasks, isLoading, fetchTasks, toggleTaskComplete } = useTaskStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<FilterType>('all');
   const [category, setCategory] = useState<CategoryType>('all');
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Check if ads should be shown on this screen
+  const showAds = shouldShowBanner(pathname);
 
   useEffect(() => {
     fetchTasks();
@@ -261,6 +267,9 @@ export default function TaskListScreen() {
           showsVerticalScrollIndicator={false}
         />
       )}
+
+      {/* Banner Ad */}
+      {showAds && <BannerAd visible={showAds} />}
 
       {/* FAB */}
       <FAB
