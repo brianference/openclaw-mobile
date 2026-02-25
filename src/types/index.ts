@@ -12,7 +12,8 @@ export interface Message {
   isStreaming?: boolean;
 }
 
-export type AttachmentType = 'image' | 'markdown';
+// US-061: Extended attachment types to support images, videos, and documents
+export type AttachmentType = 'image' | 'video' | 'document' | 'markdown';
 
 export interface MessageAttachment {
   id: string;

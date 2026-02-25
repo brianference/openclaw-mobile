@@ -26,7 +26,7 @@ import { useSubscriptionStore } from '../../../src/store/subscription';
 import { useToast } from '../../../src/components/Toast';
 import { useTheme, Theme } from '../../../src/store/theme';
 import { Message } from '../../../src/types';
-import { getAttachmentUrl } from '../../../src/lib/fileUpload';
+import { getAttachmentUrl, takePhoto, pickVideo, recordVideo, validateFile } from '../../../src/lib/fileUpload';
 
 function formatTime(dateStr: string): string {
   const d = new Date(dateStr);
@@ -119,11 +119,28 @@ function MessageBubble({ message, colors }: { message: Message; colors: Theme })
               <View key={att.id} style={[styles.attachmentItem, { backgroundColor: isUser ? 'rgba(255,255,255,0.1)' : colors.bg }]}>
                 {att.file_type === 'image' && imageUrls[att.id] ? (
                   <Image source={{ uri: imageUrls[att.id] }} style={styles.attachmentImage} resizeMode="cover" />
-                ) : (
+                ) : att.file_type === 'video' ? (
                   <View style={styles.fileAttachment}>
-                    <Ionicons name="document-text" size={20} color={isUser ? '#fff' : colors.text} />
+                    <Ionicons name="videocam" size={20} color={isUser ? '#fff' : colors.primary} />
                     <Text style={[styles.fileName, { color: isUser ? '#fff' : colors.text }]} numberOfLines={1}>
                       {att.file_name}
+                    </Text>
+                    <Text style={[styles.fileSize, { color: isUser ? 'rgba(255,255,255,0.6)' : colors.textMuted }]}>
+                      {(att.file_size / (1024 * 1024)).toFixed(1)}MB
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={styles.fileAttachment}>
+                    <Ionicons 
+                      name={att.mime_type?.includes('pdf') ? 'document-text' : 'document'} 
+                      size={20} 
+                      color={isUser ? '#fff' : colors.text} 
+                    />
+                    <Text style={[styles.fileName, { color: isUser ? '#fff' : colors.text }]} numberOfLines={1}>
+                      {att.file_name}
+                    </Text>
+                    <Text style={[styles.fileSize, { color: isUser ? 'rgba(255,255,255,0.6)' : colors.textMuted }]}>
+                      {(att.file_size / 1024).toFixed(0)}KB
                     </Text>
                   </View>
                 )}
@@ -218,6 +235,7 @@ export default function ChatScreen() {
     }
   }, [messages.length]);
 
+  // US-061: Enhanced file picker with support for images, videos, and documents
   const handlePickFile = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
@@ -225,19 +243,25 @@ export default function ChatScreen() {
       if (Platform.OS === 'ios') {
         ActionSheetIOS.showActionSheetWithOptions(
           {
-            options: ['Cancel', 'Choose Image', 'Choose Markdown File'],
+            options: ['Cancel', 'Photo Library', 'Take Photo', 'Choose Video', 'Record Video', 'Choose Document'],
             cancelButtonIndex: 0,
           },
           async (buttonIndex) => {
             if (buttonIndex === 1) await handlePickImage();
-            if (buttonIndex === 2) await handlePickDocument();
+            if (buttonIndex === 2) await handleTakePhoto();
+            if (buttonIndex === 3) await handlePickVideo();
+            if (buttonIndex === 4) await handleRecordVideo();
+            if (buttonIndex === 5) await handlePickDocument();
           }
         );
       } else {
         Alert.alert('Add Attachment', 'Choose file type', [
           { text: 'Cancel', style: 'cancel' },
           { text: 'Image', onPress: handlePickImage },
-          { text: 'Markdown File', onPress: handlePickDocument },
+          { text: 'Take Photo', onPress: handleTakePhoto },
+          { text: 'Video', onPress: handlePickVideo },
+          { text: 'Record Video', onPress: handleRecordVideo },
+          { text: 'Document', onPress: handlePickDocument },
         ]);
       }
     };
@@ -262,14 +286,81 @@ export default function ChatScreen() {
     }
   };
 
+  // US-061: Take photo with camera
+  const handleTakePhoto = async () => {
+    try {
+      const result = await takePhoto();
+      if (result) {
+        const validation = validateFile(result);
+        if (!validation.valid) {
+          toast.show(validation.error || 'Invalid file', 'error');
+          return;
+        }
+        setSelectedFiles(prev => [...prev, result]);
+        toast.show('Photo added', 'success');
+      }
+    } catch (error) {
+      toast.show(error instanceof Error ? error.message : 'Failed to take photo', 'error');
+    }
+  };
+
+  // US-061: Pick video from gallery
+  const handlePickVideo = async () => {
+    try {
+      const result = await pickVideo();
+      if (result) {
+        const validation = validateFile(result);
+        if (!validation.valid) {
+          toast.show(validation.error || 'Invalid file', 'error');
+          return;
+        }
+        setSelectedFiles(prev => [...prev, result]);
+        toast.show('Video added', 'success');
+      }
+    } catch (error) {
+      toast.show(error instanceof Error ? error.message : 'Failed to pick video', 'error');
+    }
+  };
+
+  // US-061: Record video with camera
+  const handleRecordVideo = async () => {
+    try {
+      const result = await recordVideo();
+      if (result) {
+        const validation = validateFile(result);
+        if (!validation.valid) {
+          toast.show(validation.error || 'Invalid file', 'error');
+          return;
+        }
+        setSelectedFiles(prev => [...prev, result]);
+        toast.show('Video added', 'success');
+      }
+    } catch (error) {
+      toast.show(error instanceof Error ? error.message : 'Failed to record video', 'error');
+    }
+  };
+
+  // US-061: Pick document - now supports all document types (PDF, TXT, MD, DOC, DOCX)
   const handlePickDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['text/markdown', 'text/plain'],
+        type: [
+          'application/pdf',
+          'text/plain',
+          'text/markdown',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'text/*',
+        ],
         copyToCacheDirectory: true,
       });
 
       if (!result.canceled && result.assets[0]) {
+        const validation = validateFile(result.assets[0]);
+        if (!validation.valid) {
+          toast.show(validation.error || 'Invalid file', 'error');
+          return;
+        }
         setSelectedFiles(prev => [...prev, result.assets[0]]);
         toast.show('Document added', 'success');
       }
@@ -455,21 +546,33 @@ export default function ChatScreen() {
       <View style={[styles.inputArea, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
         {selectedFiles.length > 0 && (
           <View style={styles.filesPreview}>
-            {selectedFiles.map((file, index) => (
-              <View key={index} style={[styles.fileChip, { backgroundColor: colors.primaryBg }]}>
-                <Ionicons
-                  name={'mimeType' in file && file.mimeType?.startsWith('image/') ? 'image' : 'document-text'}
-                  size={14}
-                  color={colors.primary}
-                />
-                <Text style={[styles.fileChipText, { color: colors.text }]} numberOfLines={1}>
-                  {'name' in file ? file.name : 'Image'}
-                </Text>
-                <TouchableOpacity onPress={() => handleRemoveFile(index)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                  <Ionicons name="close-circle" size={16} color={colors.textMuted} />
-                </TouchableOpacity>
-              </View>
-            ))}
+            {selectedFiles.map((file, index) => {
+              const isDocPicker = 'name' in file;
+              const mimeType = isDocPicker ? file.mimeType : file.mimeType;
+              const fileName = isDocPicker ? file.name : 'Image';
+              
+              // US-061: Determine icon based on file type
+              let iconName: any = 'document-text';
+              if (mimeType?.startsWith('image/')) {
+                iconName = 'image';
+              } else if (mimeType?.startsWith('video/')) {
+                iconName = 'videocam';
+              } else if (mimeType?.includes('pdf')) {
+                iconName = 'document-text';
+              }
+              
+              return (
+                <View key={index} style={[styles.fileChip, { backgroundColor: colors.primaryBg }]}>
+                  <Ionicons name={iconName} size={14} color={colors.primary} />
+                  <Text style={[styles.fileChipText, { color: colors.text }]} numberOfLines={1}>
+                    {fileName}
+                  </Text>
+                  <TouchableOpacity onPress={() => handleRemoveFile(index)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                    <Ionicons name="close-circle" size={16} color={colors.textMuted} />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </View>
         )}
         <View style={styles.inputRow}>
@@ -628,5 +731,9 @@ const styles = StyleSheet.create({
   fileName: {
     fontSize: 13,
     flex: 1,
+  },
+  fileSize: {
+    fontSize: 11,
+    marginLeft: 8,
   },
 });
