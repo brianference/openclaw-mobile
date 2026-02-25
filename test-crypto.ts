@@ -7,7 +7,7 @@ import {
   testEncryption,
   testPasswordHashing,
   benchmarkCrypto,
-} from './src/lib/crypto.js';
+} from './src/lib/crypto';
 
 async function main() {
   console.log('╔════════════════════════════════════════════════════════════╗');
