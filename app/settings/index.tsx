@@ -68,6 +68,15 @@ export default function SettingsHomeScreen() {
     Alert.alert('Help & Feedback', 'Help center coming soon');
   }, []);
 
+  const handlePremium = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push('/settings/premium');
+  }, [router]);
+
+  const premiumSettings: SettingsItem[] = [
+    { id: '0', title: 'Upgrade to Premium', icon: '✨', onPress: handlePremium },
+  ];
+
   const generalSettings: SettingsItem[] = [
     { id: '1', title: 'Appearance', icon: '🎨', onPress: handleAppearance },
     { id: '2', title: 'Notifications', icon: '🔔', onPress: handleNotifications },
@@ -135,9 +144,10 @@ export default function SettingsHomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {renderSettingsSection('General', generalSettings, 0)}
-        {renderSettingsSection('Account', accountSettings, 100)}
-        {renderSettingsSection('App', appSettings, 200)}
+        {renderSettingsSection('Premium', premiumSettings, 0)}
+        {renderSettingsSection('General', generalSettings, 50)}
+        {renderSettingsSection('Account', accountSettings, 150)}
+        {renderSettingsSection('App', appSettings, 250)}
       </ScrollView>
     </SafeAreaView>
   );
