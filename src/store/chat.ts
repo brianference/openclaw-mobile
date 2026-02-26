@@ -13,6 +13,19 @@ interface QueuedMessage {
   attachments?: (ImagePicker.ImagePickerAsset | DocumentPicker.DocumentPickerAsset)[];
 }
 
+// US-066: Upload progress tracking
+export interface UploadProgress {
+  id: string;
+  fileName: string;
+  fileSize: number;
+  uploadedBytes: number;
+  progress: number; // 0-100
+  status: 'preparing' | 'uploading' | 'uploaded' | 'failed';
+  error?: string;
+  startTime: number;
+  messageId?: string;
+}
+
 interface ChatState {
   conversations: Conversation[];
   activeConversation: Conversation | null;
@@ -22,6 +35,16 @@ interface ChatState {
   messageQueue: QueuedMessage[];
   isProcessingQueue: boolean;
   customEndpoint: APIEndpointConfig | null;
+  
+  // US-066: Upload progress state
+  activeUploads: Map<string, UploadProgress>;
+  
+  // US-066: Upload progress methods
+  addUpload: (upload: UploadProgress) => void;
+  updateUploadProgress: (uploadId: string, progress: number, uploadedBytes?: number) => void;
+  setUploadStatus: (uploadId: string, status: UploadProgress['status'], error?: string) => void;
+  removeUpload: (uploadId: string) => void;
+  cancelUpload: (uploadId: string) => void;
 
   fetchConversations: () => Promise<void>;
   createConversation: (title?: string) => Promise<Conversation | null>;
@@ -45,6 +68,9 @@ export const useChatStore = create<ChatState>()((set, get) => ({
   messageQueue: [],
   isProcessingQueue: false,
   customEndpoint: null,
+  
+  // US-066: Upload progress initial state
+  activeUploads: new Map(),
 
   fetchConversations: async () => {
     const { data } = await supabase
@@ -184,9 +210,39 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
       if (queuedMsg.attachments && queuedMsg.attachments.length > 0) {
         for (const file of queuedMsg.attachments) {
-          const result = await uploadFile(file, savedUserMsg.id, user.id);
+          // US-066: Create upload progress tracker
+          const isDocPicker = 'name' in file;
+          const fileName = isDocPicker ? file.name : `image_${Date.now()}.jpg`;
+          const fileSize = isDocPicker ? (file.size || 0) : (file.fileSize || 0);
+          const uploadId = `upload_${Date.now()}_${Math.random()}`;
+          
+          const { addUpload, updateUploadProgress, setUploadStatus } = get();
+          
+          // Initialize upload progress
+          addUpload({
+            id: uploadId,
+            fileName,
+            fileSize,
+            uploadedBytes: 0,
+            progress: 0,
+            status: 'preparing',
+            startTime: Date.now(),
+            messageId: savedUserMsg.id,
+          });
+
+          // Upload with progress callback
+          const result = await uploadFile(file, savedUserMsg.id, user.id, {
+            compress: true,
+            onProgress: (progress) => {
+              updateUploadProgress(uploadId, progress);
+            },
+          });
+
           if (result.success && result.attachment) {
             uploadedAttachments.push(result.attachment);
+            setUploadStatus(uploadId, 'uploaded');
+          } else {
+            setUploadStatus(uploadId, 'failed', result.error);
           }
         }
       }
@@ -473,6 +529,78 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     set({ customEndpoint: config });
   },
 
+  // US-066: Upload progress methods
+  addUpload: (upload) => {
+    set((state) => {
+      const newUploads = new Map(state.activeUploads);
+      newUploads.set(upload.id, upload);
+      return { activeUploads: newUploads };
+    });
+  },
+
+  updateUploadProgress: (uploadId, progress, uploadedBytes) => {
+    set((state) => {
+      const newUploads = new Map(state.activeUploads);
+      const upload = newUploads.get(uploadId);
+      if (upload) {
+        newUploads.set(uploadId, {
+          ...upload,
+          progress,
+          uploadedBytes: uploadedBytes ?? Math.floor((upload.fileSize * progress) / 100),
+          status: 'uploading',
+        });
+      }
+      return { activeUploads: newUploads };
+    });
+  },
+
+  setUploadStatus: (uploadId, status, error) => {
+    set((state) => {
+      const newUploads = new Map(state.activeUploads);
+      const upload = newUploads.get(uploadId);
+      if (upload) {
+        newUploads.set(uploadId, {
+          ...upload,
+          status,
+          error,
+          progress: status === 'uploaded' ? 100 : upload.progress,
+        });
+        
+        // Auto-remove successful uploads after 2 seconds
+        if (status === 'uploaded') {
+          setTimeout(() => {
+            get().removeUpload(uploadId);
+          }, 2000);
+        }
+      }
+      return { activeUploads: newUploads };
+    });
+  },
+
+  removeUpload: (uploadId) => {
+    set((state) => {
+      const newUploads = new Map(state.activeUploads);
+      newUploads.delete(uploadId);
+      return { activeUploads: newUploads };
+    });
+  },
+
+  cancelUpload: (uploadId) => {
+    // Mark as cancelled, actual cancellation logic in processQueue
+    set((state) => {
+      const newUploads = new Map(state.activeUploads);
+      const upload = newUploads.get(uploadId);
+      if (upload) {
+        newUploads.set(uploadId, {
+          ...upload,
+          status: 'failed',
+          error: 'Upload cancelled',
+        });
+      }
+      return { activeUploads: newUploads };
+    });
+  },
+
   reset: () => {
     set({
       conversations: [],
@@ -481,6 +609,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       isTyping: false,
       messageQueue: [],
       isProcessingQueue: false,
+      activeUploads: new Map(),
     });
   },
 }));

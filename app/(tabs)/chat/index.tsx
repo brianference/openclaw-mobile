@@ -27,6 +27,7 @@ import { useToast } from '../../../src/components/Toast';
 import { useTheme, Theme } from '../../../src/store/theme';
 import { Message } from '../../../src/types';
 import { getAttachmentUrl, takePhoto, pickVideo, recordVideo, validateFile } from '../../../src/lib/fileUpload';
+import UploadProgressIndicator, { UploadProgress } from '../../../src/components/UploadProgressIndicator';
 
 function formatTime(dateStr: string): string {
   const d = new Date(dateStr);
@@ -223,6 +224,8 @@ export default function ChatScreen() {
     renameConversation,
     deleteConversation,
     isLoading,
+    activeUploads,
+    cancelUpload,
   } = useChatStore();
 
   useEffect(() => {
@@ -541,6 +544,12 @@ export default function ChatScreen() {
           )
         }
         ListFooterComponent={isTyping ? <TypingDots colors={colors} /> : null}
+      />
+
+      {/* US-066: Upload progress indicator */}
+      <UploadProgressIndicator 
+        uploads={Array.from(activeUploads.values())}
+        onCancel={cancelUpload}
       />
 
       <View style={[styles.inputArea, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
