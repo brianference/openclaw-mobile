@@ -75,9 +75,8 @@ export default function SettingsHomeScreen() {
 
   const handleSecurity = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // TODO: Navigate to security dashboard
-    Alert.alert('Security Dashboard', 'Security dashboard coming soon');
-  }, []);
+    router.push('/settings/security');
+  }, [router]);
 
   const handlePlaces = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
