@@ -8,12 +8,14 @@ import {
   ViewStyle,
   TextStyle,
   Platform,
+  Pressable,
 } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, radius, typography, touchTargets } from '../design/tokens';
 
 export interface InputFieldProps extends Omit<TextInputProps, 'style'> {
@@ -57,6 +59,13 @@ export interface InputFieldProps extends Omit<TextInputProps, 'style'> {
    * @default false
    */
   disableFloating?: boolean;
+
+  /**
+   * Show password visibility toggle (eye icon)
+   * Only applies when secureTextEntry is true
+   * @default false
+   */
+  showPasswordToggle?: boolean;
 }
 
 /**
@@ -99,6 +108,8 @@ export const InputField = forwardRef<TextInput, InputFieldProps>(
       inputStyle,
       labelStyle,
       disableFloating = false,
+      showPasswordToggle = false,
+      secureTextEntry = false,
       onFocus,
       onBlur,
       editable = true,
@@ -107,6 +118,7 @@ export const InputField = forwardRef<TextInput, InputFieldProps>(
     ref
   ) => {
     const [isFocused, setIsFocused] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const labelPosition = useSharedValue(value ? -8 : 16);
     const labelScale = useSharedValue(value ? 0.85 : 1);
 
@@ -181,31 +193,54 @@ export const InputField = forwardRef<TextInput, InputFieldProps>(
           </Text>
         </Animated.View>
 
-        {/* Input */}
-        <TextInput
-          ref={ref}
-          value={value}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          editable={editable}
-          placeholderTextColor={colors.dark.textTertiary}
-          accessible={true}
-          accessibilityLabel={label}
-          accessibilityHint={error || helper}
-          style={[
-            styles.input,
-            {
-              borderColor,
-              backgroundColor: `rgba(37, 37, 37, ${getBackgroundOpacity()})`,
-              color: editable ? colors.dark.textPrimary : colors.dark.textSecondary,
-            },
-            isFocused && styles.inputFocused,
-            error && styles.inputError,
-            !editable && styles.inputDisabled,
-            inputStyle,
-          ]}
-          {...props}
-        />
+        {/* Input with optional password toggle */}
+        <View style={styles.inputWrapper}>
+          <TextInput
+            ref={ref}
+            value={value}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            editable={editable}
+            secureTextEntry={secureTextEntry && !showPassword}
+            placeholderTextColor={colors.dark.textTertiary}
+            accessible={true}
+            accessibilityLabel={label}
+            accessibilityHint={error || helper}
+            style={[
+              styles.input,
+              {
+                borderColor,
+                backgroundColor: `rgba(37, 37, 37, ${getBackgroundOpacity()})`,
+                color: editable ? colors.dark.textPrimary : colors.dark.textSecondary,
+              },
+              isFocused && styles.inputFocused,
+              error && styles.inputError,
+              !editable && styles.inputDisabled,
+              showPasswordToggle && secureTextEntry && styles.inputWithIcon,
+              inputStyle,
+            ]}
+            {...props}
+          />
+          
+          {/* Password visibility toggle */}
+          {showPasswordToggle && secureTextEntry && (
+            <Pressable
+              style={styles.toggleButton}
+              onPress={() => setShowPassword(!showPassword)}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+              accessibilityHint="Toggles password visibility"
+              hitSlop={8}
+            >
+              <Ionicons
+                name={showPassword ? 'eye-off' : 'eye'}
+                size={22}
+                color={isFocused ? colors.primary.default : colors.dark.textSecondary}
+              />
+            </Pressable>
+          )}
+        </View>
 
         {/* Helper or Error Text */}
         {(error || helper) && (
@@ -251,6 +286,9 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.medium,
   },
+  inputWrapper: {
+    position: 'relative',
+  },
   input: {
     minHeight: touchTargets.minimum,
     borderRadius: radius.md,
@@ -269,6 +307,9 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  inputWithIcon: {
+    paddingRight: touchTargets.minimum + spacing.sm, // Make room for icon
+  },
   inputFocused: {
     shadowColor: colors.primary.default,
     shadowOffset: { width: 0, height: 0 },
@@ -281,6 +322,16 @@ const styles = StyleSheet.create({
   },
   inputDisabled: {
     opacity: 0.5,
+  },
+  toggleButton: {
+    position: 'absolute',
+    right: spacing.md,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: touchTargets.minimum,
+    minHeight: touchTargets.minimum,
   },
   helperText: {
     fontSize: typography.fontSize.xs,

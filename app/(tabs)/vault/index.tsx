@@ -220,6 +220,7 @@ export default function VaultUnlockScreen() {
               onChangeText={setPassword}
               placeholder="Enter password"
               secureTextEntry
+              showPasswordToggle
               autoCapitalize="none"
               autoCorrect={false}
               returnKeyType="done"

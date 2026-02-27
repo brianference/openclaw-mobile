@@ -183,6 +183,7 @@ export default function SetupScreen() {
             onChangeText={handlePasswordChange}
             placeholder="Enter password"
             secureTextEntry
+            showPasswordToggle
             required
             error={errors.password}
             helper="8+ characters, 1 number, 1 special character"
@@ -206,6 +207,7 @@ export default function SetupScreen() {
             onChangeText={handleConfirmChange}
             placeholder="Re-enter password"
             secureTextEntry
+            showPasswordToggle
             required
             error={errors.confirm}
             autoCapitalize="none"
