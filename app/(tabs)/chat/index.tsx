@@ -20,6 +20,8 @@ import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import { useChatStore } from '../../../src/store/chat';
 import { useAuthStore } from '../../../src/store/auth';
 import { useSubscriptionStore } from '../../../src/store/subscription';
@@ -28,6 +30,7 @@ import { useTheme, Theme } from '../../../src/store/theme';
 import { Message } from '../../../src/types';
 import { getAttachmentUrl, takePhoto, pickVideo, recordVideo, validateFile } from '../../../src/lib/fileUpload';
 import UploadProgressIndicator, { UploadProgress } from '../../../src/components/UploadProgressIndicator';
+import { getDatabase } from '../../../src/lib/messageDatabase';
 
 function formatTime(dateStr: string): string {
   const d = new Date(dateStr);
@@ -207,6 +210,9 @@ function TypingDots({ colors }: { colors: Theme }) {
 export default function ChatScreen() {
   const [inputText, setInputText] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<(ImagePicker.ImagePickerAsset | DocumentPicker.DocumentPickerAsset)[]>([]);
+  const [searchVisible, setSearchVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Message[]>([]);
   const listRef = useRef<FlatList>(null);
   const { colors } = useTheme();
   const { profile, fetchProfile } = useAuthStore();
@@ -425,6 +431,75 @@ export default function ChatScreen() {
     );
   };
 
+  // US-067: Search messages
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    try {
+      const db = await getDatabase();
+      const results = await db.searchMessages(query, 20);
+      setSearchResults(results.map(r => ({
+        id: r.id,
+        conversation_id: r.conversation_id,
+        role: r.role as 'user' | 'assistant',
+        content: r.snippet, // Use snippet with search highlights
+        created_at: r.timestamp,
+        status: 'sent' as const,
+      })));
+    } catch (err) {
+      toast.show('Search failed', 'error');
+      console.error('Search error:', err);
+    }
+  };
+
+  // US-067: Export conversation
+  const handleExport = async (format: 'json' | 'txt' | 'csv') => {
+    if (!activeConversation) return;
+    
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    toast.show('Exporting...', 'info');
+    
+    try {
+      const db = await getDatabase();
+      let content = '';
+      let filename = '';
+      
+      switch (format) {
+        case 'json':
+          content = await db.exportToJSON(activeConversation.id);
+          filename = `chat-${activeConversation.id}-${Date.now()}.json`;
+          break;
+        case 'txt':
+          content = await db.exportToTXT(activeConversation.id);
+          filename = `chat-${activeConversation.id}-${Date.now()}.txt`;
+          break;
+        case 'csv':
+          content = await db.exportToCSV(activeConversation.id);
+          filename = `chat-${activeConversation.id}-${Date.now()}.csv`;
+          break;
+      }
+      
+      const path = `${FileSystem.documentDirectory}${filename}`;
+      await FileSystem.writeAsStringAsync(path, content);
+      
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(path, {
+          mimeType: format === 'json' ? 'application/json' : format === 'csv' ? 'text/csv' : 'text/plain',
+          dialogTitle: `Export Chat as ${format.toUpperCase()}`,
+        });
+        toast.show('Exported successfully', 'success');
+      } else {
+        toast.show(`Saved to ${filename}`, 'success');
+      }
+    } catch (err) {
+      toast.show('Export failed', 'error');
+      console.error('Export error:', err);
+    }
+  };
+
   if (!activeConversation) {
     return (
       <View style={[styles.container, { backgroundColor: colors.bg }]}>
@@ -520,7 +595,116 @@ export default function ChatScreen() {
             <Text style={[styles.creditsChipText, { color: colors.primary }]}>{profile.credits}</Text>
           </View>
         )}
+        
+        {/* US-067: Search button */}
+        <TouchableOpacity
+          style={styles.headerBtn}
+          onPress={() => setSearchVisible(!searchVisible)}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name={searchVisible ? "close" : "search"} size={22} color={colors.text} />
+        </TouchableOpacity>
+        
+        {/* US-067: Export button */}
+        <TouchableOpacity
+          style={styles.headerBtn}
+          onPress={() => {
+            if (Platform.OS === 'ios') {
+              ActionSheetIOS.showActionSheetWithOptions(
+                {
+                  options: ['Cancel', 'Export as JSON', 'Export as TXT', 'Export as CSV'],
+                  cancelButtonIndex: 0,
+                },
+                async (buttonIndex) => {
+                  if (buttonIndex === 1) await handleExport('json');
+                  if (buttonIndex === 2) await handleExport('txt');
+                  if (buttonIndex === 3) await handleExport('csv');
+                }
+              );
+            } else {
+              Alert.alert('Export Conversation', 'Choose export format:', [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'JSON', onPress: () => handleExport('json') },
+                { text: 'TXT', onPress: () => handleExport('txt') },
+                { text: 'CSV', onPress: () => handleExport('csv') },
+              ]);
+            }
+          }}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="download-outline" size={22} color={colors.text} />
+        </TouchableOpacity>
       </View>
+
+      {/* US-067: Search overlay */}
+      {searchVisible && (
+        <View style={[styles.searchOverlay, { backgroundColor: colors.bg }]}>
+          <View style={[styles.searchBar, { backgroundColor: colors.surface }]}>
+            <Ionicons name="search" size={20} color={colors.textMuted} />
+            <TextInput
+              style={[styles.searchInput, { color: colors.text }]}
+              placeholder="Search messages..."
+              placeholderTextColor={colors.textMuted}
+              value={searchQuery}
+              onChangeText={handleSearch}
+              autoFocus
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => { setSearchQuery(''); setSearchResults([]); }}>
+                <Ionicons name="close-circle" size={20} color={colors.textMuted} />
+              </TouchableOpacity>
+            )}
+          </View>
+          
+          {searchResults.length > 0 ? (
+            <FlatList
+              data={searchResults}
+              keyExtractor={(item, idx) => `search-${idx}`}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[styles.searchResult, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}
+                  onPress={() => {
+                    setSearchVisible(false);
+                    setSearchQuery('');
+                    setSearchResults([]);
+                    toast.show('Jump to message (coming soon)', 'info');
+                  }}
+                >
+                  <View style={styles.searchResultHeader}>
+                    <Ionicons 
+                      name={item.role === 'user' ? 'person' : 'flash'} 
+                      size={14} 
+                      color={item.role === 'user' ? colors.primary : colors.accent} 
+                    />
+                    <Text style={[styles.searchResultRole, { color: colors.textMuted }]}>
+                      {item.role === 'user' ? 'You' : 'Assistant'}
+                    </Text>
+                    <Text style={[styles.searchResultTime, { color: colors.textMuted }]}>
+                      {formatTime(item.created_at)}
+                    </Text>
+                  </View>
+                  <Text style={[styles.searchResultText, { color: colors.text }]} numberOfLines={3}>
+                    {item.content}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          ) : searchQuery.length >= 2 ? (
+            <View style={styles.emptyCenter}>
+              <Ionicons name="search-outline" size={40} color={colors.textMuted} />
+              <Text style={[styles.emptySearchText, { color: colors.textDim }]}>
+                No results for "{searchQuery}"
+              </Text>
+            </View>
+          ) : searchQuery.length > 0 ? (
+            <View style={styles.emptyCenter}>
+              <Text style={[styles.emptySearchText, { color: colors.textDim }]}>
+                Type at least 2 characters to search
+              </Text>
+            </View>
+          ) : null}
+        </View>
+      )}
 
       <FlatList
         ref={listRef}
@@ -744,5 +928,62 @@ const styles = StyleSheet.create({
   fileSize: {
     fontSize: 11,
     marginLeft: 8,
+  },
+  // US-067: Search & Export styles
+  headerBtn: {
+    padding: 8,
+    marginLeft: 8,
+  },
+  searchOverlay: {
+    position: 'absolute',
+    top: 60,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
+    padding: 16,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    marginBottom: 12,
+    gap: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 2,
+  },
+  searchResult: {
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 8,
+    borderBottomWidth: 1,
+  },
+  searchResultHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  searchResultRole: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  searchResultTime: {
+    fontSize: 11,
+    marginLeft: 'auto',
+  },
+  searchResultText: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  emptySearchText: {
+    fontSize: 15,
+    textAlign: 'center',
+    marginTop: 12,
   },
 });
