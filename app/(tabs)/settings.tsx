@@ -439,6 +439,13 @@ export default function SettingsScreen() {
           colors={colors}
           onPress={() => setShowEditProfile(true)}
         />
+        <SettingRow
+          icon="person-circle-outline"
+          title="User Profile"
+          subtitle="View stats and connected services"
+          colors={colors}
+          onPress={() => Linking.openURL('exp://profile')}
+        />
       </View>
 
       <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>ABOUT</Text>

@@ -62,6 +62,30 @@ export default function TabLayout() {
           <Ionicons name={focused ? 'map' : 'map-outline'} size={24} color={color} />
         ),
       }} />
+      <Tabs.Screen name="agents" options={{
+        title: 'Agents',
+        tabBarIcon: ({ color, focused }) => (
+          <Ionicons name={focused ? 'pulse' : 'pulse-outline'} size={24} color={color} />
+        ),
+      }} />
+      <Tabs.Screen name="apps" options={{
+        title: 'Apps',
+        tabBarIcon: ({ color, focused }) => (
+          <Ionicons name={focused ? 'rocket' : 'rocket-outline'} size={24} color={color} />
+        ),
+      }} />
+      <Tabs.Screen name="costs" options={{
+        title: 'Costs',
+        tabBarIcon: ({ color, focused }) => (
+          <Ionicons name={focused ? 'stats-chart' : 'stats-chart-outline'} size={24} color={color} />
+        ),
+      }} />
+      <Tabs.Screen name="logs" options={{
+        title: 'Logs',
+        tabBarIcon: ({ color, focused }) => (
+          <Ionicons name={focused ? 'document-text' : 'document-text-outline'} size={24} color={color} />
+        ),
+      }} />
       <Tabs.Screen name="settings" options={{
         title: 'Settings',
         tabBarIcon: ({ color, focused }) => (
